@@ -1,0 +1,107 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Modifier la société : ' ~ company.name) %}
+
+
+
+{% block body %}
+
+    {% for msg in app.flashes('error') %}
+        {{ component('Alert', {type: 'error', text: msg}) }}
+    {% endfor %}
+
+    {% for msg in app.flashes('success') %}
+        {{ component('Alert', {type: 'success', text: msg}) }}
+    {% endfor %}
+
+    <div class="ui segment">
+        <h1><i class="green save icon"></i>{{ company.name }}</h1>
+        <br>
+
+        {{ component('Modal', { title: "Souhaitez-vous supprimer la société ?", text: "", url: path('app.dashboard.index') }) }}
+
+        <div class="ui form">
+            {{ form_start(companyForm) }}
+            <div class="field">
+                <label for="company_name">Nom de la société</label>
+                {{ form_row(companyForm.name) }}
+            </div>
+
+            <div class="four fields">
+                <div class="field">
+                    <label for="company_address1">Adresse 1</label>
+                    {{ form_row(companyForm.address1) }}
+                </div>
+
+                <div class="field">
+                    <label for="company_address2">Adresse 2</label>
+                    {{ form_row(companyForm.address2) }}
+                </div>
+
+                <div class="field">
+                    <label for="company_cop">Code Postal</label>
+                    {{ form_row(companyForm.cop) }}
+                </div>
+
+                <div class="field">
+                    <label for="company_city">Ville</label>
+                    {{ form_row(companyForm.city) }}
+                </div>
+            </div>
+
+            <div class="field">
+                {{ form_widget(companyForm.submit, {label_html: true}) }} <a class="ui basic red button" href="{{ path('app.dashboard.delete_company', {id: company.id}) }}"><i class="trash icon"></i>Supprimer la société</a>
+                <button type="button" onclick="$('.ui.mini.modal').modal('show')" class="ui basic purple button">Modal</button>
+            </div>
+            {{ form_end(companyForm) }}
+
+
+        </div>
+
+        {{ component('Hr', { icon: 'warehouse', text: 'Dépôts' }) }}
+
+        <a class="ui basic blue button" href="{{ path('app.dashboard.create.deposit', { id: company.id }) }}">
+            <i class="plus icon"></i>
+            Nouveau dépôt
+        </a><br><br>
+
+        <div class="depots">
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th class="gerer">Gérer</th>
+                        <th>Nom</th>
+                        <th>Adresse</th>
+                        <th>Ville</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for deposit in deposits %}
+                    <tr>
+                        <td class="gerer"><a href="{{ path('app.dashboard.update.deposit', {id: deposit.id}) }}"><i class="large blue cogs icon"></i></a></td>
+                        <td>{{ deposit.name }}</td>
+                        <td>{{ deposit.address2 ? deposit.address1 ~ ' | ' ~ deposit.address2 : deposit.address1 }}</td>
+                        <td>{{ deposit.cop ~ ' ' ~ deposit.city }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {{ component('Hr', { icon: 'users', text: 'Utilisateurs' }) }}
+
+        <div class="utilisateurs">
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th class="gerer">Gérer</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Adresse Email</th>
+                        <th>Dépôts</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Créer une société') %}
+
+{% block body %}
+    <div class="ui segment">
+        <h1><i class="blue plus icon"></i>Créer une société</h1>
+        <br>
+
+        <div class="ui form">
+            {{ form_start(companyForm) }}
+            <div class="field">
+                <label for="company_name">Nom de la société</label>
+                {{ form_row(companyForm.name) }}
+            </div>
+
+            <div class="four fields">
+                <div class="field">
+                    <label for="company_address1">Adresse 1</label>
+                    {{ form_row(companyForm.address1) }}
+                </div>
+
+                <div class="field">
+                    <label for="company_address2">Adresse 2</label>
+                    {{ form_row(companyForm.address2) }}
+                </div>
+
+                <div class="field">
+                    <label for="company_cop">Code Postal</label>
+                    {{ form_row(companyForm.cop) }}
+                </div>
+
+                <div class="field">
+                    <label for="company_city">Ville</label>
+                    {{ form_row(companyForm.city) }}
+                </div>
+            </div>
+
+
+            <div class="field">
+                {{ form_row(companyForm.submit, {label_html: true}) }}
+            </div>
+            {{ form_end(companyForm) }}
+        </div>
+    </div>
+{% endblock %}
