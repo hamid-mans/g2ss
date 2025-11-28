@@ -88,6 +88,11 @@
 
         {{ component('Hr', { icon: 'users', text: 'Utilisateurs' }) }}
 
+        <a  class="ui basic purple button" href="{{ path('app.dashboard.create_user', { id: company.id }) }}">
+            <i class="magic icon"></i>
+            Générer un utilisateur
+            </a><br><br>
+
         <div class="utilisateurs">
             <table class="ui celled table">
                 <thead>

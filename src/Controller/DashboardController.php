@@ -6,13 +6,16 @@ namespace App\Controller;
 
 use App\Entity\Company;
 use App\Entity\Deposit;
+use App\Entity\User;
 use App\Form\CompanyType;
 use App\Form\DepositType;
+use App\Form\GenerateUserType;
 use App\Repository\CompanyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -164,6 +167,45 @@ class DashboardController extends AbstractController
         $this->addFlash('success', 'Dépôt supprimée avec succès');
 
         return $this->redirectToRoute('app.dashboard.update_company', ['id' => $companyId]);
+    }
+
+    // #### UTILISATEURS ####
+
+    #[isGranted('ROLE_SA')]
+    #[Route('/generer-utilisateur/{id}', name: 'app.dashboard.create_user')]
+    public function createUser(UserPasswordHasherInterface $hasher, EntityManagerInterface $entityManager, Company $company, Request $request): Response
+    {
+        $user = new User();
+        $userForm = $this->createForm(GenerateUserType::class, $user, [
+            'submit_label' => '<i class="plus icon"></i>Enregistrer',
+            'submit_class' => 'ui basic blue button',
+            'company' => $company,
+        ]);
+        $userForm->handleRequest($request);
+
+
+        if ($userForm->isSubmitted() && $userForm->isValid()) {
+            $user->setCompany($company);
+            $user->setRoles(['ROLE_USER']);
+            $user->setPassword($hasher->hashPassword($user, $userForm->get('plainPassword')->getData()));
+
+            foreach ($userForm->getData()->getDeposits() as $deposit)
+            {
+                $user->addDeposit($deposit);
+            }
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', "L'utilisateur a bien été créé");
+
+            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $company->getId()]);
+        }
+
+        return $this->render('dashboard/user/create.html.twig', [
+            'id' => $company->getId(),
+            'userForm' => $userForm->createView(),
+        ]);
     }
 
 }
