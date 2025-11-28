@@ -18,8 +18,6 @@
         <h1><i class="green save icon"></i>{{ company.name }}</h1>
         <br>
 
-        {{ component('Modal', { title: "Souhaitez-vous supprimer la société ?", text: "", url: path('app.dashboard.index') }) }}
-
         <div class="ui form">
             {{ form_start(companyForm) }}
             <div class="field">
@@ -50,8 +48,8 @@
             </div>
 
             <div class="field">
-                {{ form_widget(companyForm.submit, {label_html: true}) }} <a class="ui basic red button" href="{{ path('app.dashboard.delete_company', {id: company.id}) }}"><i class="trash icon"></i>Supprimer la société</a>
-                <button type="button" onclick="$('.ui.mini.modal').modal('show')" class="ui basic purple button">Modal</button>
+                {{ component('Modal', { title: "Souhaitez-vous supprimer la société ?", text: "En supprimant la société, plus aucun utilisateur ne pourra y avoir accés, et toutes les données seront supprimées.", url: path('app.dashboard.delete_company', {id: company.id}) }) }}
+                {{ form_widget(companyForm.submit, {label_html: true}) }} <button type="button" onclick="$('.ui.mini.modal').modal('show')" class="ui basic red button"><i class="trash icon"></i>Supprimer la société</button>
             </div>
             {{ form_end(companyForm) }}
 

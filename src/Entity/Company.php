@@ -33,13 +33,13 @@ class Company
     /**
      * @var Collection<int, User>
      */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'company')]
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'company', cascade: ['remove'])]
     private Collection $users;
 
     /**
      * @var Collection<int, Deposit>
      */
-    #[ORM\OneToMany(targetEntity: Deposit::class, mappedBy: 'company')]
+    #[ORM\OneToMany(targetEntity: Deposit::class, mappedBy: 'company', cascade: ['remove'])]
     private Collection $deposits;
 
     public function __construct()

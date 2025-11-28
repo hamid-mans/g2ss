@@ -1,21 +1,27 @@
+<style>
+    .inmodal {
+        padding: 20px;
+        line-height: 28px;
+    }
+</style>
+
 <div class="ui mini modal">
     <div class="header">
         {{ title }}
     </div>
 
-    <div class="description">
-        <p>
-            {{ text }}
-        </p>
+    <div class="inmodal">
+        {{ text }}
     </div>
 
     <div class="actions">
-        <button class="ui black deny button">
+        <button class="ui basic black deny button">
+            <i class="minus icon"></i>
             Annuler
         </button>
-        <a href="{{ url }}" class="ui positive right labeled icon button">
-            Confirmer
+        <a href="{{ url }}" class="ui basic positive right button">
             <i class="checkmark icon"></i>
+            Confirmer
         </a>
     </div>
 </div>
