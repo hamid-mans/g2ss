@@ -11,6 +11,7 @@ use App\Form\CompanyType;
 use App\Form\DepositType;
 use App\Form\GenerateUserType;
 use App\Repository\CompanyRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,11 +20,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/dashboard')]
+#[Route('/dashboard', 'app.dashboard.')]
 class DashboardController extends AbstractController
 {
     #[isGranted('ROLE_SA')]
-    #[Route('/', name: 'app.dashboard.index')]
+    #[Route('/', name: 'index')]
     public function index(CompanyRepository $companyRepository): Response
     {
         return $this->render('dashboard/dashboard.html.twig', [
@@ -32,7 +33,7 @@ class DashboardController extends AbstractController
     }
 
     #[isGranted('ROLE_SA')]
-    #[Route('/nouvelle-societe', name: 'app.dashboard.create_company')]
+    #[Route('/nouvelle-societe', name: 'create_company')]
     public function createCompany(EntityManagerInterface $entityManager, Request $request): Response
     {
         $company = new Company();
@@ -58,9 +59,11 @@ class DashboardController extends AbstractController
     }
 
     #[isGranted('ROLE_SA')]
-    #[Route('/modifier/{id}', name: 'app.dashboard.update_company')]
-    public function updateCompany(EntityManagerInterface $entityManager, Company $company, Request $request): Response
+    #[Route('/modifier/{id}', name: 'update_company')]
+    public function updateCompany(UserRepository $userRepository, EntityManagerInterface $entityManager, Company $company, Request $request): Response
     {
+        $users = $userRepository->findBy(['company' => $company], ['lastname' => 'ASC']);
+
         $updateForm = $this->createForm(CompanyType::class, $company, [
             'submit_label' => '<i class="save icon"></i>Mettre à jour',
             'submit_class' => 'ui basic green button'
@@ -80,11 +83,12 @@ class DashboardController extends AbstractController
             'company' => $company,
             'companyForm' => $updateForm->createView(),
             'deposits' => $company->getDeposits(),
+            'users' => $users,
         ]);
     }
 
     #[isGranted('ROLE_SA')]
-    #[Route('/supprimer/{id}', name: 'app.dashboard.delete_company')]
+    #[Route('/supprimer/{id}', name: 'delete_company')]
     public function deleteCompany(Company $company, EntityManagerInterface $entityManager): Response
     {
         $entityManager->remove($company);
@@ -101,7 +105,7 @@ class DashboardController extends AbstractController
     // ##### DEPOSITS #####
 
     #[isGranted('ROLE_SA')]
-    #[Route('/nouveau-depot/{id}', 'app.dashboard.create.deposit')]
+    #[Route('/nouveau-depot/{id}', 'create.deposit')]
     public function createDeposit(Company $company, EntityManagerInterface $entityManager, Request $request): Response
     {
         $deposit = new Deposit();
@@ -130,10 +134,9 @@ class DashboardController extends AbstractController
     }
 
     #[isGranted('ROLE_SA')]
-    #[Route('/modifier-depot/{id}', 'app.dashboard.update.deposit')]
-    public function updateDeposit(Deposit $deposit, EntityManagerInterface $entityManager, Request $request): Response
+    #[Route('/modifier-depot/{id}', 'update.deposit')]
+    public function updateDeposit(UserRepository $userRepository, Deposit $deposit, EntityManagerInterface $entityManager, Request $request): Response
     {
-
         $depositForm = $this->createForm(DepositType::class, $deposit, [
             'submit_label' => '<i class="save icon"></i>Mettre à jour',
             'submit_class' => 'ui basic green button'
@@ -152,12 +155,12 @@ class DashboardController extends AbstractController
         }
         return $this->render('dashboard/deposit/update.html.twig', [
             'depositForm' => $depositForm->createView(),
-            'deposit' => $deposit,
+            'deposit' => $deposit
         ]);
     }
 
     #[isGranted('ROLE_SA')]
-    #[Route('/supprimer-depot/{id}', name: 'app.dashboard.delete_deposit')]
+    #[Route('/supprimer-depot/{id}', name: 'delete_deposit')]
     public function deleteDeposit(Deposit $deposit, EntityManagerInterface $entityManager): Response
     {
         $companyId = $deposit->getCompany()->getId();
@@ -172,7 +175,7 @@ class DashboardController extends AbstractController
     // #### UTILISATEURS ####
 
     #[isGranted('ROLE_SA')]
-    #[Route('/generer-utilisateur/{id}', name: 'app.dashboard.create_user')]
+    #[Route('/generer-utilisateur/{id}', name: 'create_user')]
     public function createUser(UserPasswordHasherInterface $hasher, EntityManagerInterface $entityManager, Company $company, Request $request): Response
     {
         $user = new User();
@@ -205,6 +208,26 @@ class DashboardController extends AbstractController
         return $this->render('dashboard/user/create.html.twig', [
             'id' => $company->getId(),
             'userForm' => $userForm->createView(),
+        ]);
+    }
+
+    #[isGranted('ROLE_SA')]
+    #[Route('/modifier-utilisateur/{id}', name: 'update_user')]
+    public function updateUser(UserRepository $userRepository, User $user, EntityManagerInterface $entityManager, Request $request): Response
+    {
+        $userForm = $this->createForm(GenerateUserType::class, $user, [
+            'submit_label' => '<i class="save icon"></i>Enregistrer',
+            'submit_class' => 'ui basic blue button'
+        ]);
+        $userForm->handleRequest($request);
+
+        if ($userForm->isSubmitted() && $userForm->isValid()) {
+
+        }
+
+        return $this->render('dashboard/user/update.html.twig', [
+            'userForm' => $userForm->createView(),
+            'user' => $user
         ]);
     }
 

@@ -15,7 +15,7 @@
     {% endfor %}
 
     <div class="ui segment">
-        <h1><i class="green save icon"></i>{{ company.name }}</h1>
+        <h1><i class="green save icon"></i>Société : {{ company.name }}</h1>
         <br>
 
         <div class="ui form">
@@ -104,6 +104,21 @@
                         <th>Dépôts</th>
                     </tr>
                 </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td class="gerer"><a href="{{ path('app.dashboard.update_user', {id: user.id}) }}"><i class="large blue cogs icon"></i></a></td>
+                            <td>{{ user.lastname }}</td>
+                            <td>{{ user.firstname }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% for deposit in user.deposits %}
+                                    {{ deposit.name }}{% if not loop.last %} | {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
