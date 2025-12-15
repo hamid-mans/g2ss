@@ -8,7 +8,8 @@ services:
       MYSQL_USER: g2ss
       MYSQL_PASSWORD: g2ss
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pg2s>      interval: 10s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pg2ss"]
+      interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
@@ -27,7 +28,8 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset>      MAILER_DSN: "smtp://mailer:1025"
+      DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
+      MAILER_DSN: "smtp://mailer:1025"
     volumes:
       - .:/app
     ports:
