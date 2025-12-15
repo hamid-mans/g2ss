@@ -9,7 +9,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-RUN chmod +x /entrypoint.sh
+# entrypoint.sh est à la racine du repo
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod 755 /entrypoint.sh
 
 EXPOSE 8000
 
