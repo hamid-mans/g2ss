@@ -20,7 +20,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/administration', 'app.dashboard.')]
+#[Route('/administration', 'app.admin.')]
 class AdminController extends AbstractController
 {
     #[isGranted('ROLE_SA')]
