@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Saira:ital,wght@0,100..900;1,100..900&display=swap');
+
+html, body {
+    padding: 0;
+    margin: 0;
+    background-color: #f0f9ff;
+}
+
+.navbar {
+    position: fixed;
+
+    height: 100%;
+    width: 250px;
+    background-color: #13212d;
+    color: white;
+
+    box-shadow: 0 0 20px #13212d;
+}
+
+.navbar .flexy {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 85%;
+}
+
+.navbar .bottom-bar a li{
+    background-color: #d36464;
+}
+.navbar .bottom-bar a li {
+    text-transform: initial !important;
+}
+.navbar .bottom-bar a li:hover {
+    background-color: #f14747 !important;
+}
+
+.navbar h1.title {
+    text-align: center;
+    margin-top: 40px;
+    letter-spacing: 10px;
+    font-size: 48px;
+}
+
+.navbar nav {
+    margin-top: 50px;
+}
+
+.navbar nav ul {
+    padding: 0;
+    margin: 0;
+}
+
+.navbar nav ul a li {
+    list-style-type: none;
+    background-color: red;
+    margin: 20px 30px 20px 30px;
+    padding: 13px 10px 13px 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition-duration: 0.3s;
+}
+
+.navbar nav ul a li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transition-duration: 0.3s;
+}
+
+.navbar nav ul a li i {
+    margin-right: 13px;
+}
+
+.navbar nav ul a li {
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 2px;
+}

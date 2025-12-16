@@ -1,0 +1,52 @@
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>G2SS - {% block title %}{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.js"></script>
+        <link rel="stylesheet" href="{{ asset('styles/panel.css') }}">
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+
+        <div class="navbar">
+            <h1 class="title">
+                G2SS
+            </h1>
+
+            <div class="flexy">
+                <nav>
+                    <ul>
+                        <a href=""><li><i class="store icon"></i> Accueil</li></a>
+                        <a href=""><li><i class="box icon"></i>Produits</li></a>
+                        <a href=""><li><i class="warehouse icon"></i> Dépôts</li></a>
+                    </ul>
+                </nav>
+
+                <div class="bottom-bar">
+                    <div>
+                        <nav>
+                            <ul>
+                                <a href=""><li><i class="user icon"></i> Hamid</li></a>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="content">
+            {% block body %}{% endblock %}
+            <script src="{{ asset('js/main.js') }}"></script>
+        </div>
+        <br>
+    </body>
+</html>
