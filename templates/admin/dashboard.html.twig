@@ -27,7 +27,7 @@
             <tbody>
             {% for company in companies %}
                 <tr>
-                    <td class="gerer"><a href="{{ path('app.dashboard.update_company', {id: company.id}) }}"><i class="large blue cogs icon"></i></a></td>
+                    <td class="gerer"><a href="{{ path('app.admin.update_company', {id: company.id}) }}"><i class="large blue cogs icon"></i></a></td>
                     <td><b>{{ company.name }}</b></td>
                     <td>{{ company.cop ~ ' ' ~ company.city }}</td>
                 </tr>
