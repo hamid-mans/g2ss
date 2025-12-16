@@ -70,4 +70,3 @@ class GenerateUserType extends AbstractType
         ]);
     }
 }
-//
