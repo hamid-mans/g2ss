@@ -59,44 +59,58 @@ class DashboardController extends AbstractController
     }
 
     #[isGranted('ROLE_SA')]
-    #[Route('/modifier/{id}', name: 'update_company')]
-    public function updateCompany(UserRepository $userRepository, EntityManagerInterface $entityManager, Company $company, Request $request): Response
+    #[Route('/modifier-societe/{id}', name: 'update_company')]
+    public function updateCompany(UserRepository $userRepository, EntityManagerInterface $entityManager, ?Company $company, Request $request): Response
     {
-        $users = $userRepository->findBy(['company' => $company], ['lastname' => 'ASC']);
+        if($company)
+        {
+            $users = $userRepository->findBy(['company' => $company], ['lastname' => 'ASC']);
 
-        $updateForm = $this->createForm(CompanyType::class, $company, [
-            'submit_label' => '<i class="save icon"></i>Mettre à jour',
-            'submit_class' => 'ui basic green button'
-        ]);
-        $updateForm->handleRequest($request);
+            $updateForm = $this->createForm(CompanyType::class, $company, [
+                'submit_label' => '<i class="save icon"></i>Mettre à jour',
+                'submit_class' => 'ui basic green button'
+            ]);
+            $updateForm->handleRequest($request);
 
-        if ($updateForm->isSubmitted() && $updateForm->isValid()) {
-            $company->setName(strtoupper($company->getName()));
-            $entityManager->flush();
+            if ($updateForm->isSubmitted() && $updateForm->isValid()) {
+                $company->setName(strtoupper($company->getName()));
+                $entityManager->flush();
 
-            $this->addFlash('success', 'La société a bien été mise à jour');
+                $this->addFlash('success', 'La société a bien été mise à jour');
 
+                return $this->redirectToRoute('app.dashboard.index');
+            }
+
+            return $this->render('dashboard/company/update.html.twig', [
+                'company' => $company,
+                'companyForm' => $updateForm->createView(),
+                'deposits' => $company->getDeposits(),
+                'users' => $users,
+            ]);
+        }
+        else
+        {
             return $this->redirectToRoute('app.dashboard.index');
         }
-
-        return $this->render('dashboard/company/update.html.twig', [
-            'company' => $company,
-            'companyForm' => $updateForm->createView(),
-            'deposits' => $company->getDeposits(),
-            'users' => $users,
-        ]);
     }
 
     #[isGranted('ROLE_SA')]
-    #[Route('/supprimer/{id}', name: 'delete_company')]
-    public function deleteCompany(Company $company, EntityManagerInterface $entityManager): Response
+    #[Route('/supprimer-societe/{id}', name: 'delete_company')]
+    public function deleteCompany(?Company $company, EntityManagerInterface $entityManager): Response
     {
-        $entityManager->remove($company);
-        $entityManager->flush();
+        if($company)
+        {
+            $entityManager->remove($company);
+            $entityManager->flush();
 
-        $this->addFlash('success', 'Société supprimée avec succès');
+            $this->addFlash('success', 'Société supprimée avec succès');
 
-        return $this->redirectToRoute('app.dashboard.index');
+            return $this->redirectToRoute('app.dashboard.index');
+        }
+        else
+        {
+            return $this->redirectToRoute('app.dashboard.index');
+        }
     }
 
 
@@ -106,70 +120,91 @@ class DashboardController extends AbstractController
 
     #[isGranted('ROLE_SA')]
     #[Route('/nouveau-depot/{id}', 'create.deposit')]
-    public function createDeposit(Company $company, EntityManagerInterface $entityManager, Request $request): Response
+    public function createDeposit(?Company $company, EntityManagerInterface $entityManager, Request $request): Response
     {
-        $deposit = new Deposit();
+        if($company)
+        {
+            $deposit = new Deposit();
 
-        $depositForm = $this->createForm(DepositType::class, $deposit, [
-            'submit_label' => '<i class="plus icon"></i>Enregistrer',
-            'submit_class' => 'ui basic blue button'
-        ]);
-        $depositForm->handleRequest($request);
+            $depositForm = $this->createForm(DepositType::class, $deposit, [
+                'submit_label' => '<i class="plus icon"></i>Enregistrer',
+                'submit_class' => 'ui basic blue button'
+            ]);
+            $depositForm->handleRequest($request);
 
-        if ($depositForm->isSubmitted() && $depositForm->isValid()) {
-            $deposit->setCompany($company);
-            $deposit->setName(strtoupper($deposit->getName()));
-            $entityManager->persist($deposit);
+            if ($depositForm->isSubmitted() && $depositForm->isValid()) {
+                $deposit->setCompany($company);
+                $deposit->setName(strtoupper($deposit->getName()));
+                $entityManager->persist($deposit);
 
-            $entityManager->flush();
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Le dépôt a été ajouté avec succès');
+                $this->addFlash('success', 'Le dépôt a été ajouté avec succès');
 
-            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
+                return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
+            }
+            return $this->render('dashboard/deposit/create.html.twig', [
+                'company' => $company,
+                'depositForm' => $depositForm->createView(),
+            ]);
         }
-        return $this->render('dashboard/deposit/create.html.twig', [
-            'company' => $company,
-            'depositForm' => $depositForm->createView(),
-        ]);
+        else
+        {
+            return $this->redirectToRoute('app.dashboard.index');
+        }
     }
 
     #[isGranted('ROLE_SA')]
     #[Route('/modifier-depot/{id}', 'update.deposit')]
-    public function updateDeposit(UserRepository $userRepository, Deposit $deposit, EntityManagerInterface $entityManager, Request $request): Response
+    public function updateDeposit(UserRepository $userRepository, ?Deposit $deposit, EntityManagerInterface $entityManager, Request $request): Response
     {
-        $depositForm = $this->createForm(DepositType::class, $deposit, [
-            'submit_label' => '<i class="save icon"></i>Mettre à jour',
-            'submit_class' => 'ui basic green button'
-        ]);
-        $depositForm->handleRequest($request);
+        if($deposit)
+        {
+            $depositForm = $this->createForm(DepositType::class, $deposit, [
+                'submit_label' => '<i class="save icon"></i>Mettre à jour',
+                'submit_class' => 'ui basic green button'
+            ]);
+            $depositForm->handleRequest($request);
 
-        if ($depositForm->isSubmitted() && $depositForm->isValid()) {
-            $deposit->setName(strtoupper($deposit->getName()));
-            $entityManager->persist($deposit);
+            if ($depositForm->isSubmitted() && $depositForm->isValid()) {
+                $deposit->setName(strtoupper($deposit->getName()));
+                $entityManager->persist($deposit);
 
-            $entityManager->flush();
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Le dépôt a été modifié avec succès');
+                $this->addFlash('success', 'Le dépôt a été modifié avec succès');
 
-            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
+                return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
+            }
+            return $this->render('dashboard/deposit/update.html.twig', [
+                'depositForm' => $depositForm->createView(),
+                'deposit' => $deposit
+            ]);
         }
-        return $this->render('dashboard/deposit/update.html.twig', [
-            'depositForm' => $depositForm->createView(),
-            'deposit' => $deposit
-        ]);
+        else
+        {
+            return $this->redirectToRoute('app.dashboard.index');
+        }
     }
 
     #[isGranted('ROLE_SA')]
     #[Route('/supprimer-depot/{id}', name: 'delete_deposit')]
-    public function deleteDeposit(Deposit $deposit, EntityManagerInterface $entityManager): Response
+    public function deleteDeposit(?Deposit $deposit, EntityManagerInterface $entityManager): Response
     {
-        $companyId = $deposit->getCompany()->getId();
-        $entityManager->remove($deposit);
-        $entityManager->flush();
+        if($deposit)
+        {
+            $companyId = $deposit->getCompany()->getId();
+            $entityManager->remove($deposit);
+            $entityManager->flush();
 
-        $this->addFlash('success', 'Dépôt supprimée avec succès');
+            $this->addFlash('success', 'Dépôt supprimée avec succès');
 
-        return $this->redirectToRoute('app.dashboard.update_company', ['id' => $companyId]);
+            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $companyId]);
+        }
+        else
+        {
+            return $this->redirectToRoute('app.dashboard.index');
+        }
     }
 
     // #### UTILISATEURS ####
@@ -213,22 +248,48 @@ class DashboardController extends AbstractController
 
     #[isGranted('ROLE_SA')]
     #[Route('/modifier-utilisateur/{id}', name: 'update_user')]
-    public function updateUser(UserRepository $userRepository, User $user, EntityManagerInterface $entityManager, Request $request): Response
+    public function updateUser(UserRepository $userRepository, ?User $user, EntityManagerInterface $entityManager, Request $request): Response
     {
-        $userForm = $this->createForm(GenerateUserType::class, $user, [
-            'submit_label' => '<i class="save icon"></i>Enregistrer',
-            'submit_class' => 'ui basic blue button'
-        ]);
-        $userForm->handleRequest($request);
+        if($user)
+        {
+            $userForm = $this->createForm(GenerateUserType::class, $user, [
+                'submit_label' => '<i class="save icon"></i>Mettre à jour',
+                'submit_class' => 'ui basic green button'
+            ]);
+            $userForm->handleRequest($request);
 
-        if ($userForm->isSubmitted() && $userForm->isValid()) {
+            if ($userForm->isSubmitted() && $userForm->isValid()) {
 
+            }
+
+            return $this->render('dashboard/user/update.html.twig', [
+                'userForm' => $userForm->createView(),
+                'user' => $user
+            ]);
         }
+        else
+        {
+            return $this->redirectToRoute('app.dashboard.index');
+        }
+    }
 
-        return $this->render('dashboard/user/update.html.twig', [
-            'userForm' => $userForm->createView(),
-            'user' => $user
-        ]);
+    #[isGranted('ROLE_SA')]
+    #[Route('/supprimer-utilisateur/{id}', name: 'delete_user')]
+    public function deleteUser(UserRepository $userRepository, ?User $user, EntityManagerInterface $entityManager, Request $request): Response
+    {
+        if($user)
+        {
+            $companyId = $user->getCompany()->getId();
+
+            $entityManager->remove($user);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $companyId]);
+        }
+        else
+        {
+            return $this->redirectToRoute('app.dashboard.index');
+        }
     }
 
 }

@@ -32,7 +32,7 @@ class GenerateUserType extends AbstractType
             ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => false,
-                'mapped' => false,
+                'mapped' => false
             ])
             ->add('deposits', EntityType::class, [
                 'class' => Deposit::class,
