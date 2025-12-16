@@ -27,7 +27,7 @@ class AdminController extends AbstractController
     #[Route('/', name: 'index')]
     public function index(CompanyRepository $companyRepository): Response
     {
-        return $this->render('dashboard/dashboard.html.twig', [
+        return $this->render('admin/dashboard.html.twig', [
             'companies' => $companyRepository->findAll(),
         ]);
     }
@@ -53,7 +53,7 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('app.dashboard.index');
         }
 
-        return $this->render('dashboard/company/create.html.twig', [
+        return $this->render('admin/company/create.html.twig', [
             'companyForm' => $createForm->createView(),
         ]);
     }
@@ -81,7 +81,7 @@ class AdminController extends AbstractController
                 return $this->redirectToRoute('app.dashboard.index');
             }
 
-            return $this->render('dashboard/company/update.html.twig', [
+            return $this->render('admin/company/update.html.twig', [
                 'company' => $company,
                 'companyForm' => $updateForm->createView(),
                 'deposits' => $company->getDeposits(),
@@ -143,7 +143,7 @@ class AdminController extends AbstractController
 
                 return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
             }
-            return $this->render('dashboard/deposit/create.html.twig', [
+            return $this->render('admin/deposit/create.html.twig', [
                 'company' => $company,
                 'depositForm' => $depositForm->createView(),
             ]);
@@ -176,7 +176,7 @@ class AdminController extends AbstractController
 
                 return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
             }
-            return $this->render('dashboard/deposit/update.html.twig', [
+            return $this->render('admin/deposit/update.html.twig', [
                 'depositForm' => $depositForm->createView(),
                 'deposit' => $deposit
             ]);
@@ -240,7 +240,7 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('app.dashboard.update_company', ['id' => $company->getId()]);
         }
 
-        return $this->render('dashboard/user/create.html.twig', [
+        return $this->render('admin/user/create.html.twig', [
             'id' => $company->getId(),
             'userForm' => $userForm->createView(),
         ]);
@@ -262,7 +262,7 @@ class AdminController extends AbstractController
 
             }
 
-            return $this->render('dashboard/user/update.html.twig', [
+            return $this->render('admin/user/update.html.twig', [
                 'userForm' => $userForm->createView(),
                 'user' => $user
             ]);

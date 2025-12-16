@@ -6,7 +6,7 @@
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.css">
         <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.js"></script>
-        <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
+        <link rel="stylesheet" href="{{ asset('styles/panel.css') }}">
         {% block stylesheets %}
         {% endblock %}
 
@@ -15,20 +15,34 @@
         {% endblock %}
     </head>
     <body>
-    <div class="ui secondary menu">
-        {% if app.user %}
-            <a href="{{ path('app.dashboard.index') }}" class="item">
-                Sociétés
-            </a>
-            <a href="{{ path('app.security.logout') }}" class="item">
-                Déconnexion
-            </a>
-        {% else %}
-            <a href="{{ path('app.security.login') }}" class="item">
-                Se connecter
-            </a>
-        {% endif %}
-    </div>
+
+        <div class="navbar">
+            <h1 class="title">
+                G2SS
+            </h1>
+
+            <div class="flexy">
+                <nav>
+                    <ul>
+                        <a href=""><li><i class="store icon"></i> Accueil</li></a>
+                        <a href=""><li><i class="box icon"></i>Produits</li></a>
+                        <a href=""><li><i class="warehouse icon"></i> Dépôts</li></a>
+                    </ul>
+                </nav>
+
+                <div class="bottom-bar">
+                    <div>
+                        <nav>
+                            <ul>
+                                <a href=""><li><i class="user icon"></i> Hamid</li></a>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         <div class="content">
             {% block body %}{% endblock %}
             <script src="{{ asset('js/main.js') }}"></script>

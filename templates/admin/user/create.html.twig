@@ -1,10 +1,10 @@
-{% extends 'layouts/dashboard.base.html.twig' %}
+{% extends 'layouts/admin.base.html.twig' %}
 
-{% block title('Modifier un utilisateur') %}
+{% block title('Créer un utilisateur') %}
 
 {% block body %}
     <div class="ui segment">
-        <h1><i class="blue save icon"></i>Utilisateur : {{ user.lastname ~ ' ' ~ user.firstname }}</h1>
+        <h1><i class="blue plus icon"></i>Créer un utilisateur</h1>
         <br>
 
         <div class="ui form">
@@ -40,8 +40,7 @@
 
 
             <div class="field">
-                {{ component('Modal', { title: "Souhaitez-vous supprimer l'uitlisateur ?", text: "En supprimant l'utilisateur, il ne pourra plus accéder à la société.", url: path('app.dashboard.delete_user', {id: user.id}) }) }}
-                {{ form_widget(userForm.submit, {label_html: true}) }} <button class="ui basic red button" type="button" onclick="$('.ui.mini.modal').modal('show')"><i class="trash icon"></i>Supprimer l'utilisateur</button>
+                {{ form_row(userForm.submit, {label_html: true}) }}
             </div>
             {{ form_end(userForm) }}
         </div>
