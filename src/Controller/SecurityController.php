@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/dashboard/se-connecter', name: 'app.security.login')]
+    #[Route(path: '/administration/se-connecter', name: 'app.security.login')]
     public function login(UserPasswordHasherInterface $hasher, AuthenticationUtils $authenticationUtils): Response
     {
         // if ($this->getUser()) {
@@ -22,7 +22,7 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('dashboard/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('admin/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
     #[Route(path: '/logout', name: 'app.security.logout')]
