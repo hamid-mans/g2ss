@@ -1,0 +1,38 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Nos produits') %}
+
+{% block body %}
+    <h1 class="ui header"><i class="box icon"></i> Nos produits</h1>
+
+    <a href="{{ path('app.dashboard.product.create') }}" class="ui blue basic button">
+        <i class="plus icon"></i>
+        Nouveau
+    </a>
+
+    <button class="ui orange basic button">
+        <i class="search icon"></i>
+        Rechercher
+    </button>
+
+    <table class="ui btc-blue celled table">
+        <thead>
+        <tr>
+            <th>Réf. Interne</th>
+            <th>Réf. Fournisseur</th>
+            <th>Désignation</th>
+            <th>Prix de vente</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr>
+                <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
+                <td>{{ product.refSupplier }}</td>
+                <td>{{ product.designation }}</td>
+                <td>{{ product.buyPrice }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
