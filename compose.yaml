@@ -16,26 +16,6 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
-  # ✅ One-shot: crée le schéma / exécute les migrations, puis s'arrête.
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: g2ss-migrate
-    working_dir: /app
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
-      MAILER_DSN: "smtp://mailer:1025"
-    command: >
-      sh -lc "
-        php bin/console doctrine:migrations:migrate --no-interaction
-        || php bin/console doctrine:schema:update --force
-      "
-    restart: "no"
-
   app:
     build:
       context: .
@@ -45,12 +25,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      # (Optionnel) si ton Portainer/compose supporte "service_completed_successfully"
-      # migrate:
-      #   condition: service_completed_successfully
+    # env_file:
+    #   - .env
     environment:
       DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
       MAILER_DSN: "smtp://mailer:1025"
+    # volumes:
+    #   - .:/app
     ports:
       - "8080:8000"
 
