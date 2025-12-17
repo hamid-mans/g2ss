@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: mysql:8.0
@@ -17,21 +19,16 @@ services:
       - db_data:/var/lib/mysql
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/TON_ORG/g2ss-app:latest   # ⬅️ image pré-buildée
+    pull_policy: always
     container_name: g2ss-app
     working_dir: /app
     depends_on:
       db:
         condition: service_healthy
-#    env_file:
-#      - .env
     environment:
       DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
       MAILER_DSN: "smtp://mailer:1025"
-#    volumes:
-#      - .:/app
     ports:
       - "8080:8000"
 
@@ -43,4 +40,4 @@ services:
       - "8025:8025"
 
 volumes:
-  db_data: {}
+  db_data:
