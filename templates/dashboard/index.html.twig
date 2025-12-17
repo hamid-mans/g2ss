@@ -3,5 +3,29 @@
 {% block title('Accueil') %}
 
 {% block body %}
+    <h1 class="ui header">
+        <i class="map signs icon"></i> Tableau de bord
+    </h1>
 
+    <div class="ui stats">
+        <a href="{{ path('app.dashboard.product.index') }}">
+            <div class="stat btc-blue">
+                <div class="value">
+                    <i class="box icon"></i> 5
+                </div>
+                <div class="label">
+                    Produits
+                </div>
+            </div>
+        </a>
+
+        <div class="stat btc-orange">
+            <div class="value">
+                <i class="warehouse icon"></i> 5
+            </div>
+            <div class="label">
+                Dépôts
+            </div>
+        </div>
+    </div>
 {% endblock %}

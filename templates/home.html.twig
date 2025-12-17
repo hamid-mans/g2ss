@@ -1,1 +1,14 @@
-Plateforme
+<html>
+    <head>
+        <title>G2SS - Accueil</title>
+    </head>
+    <body>
+    <div>
+        <h1>Page d'accueil</h1>
+
+        <p>Connecté : {{ app.user.firstname ?? 'Invité' }}</p>
+        <a href="{{ path('app.dashboard.index') }}">Ouvrir la plateforme</a>
+    </div>
+
+    </body>
+</html>

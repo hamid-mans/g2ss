@@ -1,0 +1,46 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Produit : ' ~ product.refInterne) %}
+
+{% block body %}
+    <h1 class="ui header"><i class="box icon"></i> {{ product.refInterne }}</h1>
+
+    <div class="ui form">
+        {{ form_start(form) }}
+
+        <div class="two fields">
+            <div class="field">
+                <label for="product_refInterne">Référence Interne</label>
+                {{ form_row(form.refInterne) }}
+            </div>
+
+            <div class="field">
+                <label for="product_refSupplier">Référence Fournisseur</label>
+                {{ form_row(form.refSupplier) }}
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="product_designation">Désignation</label>
+            {{ form_row(form.designation) }}
+        </div>
+
+        <div class="four fields">
+            <div class="field">
+                <label for="product_buyPrice">Prix d'achat HT</label>
+                {{ form_row(form.buyPrice) }}
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="product_description">Commentaire</label>
+            {{ form_row(form.description) }}
+        </div>
+
+        <div class="field">
+            {{ form_row(form.submit, { label_html: true }) }}
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

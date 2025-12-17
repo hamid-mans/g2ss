@@ -6,7 +6,7 @@
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.css">
         <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.js"></script>
-        <link rel="stylesheet" href="{{ asset('styles/panel.css') }}">
+        <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
         {% block stylesheets %}
         {% endblock %}
 
@@ -24,8 +24,8 @@
             <div class="flexy">
                 <nav>
                     <ul>
-                        <a href=""><li><i class="store icon"></i> Accueil</li></a>
-                        <a href=""><li><i class="box icon"></i>Produits</li></a>
+                        <a href="{{ path('app.dashboard.index') }}"><li><i class="map signs icon"></i> Accueil</li></a>
+                        <a href="{{ path('app.dashboard.product.index') }}"><li><i class="box icon"></i>Produits</li></a>
                         <a href=""><li><i class="warehouse icon"></i> Dépôts</li></a>
                     </ul>
                 </nav>
@@ -43,8 +43,10 @@
 
         </div>
 
-        <div class="content">
-            {% block body %}{% endblock %}
+        <div class="content-dashboard">
+            <div class="ui raised segment" style="padding-top: 30px;padding-left: 20px;padding-right: 20px;">
+                {% block body %}{% endblock %}
+            </div>
             <script src="{{ asset('js/main.js') }}"></script>
         </div>
         <br>
