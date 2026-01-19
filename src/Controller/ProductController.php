@@ -43,7 +43,7 @@ final class ProductController extends AbstractController
             $entityManager->persist($product);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Produit créé !');
+            $this->addFlash('success', 'Produit enregistré !');
 
             return $this->redirectToRoute('app.dashboard.product.index');
         }
@@ -77,10 +77,19 @@ final class ProductController extends AbstractController
             'serialNumber' => 'ASC',
         ]);
 
+        $sommeUnit = 0;
+
+        foreach ($productUnits as $unit) {
+            $sommeUnit += $unit->getBuyPrice();
+        }
+
+        $pmp = $sommeUnit / count($productUnits);
+
         return $this->render('dashboard/product/update.html.twig', [
             'product' => $product,
             'form' => $form,
             'productUnits' => $productUnits,
+            'pmp' => $pmp,
         ]);
     }
 

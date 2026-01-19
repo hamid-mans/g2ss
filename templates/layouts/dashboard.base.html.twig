@@ -30,19 +30,28 @@
             </div>
 
             <div class="sidebar">
-                <nav>
-                    <ul>
-                        <a href="{{ path('app.dashboard.index') }}"><li class="{{ app.request.attributes.get('_route') == 'app.dashboard.index' ? 'active' : '' }}"><i class="map signs icon"></i> Accueil</li></a>
-                        <a href="{{ path('app.dashboard.product.index') }}"><li  class="{{ app.request.attributes.get('_route') == 'app.dashboard.product.index' ? 'active' : '' }}"><i class="box icon"></i>Produits</li></a>
-                        <a href=""><li><i class="warehouse icon"></i> Dépôts</li></a>
-                    </ul>
-                </nav>
 
-                <nav>
-                    <ul>
-                        <a href=""><li><i class="user icon"></i> Hamid</li></a>
-                    </ul>
-                </nav>
+                <div class="company">
+                    <span style="border-bottom: 1px solid black">
+                        {{ app.user.company.name }}
+                    </span>
+                </div>
+
+                <div class="navigation">
+                    <nav>
+                        <ul>
+                            <a href="{{ path('app.dashboard.index') }}"><li class="{{ app.request.attributes.get('_route') == 'app.dashboard.index' ? 'active' : '' }}"><i class="map signs icon"></i> Accueil</li></a>
+                            <a href="{{ path('app.dashboard.product.index') }}"><li  class="{{ 'app.dashboard.product' in app.request.attributes.get('_route') ? 'active' : '' }}"><i class="box icon"></i>Produits</li></a>
+                            <a href=""><li><i class="warehouse icon"></i> Dépôts</li></a>
+                        </ul>
+                    </nav>
+
+                    <nav>
+                        <ul>
+                            <a href=""><li><i class="user icon"></i> Hamid</li></a>
+                        </ul>
+                    </nav>
+                </div>
             </div>
 
             <div class="content">

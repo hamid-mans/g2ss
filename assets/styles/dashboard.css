@@ -7,15 +7,19 @@
 
 :root {
     --color-black: #282828;
+    --color-border: #d3d3d3;
+    --color-bg: #fdfdfd;
 }
 
+.ui.label { background-color: var(--color-bg) !important; }
 table { border-top: 2px solid !important; }
 table thead th { text-transform: uppercase !important; }
-table tbody tr td a { color: var(--color-black) !important; }
+table tbody tr td a:not(a.label) { color: var(--color-black) !important; }
 table thead tr th.table-loop,
 table tbody tr td.table-loop {
     text-align: center !important;
     color: gray !important;
+    width: 8%;
 }
 table tbody tr:hover {
     background-color: #ececec;
@@ -27,7 +31,8 @@ html, body {
     padding: 0;
     margin: 0;
     height: 100%;
-    background-color: #fdfdfd;
+    background-color: var(--color-bg);
+    overflow: hidden;
 }
 
 .layout {
@@ -41,6 +46,13 @@ html, body {
     grid-template-areas:
     "logo topbar"
     "sidebar content";
+}
+
+.logo,
+.sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .logo {
@@ -74,7 +86,18 @@ html, body {
 .sidebar {
     background-color: #f3f3f3;
     grid-area: sidebar;
+}
+
+.sidebar .company {
+    width: 100%;
     padding: 20px;
+    border-bottom: 0.9px solid var(--color-border);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.sidebar .navigation {
+    padding: 16px;
 }
 
 .sidebar nav ul { padding: 0; margin: 0; }
@@ -82,7 +105,7 @@ html, body {
 .sidebar nav ul a li {
     list-style-type: none;
 
-    border-radius: 4px;
+    border-radius: 7px;
 
     margin: 10px;
     padding: 7px 5px 7px 10px;
@@ -111,13 +134,20 @@ html, body {
 .content {
     grid-area: content;
     padding: 20px;
+
+    overflow-y: auto;
+    height: 100%;
 }
+
+.sidebar { border-right: 1px solid var(--color-border); border-left: 1px solid var(--color-border) }
+.sidebar .company { border-bottom: 1px solid var(--color-border) }
+.logo { border-right: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); border-top: 1px solid var(--color-border) }
+.topbar { border-bottom: 1px solid var(--color-border); border-top: 1px solid var(--color-border); border-right: 1px solid var(--color-border) }
+.content { border-right: 1px solid var(--color-border) }
 
 .logo,
 .topbar,
-.sidebar,
 .content {
-    border: 0.9px solid #ececec;
     padding: 16px;
 }
 

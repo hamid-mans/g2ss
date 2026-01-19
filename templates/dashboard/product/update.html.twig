@@ -9,17 +9,23 @@
 {% block body %}
 
     <p class="ui basic black label">
-        Qté. Stock : 4
+        Qté. Stock : {{ product.productUnits|length }}
     </p>
 
-    <p class="ui basic red label">
-        P.M.P. : 18.45 €
+    <p class="ui basic red label" title="Prix Moyen Pondéré (achat)">
+        P.M.P. : {{ pmp }} €
     </p>
 
     <div class="ui top menu">
         <a class="active item" data-tab="general">Général</a>
         <a class="item" data-tab="stock">Stock</a>
     </div>
+
+    {% for msg in app.flashes('success') %}
+        <div class="ui positive message">
+            {{ msg }}
+        </div>
+    {% endfor %}
 
     <div class="ui bottom tab segment" data-tab="general">
         <div class="ui form">
@@ -59,10 +65,15 @@
 
             {{ component('Hr', { icon: 'euro sign', text: 'Tarification' }) }}
 
-            <div class="four fields">
+            <div class="five fields">
                 <div class="field">
                     <label for="product_sellPrice">Prix de vente HT</label>
                     {{ form_row(form.sellPrice) }}
+                </div>
+
+                <div class="field">
+                    <label>Marge estimée</label>
+                    <input type="text" value="{{ product.sellPrice - pmp }} €" disabled>
                 </div>
             </div>
 
@@ -86,19 +97,33 @@
     <div class="ui bottom tab segment" data-tab="stock">
         {{ component('Hr', { icon: 'box', text: 'Stock' }) }}
 
+        <a href="{{ path('app.dashboard.product_unit.create', { productId: product.id }) }}" class="ui black button">
+            <i class="plus icon"></i>
+            Nouveau
+        </a>
+
         <table class="ui celled table">
             <thead>
             <tr>
-                <th>#</th>
+                <th class="table-loop">#</th>
                 <th>Numéro de série</th>
                 <th>Dépôt</th>
                 <th>Prix d'achat</th>
+                <th class="table-loop"><i class="cog icon"></i></th>
             </tr>
             </thead>
             <tbody>
             {% for unit in productUnits %}
-            <tr>
-                <td>{{ loop.index }}</td>
+            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product_unit.update', { productUnitId: unit.id }) }}">
+                <td class="table-loop">{{ loop.index }}</td>
+                <td>{{ unit.serialNumber }}</td>
+                <td>{{ unit.deposit.name }}</td>
+                <td>{{ unit.buyPrice }} €</td>
+                <td class="table-loop">
+                    <a class="ui basic red label" href="{{ path('app.dashboard.product_unit.delete', { productUnitId: unit.id }) }}">
+                        Supprimer
+                    </a>
+                </td>
             </tr>
             {% endfor %}
             </tbody>
