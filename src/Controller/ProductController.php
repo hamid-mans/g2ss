@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use App\Repository\ProductUnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -54,7 +55,7 @@ final class ProductController extends AbstractController
     }
 
     #[Route('{refInterne}', name: 'update')]
-    public function update(#[MapEntity(mapping: ['refInterne' => 'refInterne'])] Product $product, Request $request, EntityManagerInterface $entityManager): Response
+    public function update(#[MapEntity(mapping: ['refInterne' => 'refInterne'])] Product $product, ProductUnitRepository $productUnitRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ProductType::class, $product, [
             'submit_label' => '<i class="save icon"></i> Enregistrer',
@@ -72,9 +73,14 @@ final class ProductController extends AbstractController
             return $this->redirectToRoute('app.dashboard.product.index');
         }
 
+        $productUnits = $productUnitRepository->findBy(['product' => $product], [
+            'serialNumber' => 'ASC',
+        ]);
+
         return $this->render('dashboard/product/update.html.twig', [
             'product' => $product,
-            'form' => $form
+            'form' => $form,
+            'productUnits' => $productUnits,
         ]);
     }
 

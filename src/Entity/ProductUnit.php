@@ -27,6 +27,10 @@ class ProductUnit
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\ManyToOne(inversedBy: 'productUnits')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Deposit $deposit = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,6 +80,18 @@ class ProductUnit
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getDeposit(): ?Deposit
+    {
+        return $this->deposit;
+    }
+
+    public function setDeposit(?Deposit $deposit): static
+    {
+        $this->deposit = $deposit;
 
         return $this;
     }

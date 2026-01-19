@@ -73,9 +73,9 @@
 
             <div class="field">
                 {{ form_widget(form.submit, { label_html: true }) }}
-                <a href="{{ path('app.dashboard.product.index') }}" class="ui basic button">
-                    <i class="minus icon"></i>
-                    Annuler
+                <a href="{{ path('app.dashboard.product.delete', { refInterne: product.refInterne }) }}" class="ui basic red button">
+                    <i class="trash icon"></i>
+                    Supprimer
                 </a>
             </div>
 
@@ -85,6 +85,24 @@
 
     <div class="ui bottom tab segment" data-tab="stock">
         {{ component('Hr', { icon: 'box', text: 'Stock' }) }}
+
+        <table class="ui celled table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Numéro de série</th>
+                <th>Dépôt</th>
+                <th>Prix d'achat</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for unit in productUnits %}
+            <tr>
+                <td>{{ loop.index }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 
