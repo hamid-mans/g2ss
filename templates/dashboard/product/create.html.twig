@@ -2,8 +2,11 @@
 
 {% block title('Nouveau produit') %}
 
+{% block topbar %}
+    <h1 class="ui header">Nouveau produit</h1>
+{% endblock %}
+
 {% block body %}
-    <h1 class="ui header"><i class="box icon"></i> Nouveau produit</h1>
 
     <div class="ui form">
         {{ form_start(form) }}
@@ -14,7 +17,9 @@
             </div>
         {% endif %}
 
-        <div class="two fields">
+        {{ component('Hr', { icon: 'thumbtack', text: 'Informations principales' }) }}
+
+        <div class="three fields">
             <div class="field">
                 <label for="product_refInterne">Référence Interne</label>
                 {{ form_widget(form.refInterne) }}
@@ -24,28 +29,41 @@
                 <label for="product_refSupplier">Référence Fournisseur</label>
                 {{ form_widget(form.refSupplier) }}
             </div>
+
+            <div class="field">
+                <label for="product_category">Catégorie</label>
+                {{ form_widget(form.category) }}
+            </div>
         </div>
 
         <div class="field">
-                <label for="product_designation">Désignation</label>
-                {{ form_row(form.designation) }}
-            </div>
+            <label for="product_designation">Désignation</label>
+            {{ form_row(form.designation) }}
+        </div>
 
-            <div class="four fields">
-                <div class="field">
-                    <label for="product_buyPrice">Prix d'achat HT</label>
-                    {{ form_row(form.buyPrice) }}
-                </div>
-            </div>
+        <div class="space"></div>
 
+        {{ component('Hr', { icon: 'euro sign', text: 'Tarification' }) }}
+
+        <div class="four fields">
             <div class="field">
-                <label for="product_description">Commentaire</label>
-                {{ form_row(form.description) }}
+                <label for="product_sellPrice">Prix de vente HT</label>
+                {{ form_row(form.sellPrice) }}
             </div>
+        </div>
 
-            <div class="field">
-                {{ form_row(form.submit, { label_html: true }) }}
-            </div>
+        <div class="field">
+            <label for="product_description">Commentaire</label>
+            {{ form_row(form.description) }}
+        </div>
+
+        <div class="field">
+            {{ form_widget(form.submit, { label_html: true }) }}
+            <a href="{{ path('app.dashboard.product.index') }}" class="ui basic button">
+                <i class="minus icon"></i>
+                Annuler
+            </a>
+        </div>
 
         {{ form_end(form) }}
     </div>

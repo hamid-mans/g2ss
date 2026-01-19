@@ -1,23 +1,33 @@
 {% extends 'layouts/dashboard.base.html.twig' %}
 
-{% block title('Nos produits') %}
+{% block title('Produits') %}
+
+{% block topbar %}
+    <h1 class="ui header">Produits</h1>
+{% endblock %}
 
 {% block body %}
-    <h1 class="ui header"><i class="box icon"></i> Nos produits</h1>
 
-    <a href="{{ path('app.dashboard.product.create') }}" class="ui blue basic button">
+    {% for msg in app.flashes('success') %}
+        <div class="ui message">
+            {{ msg }}
+        </div>
+    {% endfor %}
+
+    <a href="{{ path('app.dashboard.product.create') }}" class="ui black button">
         <i class="plus icon"></i>
         Nouveau
     </a>
 
-    <button class="ui orange basic button">
+    <button class="ui basic button">
         <i class="search icon"></i>
         Rechercher
     </button>
 
-    <table class="ui btc-blue celled table">
+    <table class="ui celled table">
         <thead>
         <tr>
+            <th class="table-loop">#</th>
             <th>Réf. Interne</th>
             <th>Réf. Fournisseur</th>
             <th>Désignation</th>
@@ -26,11 +36,12 @@
         </thead>
         <tbody>
         {% for product in products %}
-            <tr>
+            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
+                <td class="table-loop">{{ loop.index }}</td>
                 <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
                 <td>{{ product.refSupplier }}</td>
                 <td>{{ product.designation }}</td>
-                <td>{{ product.buyPrice }}</td>
+                <td>{{ product.sellPrice }}</td>
             </tr>
         {% endfor %}
         </tbody>

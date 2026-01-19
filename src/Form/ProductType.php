@@ -2,8 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\Category;
 use App\Entity\Product;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -36,7 +39,7 @@ class ProductType extends AbstractType
                 ],
                 'error_bubbling' => true,
             ])
-            ->add('buyPrice', TextType::class, [
+            ->add('sellPrice', TextType::class, [
                 'label' => false,
                 'required' => false,
             ])
@@ -48,6 +51,14 @@ class ProductType extends AbstractType
                 'label' => $options['submit_label'],
                 'attr' => [
                     'class' => $options['submit_class']
+                ]
+            ])
+            ->add('category', EntityType::class, [
+                'label' => false,
+                'class' => Category::class,
+                'choice_label' => 'label',
+                'attr' => [
+                    'class' => 'ui dropdown search'
                 ]
             ])
         ;

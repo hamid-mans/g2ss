@@ -2,10 +2,14 @@
 
 {% block title('Accueil') %}
 
-{% block body %}
+{% block topbar %}
     <h1 class="ui header">
-        <i class="map signs icon"></i> Tableau de bord
+            Tableau de bord
     </h1>
+{% endblock %}
+
+{% block body %}
+
 
     <div class="ui stats">
         <a href="{{ path('app.dashboard.product.index') }}">

@@ -16,39 +16,45 @@
     </head>
     <body>
 
-        <div class="navbar">
-            <h1 class="title">
-                G2SS
-            </h1>
+        <div class="layout">
 
-            <div class="flexy">
+            <div class="logo">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo">
+                <h1 style="margin: 0px 0px 0px 10px" class="title">
+                    G2SS
+                </h1>
+            </div>
+
+            <div class="topbar">
+                {% block topbar %}{% endblock %}
+            </div>
+
+            <div class="sidebar">
                 <nav>
                     <ul>
-                        <a href="{{ path('app.dashboard.index') }}"><li><i class="map signs icon"></i> Accueil</li></a>
-                        <a href="{{ path('app.dashboard.product.index') }}"><li><i class="box icon"></i>Produits</li></a>
+                        <a href="{{ path('app.dashboard.index') }}"><li class="{{ app.request.attributes.get('_route') == 'app.dashboard.index' ? 'active' : '' }}"><i class="map signs icon"></i> Accueil</li></a>
+                        <a href="{{ path('app.dashboard.product.index') }}"><li  class="{{ app.request.attributes.get('_route') == 'app.dashboard.product.index' ? 'active' : '' }}"><i class="box icon"></i>Produits</li></a>
                         <a href=""><li><i class="warehouse icon"></i> Dépôts</li></a>
                     </ul>
                 </nav>
 
-                <div class="bottom-bar">
-                    <div>
-                        <nav>
-                            <ul>
-                                <a href=""><li><i class="user icon"></i> Hamid</li></a>
-                            </ul>
-                        </nav>
+                <nav>
+                    <ul>
+                        <a href=""><li><i class="user icon"></i> Hamid</li></a>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="content">
+                <div class="content-dashboard">
+                    <div style="padding-right: 20px;">
+                        {% block body %}{% endblock %}
                     </div>
+                    <script src="{{ asset('js/main.js') }}"></script>
                 </div>
             </div>
 
         </div>
 
-        <div class="content-dashboard">
-            <div class="ui raised segment" style="padding-top: 30px;padding-left: 20px;padding-right: 20px;">
-                {% block body %}{% endblock %}
-            </div>
-            <script src="{{ asset('js/main.js') }}"></script>
-        </div>
-        <br>
     </body>
 </html>

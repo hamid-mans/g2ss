@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -27,15 +29,28 @@ class Product
     #[ORM\Column(length: 255, unique: true)]
     private ?string $refInterne = null;
 
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $refSupplier = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $buyPrice = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Category $category = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $sellPrice = null;
+
+    /**
+     * @var Collection<int, ProductUnit>
+     */
+    #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'product', orphanRemoval: true)]
+    private Collection $productUnits;
+
+    public function __construct()
+    {
+        $this->productUnits = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -78,18 +93,6 @@ class Product
         return $this;
     }
 
-    public function getBuyPrice(): ?string
-    {
-        return $this->buyPrice;
-    }
-
-    public function setBuyPrice(?string $buyPrice): static
-    {
-        $this->buyPrice = $buyPrice;
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -98,6 +101,60 @@ class Product
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    public function getSellPrice(): ?string
+    {
+        return $this->sellPrice;
+    }
+
+    public function setSellPrice(?string $sellPrice): static
+    {
+        $this->sellPrice = $sellPrice;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductUnit>
+     */
+    public function getProductUnits(): Collection
+    {
+        return $this->productUnits;
+    }
+
+    public function addProductUnit(ProductUnit $productUnit): static
+    {
+        if (!$this->productUnits->contains($productUnit)) {
+            $this->productUnits->add($productUnit);
+            $productUnit->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductUnit(ProductUnit $productUnit): static
+    {
+        if ($this->productUnits->removeElement($productUnit)) {
+            // set the owning side to null (unless already changed)
+            if ($productUnit->getProduct() === $this) {
+                $productUnit->setProduct(null);
+            }
+        }
 
         return $this;
     }

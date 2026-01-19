@@ -33,7 +33,7 @@ final class ProductController extends AbstractController
 
         $form = $this->createForm(ProductType::class, $product, [
             'submit_label' => '<i class="plus icon"></i> Ajouter',
-            'submit_class' => 'ui basic green button',
+            'submit_class' => 'ui black button',
         ]);
         $form->handleRequest($request);
 
@@ -58,7 +58,7 @@ final class ProductController extends AbstractController
     {
         $form = $this->createForm(ProductType::class, $product, [
             'submit_label' => '<i class="save icon"></i> Enregistrer',
-            'submit_class' => 'ui basic blue button',
+            'submit_class' => 'ui black button',
         ]);
         $form->handleRequest($request);
 
@@ -69,13 +69,24 @@ final class ProductController extends AbstractController
 
             $this->addFlash('success', 'Produit modifié !');
 
-            $this->redirectToRoute('app.dashboard.product.index');
+            return $this->redirectToRoute('app.dashboard.product.index');
         }
 
         return $this->render('dashboard/product/update.html.twig', [
             'product' => $product,
             'form' => $form
         ]);
+    }
+
+    #[Route('supprimer/{refInterne}', name: 'delete')]
+    public function delete(EntityManagerInterface $entityManager, Product $product): Response
+    {
+        $entityManager->remove($product);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Produit supprimé !');
+
+        return $this->redirectToRoute('app.dashboard.product.index');
     }
 
 }
