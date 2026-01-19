@@ -1,0 +1,64 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    background-color: #eaf2ff;
+}
+
+.centerxy {
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+.ui.secondary.menu {
+    background-color: #78b4d5;
+    border-radius: 0 !important;
+    height: 66px;
+}
+
+.ui.secondary.menu .item {
+    margin-left: 20px;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ui.secondary.menu .item:hover {
+    color: white !important;
+}
+
+.content .ui.raised.segment {
+    width: 30%;
+    padding: 20px 30px 20px 30px;
+}
+
+.content {
+    margin: 50px 70px 50px 70px !important;
+}
+
+thead th {
+    background-color: #78b4d5 !important;
+    color: white !important;
+    font-size: 18px;
+    text-transform: uppercase !important;
+    letter-spacing: 1px;
+    font-weight: bold;
+    padding: 9px !important;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.login {
+    margin-top: 30px !important;
+    width: 35% !important;
+}
+
+.gerer {
+    width: 6%;
+    text-align: center !important;
+}

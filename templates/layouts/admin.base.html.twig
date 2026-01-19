@@ -6,7 +6,7 @@
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.css">
         <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.js"></script>
-        <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
+        <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
         {% block stylesheets %}
         {% endblock %}
 
@@ -17,7 +17,7 @@
     <body>
     <div class="ui secondary menu">
         {% if app.user %}
-            <a href="{{ path('app.dashboard.index') }}" class="item">
+            <a href="{{ path('app.admin.index') }}" class="item">
                 Sociétés
             </a>
             <a href="{{ path('app.security.logout') }}" class="item">

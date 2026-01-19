@@ -1,0 +1,92 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Produit : ' ~ product.refInterne) %}
+
+{% block topbar %}
+    <h1 class="ui header">Produit --> {{ product.refInterne }}</h1>
+{% endblock %}
+
+{% block body %}
+
+    <p class="ui basic black label">
+        Qté. Stock : 4
+    </p>
+
+    <p class="ui basic red label">
+        P.M.P. : 18.45 €
+    </p>
+
+    <div class="ui top menu">
+        <a class="active item" data-tab="general">Général</a>
+        <a class="item" data-tab="stock">Stock</a>
+    </div>
+
+    <div class="ui bottom tab segment" data-tab="general">
+        <div class="ui form">
+            {{ form_start(form) }}
+
+            {% if form_errors(form) %}
+                <div class="ui red message">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+
+            {{ component('Hr', { icon: 'thumbtack', text: 'Informations principales' }) }}
+
+            <div class="three fields">
+                <div class="field">
+                    <label for="product_refInterne">Référence Interne</label>
+                    {{ form_widget(form.refInterne) }}
+                </div>
+
+                <div class="field">
+                    <label for="product_refSupplier">Référence Fournisseur</label>
+                    {{ form_widget(form.refSupplier) }}
+                </div>
+
+                <div class="field">
+                    <label for="product_category">Catégorie</label>
+                    {{ form_widget(form.category) }}
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="product_designation">Désignation</label>
+                {{ form_row(form.designation) }}
+            </div>
+
+            <div class="space"></div>
+
+            {{ component('Hr', { icon: 'euro sign', text: 'Tarification' }) }}
+
+            <div class="four fields">
+                <div class="field">
+                    <label for="product_sellPrice">Prix de vente HT</label>
+                    {{ form_row(form.sellPrice) }}
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="product_description">Commentaire</label>
+                {{ form_row(form.description) }}
+            </div>
+
+            <div class="field">
+                {{ form_widget(form.submit, { label_html: true }) }}
+                <a href="{{ path('app.dashboard.product.index') }}" class="ui basic button">
+                    <i class="minus icon"></i>
+                    Annuler
+                </a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <div class="ui bottom tab segment" data-tab="stock">
+        {{ component('Hr', { icon: 'box', text: 'Stock' }) }}
+    </div>
+
+
+
+{% endblock %}

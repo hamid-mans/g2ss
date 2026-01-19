@@ -1,0 +1,49 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Produits') %}
+
+{% block topbar %}
+    <h1 class="ui header">Produits</h1>
+{% endblock %}
+
+{% block body %}
+
+    {% for msg in app.flashes('success') %}
+        <div class="ui message">
+            {{ msg }}
+        </div>
+    {% endfor %}
+
+    <a href="{{ path('app.dashboard.product.create') }}" class="ui black button">
+        <i class="plus icon"></i>
+        Nouveau
+    </a>
+
+    <button class="ui basic button">
+        <i class="search icon"></i>
+        Rechercher
+    </button>
+
+    <table class="ui celled table">
+        <thead>
+        <tr>
+            <th class="table-loop">#</th>
+            <th>Réf. Interne</th>
+            <th>Réf. Fournisseur</th>
+            <th>Désignation</th>
+            <th>Prix de vente</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
+                <td class="table-loop">{{ loop.index }}</td>
+                <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
+                <td>{{ product.refSupplier }}</td>
+                <td>{{ product.designation }}</td>
+                <td>{{ product.sellPrice }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
