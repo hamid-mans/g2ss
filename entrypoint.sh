@@ -119,8 +119,6 @@ try {
 }
 ' || true
 
-echo "🚀 Starting app..."
-
 # Assets + cache (Symfony)
 if [ -f "bin/console" ]; then
   # Compile asset-map (si demandé)
@@ -135,5 +133,7 @@ if [ -f "bin/console" ]; then
     php bin/console cache:warmup --env="${APP_ENV:-prod}" || true
   fi
 fi
+
+echo "🚀 Starting app..."
 
 exec "$@"
