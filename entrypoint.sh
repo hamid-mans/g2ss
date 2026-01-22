@@ -120,4 +120,20 @@ try {
 ' || true
 
 echo "🚀 Starting app..."
+
+# Assets + cache (Symfony)
+if [ -f "bin/console" ]; then
+  # Compile asset-map (si demandé)
+  if [ "${RUN_ASSETMAP_COMPILE:-0}" = "1" ]; then
+    echo "🎛️ Compiling asset-map..."
+    php bin/console asset-map:compile --env="${APP_ENV:-prod}" || true
+  fi
+
+  # Warmup cache (si demandé)
+  if [ "${RUN_CACHE_WARMUP:-0}" = "1" ]; then
+    echo "🔥 Warming up cache..."
+    php bin/console cache:warmup --env="${APP_ENV:-prod}" || true
+  fi
+fi
+
 exec "$@"
