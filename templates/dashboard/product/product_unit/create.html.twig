@@ -1,0 +1,57 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Nouveau numéro de série') %}
+
+{% block topbar %}
+    <h1 class="ui header">Nouveau numéro de série</h1>
+{% endblock %}
+
+{% block body %}
+
+    <a href="{{ path('app.dashboard.product.index') }}" class="ui basic black button">
+        <i class="reply icon"></i>
+        Retour
+    </a>
+
+    <div class="ui segment">
+        <div class="ui form">
+            {{ form_start(form) }}
+
+            {% if form_errors(form) %}
+                <div class="ui red message">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+
+            {{ component('Hr', { icon: 'thumbtack', text: 'Informations principales' }) }}
+
+            <div class="three fields">
+                <div class="field">
+                    <label for="product_unit_serialNumber">Numéro de série</label>
+                    {{ form_widget(form.serialNumber) }}
+                </div>
+
+                <div class="field">
+                    <label for="product_unit_buyPrice">Prix d'achat</label>
+                    {{ form_widget(form.buyPrice) }}
+                </div>
+
+                <div class="field">
+                    <label for="product_unit_deposit">Dépôt</label>
+                    {{ form_widget(form.deposit) }}
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="product_unit_description">Commentaire</label>
+                {{ form_widget(form.description) }}
+            </div>
+
+            <div class="field">
+                {{ form_widget(form.submit, { label_html: true }) }}
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

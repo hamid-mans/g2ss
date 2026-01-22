@@ -25,13 +25,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     environment:
       DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
       MAILER_DSN: "smtp://mailer:1025"
-#    volumes:
-#      - .:/app
+    # volumes:
+    #   - .:/app
     ports:
       - "8080:8000"
 

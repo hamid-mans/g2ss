@@ -1,64 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Saira:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+*:not(i) {
+    font-family: 'Inter', sans-serif !important;
+}
+
+:root {
+    --color-black: #282828;
+    --color-border: #d3d3d3;
+    --color-bg: #fdfdfd;
+}
+
+.ui.label { background-color: var(--color-bg) !important; }
+table { border-top: 2px solid !important; }
+table thead th { text-transform: uppercase !important; }
+table tbody tr td a:not(a.label) { color: var(--color-black) !important; }
+table thead tr th.table-loop,
+table tbody tr td.table-loop {
+    text-align: center !important;
+    color: gray !important;
+    width: 8%;
+}
+table tbody tr:hover {
+    background-color: #ececec;
+}
+.ui.button { margin: 7px 0; }
+.space { margin-top: 50px; }
+
 html, body {
     padding: 0;
     margin: 0;
-    background-color: #eaf2ff;
+    height: 100%;
+    background-color: var(--color-bg);
+    overflow: hidden;
 }
 
-.centerxy {
+.layout {
+    height: 100vh;
+    display: grid;
+
+    grid-template-columns: 280px 1fr;
+
+    grid-template-rows: 80px 1fr;
+
+    grid-template-areas:
+    "logo topbar"
+    "sidebar content";
+}
+
+.logo,
+.sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo {
+    grid-area: logo;
+    color: var(--color-black);
     display: flex;
-    justify-content: center;
-    margin-top: 100px;
+    align-items: center;
+    justify-content: start;
+    background-color: #f3f3f3;
 }
 
-.ui.secondary.menu {
-    background-color: #78b4d5;
-    border-radius: 0 !important;
-    height: 66px;
+.logo h1 {
+    font-family: 'Orbitron', sans-serif !important;
+    letter-spacing: 5px;
 }
 
-.ui.secondary.menu .item {
-    margin-left: 20px;
+.logo img {
+    width: 40px;
+}
+
+.topbar {
+    grid-area: topbar;
     color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.ui.secondary.menu .item:hover {
-    color: white !important;
-}
-
-.content .ui.raised.segment {
-    width: 30%;
-    padding: 20px 30px 20px 30px;
-}
-
-.content {
-    margin: 50px 70px 50px 70px !important;
-}
-
-thead th {
-    background-color: #78b4d5 !important;
-    color: white !important;
-    font-size: 18px;
-    text-transform: uppercase !important;
-    letter-spacing: 1px;
-    font-weight: bold;
-    padding: 9px !important;
-}
-
-.center {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    padding-left: 20px;
+}
+
+.topbar h1 { font-weight: 400 !important; }
+
+.sidebar {
+    background-color: #f3f3f3;
+    grid-area: sidebar;
+}
+
+.sidebar .company {
     width: 100%;
+    padding: 20px;
+    border-bottom: 0.9px solid var(--color-border);
+    font-weight: bold;
+    font-size: 18px;
 }
 
-.login {
-    margin-top: 30px !important;
-    width: 35% !important;
+.sidebar .navigation {
+    padding: 16px;
 }
 
-.gerer {
-    width: 6%;
-    text-align: center !important;
+.sidebar nav ul { padding: 0; margin: 0; }
+
+.sidebar nav ul a li {
+    list-style-type: none;
+
+    border-radius: 7px;
+
+    margin: 10px;
+    padding: 7px 5px 7px 10px;
+    transition-duration: 0.3s;
+}
+
+.sidebar nav ul a li:hover {
+    background-color: #ffffff;
+    box-shadow: 0 1px 4px #b7b7b7;
+}
+
+.sidebar nav ul a li.active {
+    background-color: #ffffff;
+    box-shadow: 0 1px 4px #b7b7b7;
+}
+
+.sidebar nav ul a {
+    color: var(--color-black);
+    font-weight: 500;
+}
+
+.sidebar nav ul a li i {
+    margin-right: 15px;
+}
+
+.layout .content-full {
+    grid-area: content;
+    padding: 20px;
+
+    overflow-y: auto;
+    height: 100%;
+}
+
+.sidebar { border-right: 1px solid var(--color-border); border-left: 1px solid var(--color-border) }
+.sidebar .company { border-bottom: 1px solid var(--color-border) }
+.logo { border-right: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); border-top: 1px solid var(--color-border) }
+.topbar { border-bottom: 1px solid var(--color-border); border-top: 1px solid var(--color-border); border-right: 1px solid var(--color-border) }
+.content { border-right: 1px solid var(--color-border) }
+
+.logo,
+.topbar,
+.content {
+    padding: 16px;
+}
+
+.stats {
+    display: flex;
+    margin-top: 30px;
+}
+
+.stats a {
+    color: inherit;
+}
+
+.stats .stat {
+    border-top: 3px solid var(--color-black);
+    box-shadow: 0 0 3px 0px gray;
+    border-radius: 5px;
+    margin-right: 20px;
+    padding: 15px 20px 15px 20px;
+    width: 150px;
+}
+
+.stats .stat .value {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.stats .stat .label {
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-top: 5px;
 }

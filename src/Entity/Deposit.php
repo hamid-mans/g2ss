@@ -36,12 +36,19 @@ class Deposit
     /**
      * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'deposits')]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'deposits', orphanRemoval: true)]
     private Collection $users;
+
+    /**
+     * @var Collection<int, ProductUnit>
+     */
+    #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'deposit')]
+    private Collection $productUnits;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->productUnits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,6 +150,36 @@ class Deposit
     {
         if ($this->users->removeElement($user)) {
             $user->removeDeposit($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductUnit>
+     */
+    public function getProductUnits(): Collection
+    {
+        return $this->productUnits;
+    }
+
+    public function addProductUnit(ProductUnit $productUnit): static
+    {
+        if (!$this->productUnits->contains($productUnit)) {
+            $this->productUnits->add($productUnit);
+            $productUnit->setDeposit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductUnit(ProductUnit $productUnit): static
+    {
+        if ($this->productUnits->removeElement($productUnit)) {
+            // set the owning side to null (unless already changed)
+            if ($productUnit->getDeposit() === $this) {
+                $productUnit->setDeposit(null);
+            }
         }
 
         return $this;

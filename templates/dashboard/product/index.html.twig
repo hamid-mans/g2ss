@@ -1,0 +1,69 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Produits') %}
+
+{% block topbar %}
+    <h1 class="ui header">Produits</h1>
+{% endblock %}
+
+{% block body %}
+
+    {% for msg in app.flashes('success') %}
+        <div class="ui positive message">
+            {{ msg }}
+        </div>
+    {% endfor %}
+
+    <a href="{{ path('app.dashboard.product.create') }}" class="ui black button">
+        <i class="plus icon"></i>
+        Nouveau
+    </a>
+
+    <button class="ui basic black button searchButton">
+        <i class="search icon"></i>
+        Rechercher
+    </button>
+
+    <div class="ui segment searchModal">
+        {{ form_start(searchForm) }}
+            <div class="ui form">
+
+                <div class="four wide field">
+                    {{ form_widget(searchForm.search) }}
+
+                    {{ form_widget(searchForm.submit, {
+                        label_html: true
+                    }) }}
+                </div>
+
+            </div>
+        {{ form_end(searchForm) }}
+    </div>
+
+    <table class="ui celled table">
+        <thead>
+        <tr>
+            <th class="table-loop">#</th>
+            <th>Réf. Interne</th>
+            <th>Réf. Fournisseur</th>
+            <th>Désignation</th>
+            <th>Prix de vente</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product in pagination %}
+            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
+                <td class="table-loop">{{ loop.index }}</td>
+                <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
+                <td>{{ product.refSupplier }}</td>
+                <td>{{ product.designation }}</td>
+                <td>{{ product.sellPrice }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {{ knp_pagination_render(pagination, 'pagination/semantic_ui_pagination.html.twig') }}
+    </div>
+{% endblock %}
