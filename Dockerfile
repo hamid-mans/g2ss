@@ -17,10 +17,10 @@ RUN chmod 755 /entrypoint.sh
 COPY . /app
 
 # Compile asset-map pendant le build
-RUN php bin/console asset-map:compile --env=prod
+#RUN php bin/console asset-map:compile --env=prod
 
 # (optionnel) warmup cache
-RUN php bin/console cache:warmup --env=prod
+#RUN php bin/console cache:warmup --env=prod
 
 EXPOSE 8000
 
