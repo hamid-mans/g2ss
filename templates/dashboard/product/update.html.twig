@@ -8,16 +8,16 @@
 
 {% block body %}
 
-    <p class="ui basic black label">
-        Qté. Stock : {{ product.productUnits|length }}
+    <p class="ui basic large black label">
+        Qté. Stock --> {{ product.productUnits|length }}
     </p>
 
-    <p class="ui basic red label" title="Prix Moyen Pondéré (achat)">
-        P.M.P. : {{ pmp }} €
+    <p class="ui basic large red label" title="Prix Moyen Pondéré (achat)">
+        P.M.P. --> {{ pmp|number_format(2) }} €
     </p>
 
     <div class="ui top menu">
-        <a class="active item" data-tab="general">Général</a>
+        <a class="item" data-tab="general">Général</a>
         <a class="item" data-tab="stock">Stock</a>
     </div>
 
@@ -73,7 +73,7 @@
 
                 <div class="field">
                     <label>Marge estimée</label>
-                    <input type="text" value="{{ product.sellPrice - pmp }} €" disabled>
+                    <input type="text" value="{{ (product.sellPrice - pmp)|number_format(2) }} €" disabled>
                 </div>
             </div>
 
@@ -95,39 +95,97 @@
     </div>
 
     <div class="ui bottom tab segment" data-tab="stock">
-        {{ component('Hr', { icon: 'box', text: 'Stock' }) }}
+        {{ component('Hr', { icon: 'warehouse', text: 'Stock / Dépôt' }) }}
+
+        <div class="ui cards">
+            {% for deposit in deposits %}
+                <div class="ui card">
+                    <div class="content">
+                        <h3 class="header">
+                            {{ deposit.name }}
+                        </h3>
+                    </div>
+
+                    <div class="content">
+                        <p class="ui basic black label">
+                            Qté. Stock --> {{ deposit.productUnits|length }}
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="space"></div>
+
+        {{ component('Hr', { icon: 'box', text: 'Numéros de séries' }) }}
 
         <a href="{{ path('app.dashboard.product_unit.create', { productId: product.id }) }}" class="ui black button">
             <i class="plus icon"></i>
             Nouveau
         </a>
 
-        <table class="ui celled table">
-            <thead>
-            <tr>
-                <th class="table-loop">#</th>
-                <th>Numéro de série</th>
-                <th>Dépôt</th>
-                <th>Prix d'achat</th>
-                <th class="table-loop"><i class="cog icon"></i></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for unit in productUnits %}
-            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product_unit.update', { productUnitId: unit.id }) }}">
-                <td class="table-loop">{{ loop.index }}</td>
-                <td>{{ unit.serialNumber }}</td>
-                <td>{{ unit.deposit.name }}</td>
-                <td>{{ unit.buyPrice }} €</td>
-                <td class="table-loop">
-                    <a class="ui basic red label" href="{{ path('app.dashboard.product_unit.delete', { productUnitId: unit.id }) }}">
-                        Supprimer
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <button class="ui basic black button searchButton">
+            <i class="search icon"></i>
+            Rechercher
+        </button>
+
+        <br><br>
+
+        <div class="ui segment searchModal">
+            {{ form_start(searchForm, {
+                method: 'GET',
+                attr: { 'data-turbo-frame': 'stock-frame' }
+            }) }}
+            <div class="ui form">
+
+                <div class="four wide field">
+                    {{ form_widget(searchForm.search) }}
+
+                    {{ form_widget(searchForm.submit, {
+                        label_html: true
+                    }) }}
+                </div>
+
+                <input type="hidden" name="tab" id="activeTabInput">
+
+            </div>
+            {{ form_end(searchForm) }}
+        </div>
+
+        <turbo-frame id="stock-frame">
+
+            <table class="ui celled table">
+                <thead>
+                <tr>
+                    <th class="table-loop">#</th>
+                    <th>Numéro de série</th>
+                    <th>Dépôt</th>
+                    <th>Prix d'achat</th>
+                    <th class="table-loop"><i class="cog icon"></i></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for unit in pagination %}
+                <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product_unit.update', { productUnitId: unit.id }) }}">
+                    <td class="table-loop">{{ loop.index }}</td>
+                    <td>{{ unit.serialNumber }}</td>
+                    <td>{{ unit.deposit.name }}</td>
+                    <td>{{ unit.buyPrice }} €</td>
+                    <td class="table-loop">
+                        <a class="ui basic red label" href="{{ path('app.dashboard.product_unit.delete', { productUnitId: unit.id }) }}">
+                            Supprimer
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                {{ knp_pagination_render(pagination, 'pagination/semantic_ui_pagination.html.twig') }}
+            </div>
+
+        </turbo-frame>
     </div>
 
 

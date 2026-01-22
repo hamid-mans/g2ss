@@ -131,7 +131,7 @@ html, body {
     margin-right: 15px;
 }
 
-.content {
+.layout .content-full {
     grid-area: content;
     padding: 20px;
 

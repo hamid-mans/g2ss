@@ -19,10 +19,26 @@
         Nouveau
     </a>
 
-    <button class="ui basic button">
+    <button class="ui basic black button searchButton">
         <i class="search icon"></i>
         Rechercher
     </button>
+
+    <div class="ui segment searchModal">
+        {{ form_start(searchForm) }}
+            <div class="ui form">
+
+                <div class="four wide field">
+                    {{ form_widget(searchForm.search) }}
+
+                    {{ form_widget(searchForm.submit, {
+                        label_html: true
+                    }) }}
+                </div>
+
+            </div>
+        {{ form_end(searchForm) }}
+    </div>
 
     <table class="ui celled table">
         <thead>
@@ -35,7 +51,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for product in products %}
+        {% for product in pagination %}
             <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
                 <td class="table-loop">{{ loop.index }}</td>
                 <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
@@ -46,4 +62,8 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <div class="pagination">
+        {{ knp_pagination_render(pagination, 'pagination/semantic_ui_pagination.html.twig') }}
+    </div>
 {% endblock %}
