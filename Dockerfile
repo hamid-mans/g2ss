@@ -9,22 +9,21 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# entrypoint (à la racine du repo)
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod 755 /entrypoint.sh
-
-# ✅ copier le code dans l'image
+# Copier le code
 COPY . /app
 
-# Compile asset-map pendant le build
-#RUN php bin/console asset-map:compile --env=prod
+# Installer les dépendances PHP (vendor) dans l'image
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-# (optionnel) warmup cache
-#RUN php bin/console cache:warmup --env=prod
+# (optionnel) compile assets + warmup AU BUILD
+# RUN php bin/console asset-map:compile --env=prod
+# RUN php bin/console cache:warmup --env=prod
 
-EXPOSE 8000
-
+# Entrypoint
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-CMD ["sh", "-lc", "composer install --no-interaction && php -S 0.0.0.0:8000 -t public"]
+EXPOSE 8000
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["sh", "-lc", "php -S 0.0.0.0:8000 -t public"]
