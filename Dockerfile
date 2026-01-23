@@ -24,5 +24,7 @@ COPY . /app
 
 EXPOSE 8000
 
-ENTRYPOINT ["/entrypoint.sh"]
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 CMD ["sh", "-lc", "composer install --no-interaction && php -S 0.0.0.0:8000 -t public"]
