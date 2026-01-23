@@ -29,10 +29,11 @@ services:
     DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
     MAILER_DSN: "smtp://mailer:1025"
     APP_ENV: "prod"
-  entrypoint: ["/app/entrypoint.sh"]
-  command: ["sh", "-lc", "php -S 0.0.0.0:8000 -t public"]
+  entrypoint: /app/entrypoint.sh
+  command: sh -lc "php -S 0.0.0.0:8000 -t public"
   ports:
     - "8080:8000"
+
 
   mailer:
     image: axllent/mailpit
