@@ -63,6 +63,8 @@ if (!$dsn) { fwrite(STDERR, "DATABASE_URL is missing\n"); exit(0); }
 $adminEmail = getenv("ADMIN_EMAIL") ?: "admin@g2ss.fr";
 $adminPassword = getenv("ADMIN_PASSWORD") ?: "admin";
 $adminRole = getenv("ADMIN_ROLE") ?: "ROLE_ADMIN";
+$adminFirstname = getenv("ADMIN_FIRSTNAME") ?: "Admin";
+$adminLastname  = getenv("ADMIN_LASTNAME")  ?: "User";
 
 $u = parse_url($dsn);
 $host = $u["host"] ?? "db";
@@ -86,39 +88,62 @@ if (!$st->fetchColumn()) {
   exit(0);
 }
 
-$hash = password_hash($adminPassword, PASSWORD_BCRYPT);
+// Vérifie si la colonne firstname existe (sécurité si schéma varie)
+$col = $pdo->prepare("
+  SELECT column_name
+  FROM information_schema.columns
+  WHERE table_schema=? AND table_name=? AND column_name IN (\"firstname\",\"last_name\",\"lastname\")
+");
+$col->execute([$db, "user"]);
+$cols = $col->fetchAll(PDO::FETCH_COLUMN);
+$hasFirstname = in_array("firstname", $cols, true);
+$hasLastname  = in_array("lastname", $cols, true) || in_array("last_name", $cols, true);
 
-// Essaie d’upsert “compatible” (si ta table est différente, adapte les colonnes ici)
+// Hash : je te conseille Argon2id si dispo, sinon bcrypt
+$algo = defined("PASSWORD_ARGON2ID") ? PASSWORD_ARGON2ID : PASSWORD_BCRYPT;
+$hash = password_hash($adminPassword, $algo);
+
 try {
   // Cherche l’utilisateur
   $sel = $pdo->prepare("SELECT id FROM user WHERE email = :email LIMIT 1");
   $sel->execute([":email" => $adminEmail]);
   $id = $sel->fetchColumn();
 
+  $rolesJson = json_encode([$adminRole]);
+
   if ($id) {
-    $upd = $pdo->prepare("UPDATE user SET password = :password, roles = :roles WHERE id = :id");
-    $upd->execute([
-      ":password" => $hash,
-      ":roles" => json_encode([$adminRole]),
-      ":id" => $id
-    ]);
+    // Update
+    $sql = "UPDATE user SET password = :password, roles = :roles";
+    $params = [":password" => $hash, ":roles" => $rolesJson, ":id" => $id];
+
+    if ($hasFirstname) { $sql .= ", firstname = :firstname"; $params[":firstname"] = $adminFirstname; }
+    if ($hasLastname)  { $sql .= ", lastname = :lastname";  $params[":lastname"]  = $adminLastname; }
+
+    $sql .= " WHERE id = :id";
+    $upd = $pdo->prepare($sql);
+    $upd->execute($params);
+
     echo "✅ Admin updated (email=$adminEmail)\n";
   } else {
-    $ins = $pdo->prepare("INSERT INTO user (email, password, roles) VALUES (:email, :password, :roles)");
-    $ins->execute([
-      ":email" => $adminEmail,
-      ":password" => $hash,
-      ":roles" => json_encode([$adminRole]),
-    ]);
+    // Insert (avec firstname si présent / requis)
+    $fields = ["email", "password", "roles"];
+    $values = [":email", ":password", ":roles"];
+    $params = [":email" => $adminEmail, ":password" => $hash, ":roles" => $rolesJson];
+
+    if ($hasFirstname) { $fields[] = "firstname"; $values[] = ":firstname"; $params[":firstname"] = $adminFirstname; }
+    if ($hasLastname)  { $fields[] = "lastname";  $values[] = ":lastname";  $params[":lastname"]  = $adminLastname; }
+
+    $sql = "INSERT INTO user (".implode(",", $fields).") VALUES (".implode(",", $values).")";
+    $ins = $pdo->prepare($sql);
+    $ins->execute($params);
+
     echo "✅ Admin created (email=$adminEmail)\n";
   }
 } catch (Throwable $e) {
-  // Ne jamais faire tomber le conteneur à cause de l’admin seed
   fwrite(STDERR, "⚠️ Admin upsert failed (non-fatal): ".$e->getMessage()."\n");
   exit(0);
 }
 ' || true
-
 if [ -f "bin/console" ]; then
   echo "🎛️ asset-map:compile..."
   php bin/console asset-map:compile --env="${APP_ENV:-prod}" || true
