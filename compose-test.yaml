@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: g2ss-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: g2ss
+      MYSQL_DATABASE: g2ss
+      MYSQL_USER: g2ss
+      MYSQL_PASSWORD: g2ss
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pg2ss"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    # On utilise l'image FrankenPHP (PHP 8.3 + Serveur Web haute performance)
+    image: dunglas/frankenphp:latest-php8.3-alpine
+    container_name: g2ss-app
+    restart: always
+    working_dir: /app
+    # On monte votre code dans le container pour que PHP puisse l'exécuter
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
+      MAILER_DSN: "smtp://mailer:1025"
+      APP_ENV: "prod"
+      # Important : FrankenPHP sert le dossier /public par défaut
+      FRANKENPHP_CONFIG: "worker ./public/index.php"
+    ports:
+      - "8080:80" # Port 80 en interne pour FrankenPHP
+
+  mailer:
+    image: axllent/mailpit
+    container_name: g2ss-mailer
+    restart: always
+    ports:
+      - "8025:8025"
+
+volumes:
+  db_data: {}
