@@ -1,31 +1,30 @@
 {% extends 'layouts/dashboard.base.html.twig' %}
 
-{% block title('Nouveau numéro de série') %}
+{% block title('Numéro de série - ' ~ productUnit.serialNumber) %}
 
 {% block topbar %}
-    <h1 class="ui header">Produit --> {{ productUnit.product.refInterne }} --> Numéro de série --> {{ productUnit.serialNumber }}</h1>
+    <div class="breadcrumbs text-lg">
+        <ul>
+            <li><a href="{{ path('app.dashboard.product.index') }}">Produits</a></li>
+            <li><a href="{{ path('app.dashboard.product.update', { refInterne: productUnit.product.refInterne }) }}">{{ productUnit.product.refInterne }}</a></li>
+            <li>Numéro de série</li>
+            <li>{{ productUnit.serialNumber }}</li>
+        </ul>
+    </div>
 {% endblock %}
 
 {% block body %}
 
-    <a href="{{ path('app.dashboard.product.update', { refInterne: productUnit.product.refInterne }) }}" class="ui basic black button">
-        <i class="reply icon"></i>
-        Retour
+    <a href="{{ path('app.dashboard.product.update', { refInterne: productUnit.product.refInterne }) }}" class="btn btn-secondary">
+        <i class="ri-arrow-go-back-line"></i>
+        Annuler
     </a>
 
     <div class="ui segment">
         <div class="ui form">
             {{ form_start(form) }}
 
-            {% if form_errors(form) %}
-                <div class="ui red message">
-                    {{ form_errors(form) }}
-                </div>
-            {% endif %}
-
-            {{ component('Hr', { icon: 'thumbtack', text: 'Informations principales' }) }}
-
-            <div class="three fields">
+            <div class="grid grid-cols-3 gap-6 mt-4">
                 <div class="field">
                     <label for="product_unit_serialNumber">Numéro de série</label>
                     {{ form_widget(form.serialNumber) }}

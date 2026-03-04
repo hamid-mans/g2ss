@@ -1,3 +1,34 @@
-<div class="ui {{ type}} message">
-    {{ text }}
+<div class="toast toast-end toast-top z-[100]">
+	{% for label, messages in app.flashes %}
+		{% for message in messages %}
+			<script>
+                Toastify({
+                    text: "✔ {{ message }}",
+                    duration: 3000,
+                    newWindow: true,
+                    close: false,
+                    gravity: "bottom",
+                    position: "right",
+	                style: {
+                        //background: 'oklch(96% 0.044 156.743)',
+		                background: 'white',
+		                color: 'var(--color-success-content)',
+		                //boxShadow: '0 0 5px var(--color-success)',
+		                boxShadow: 'none',
+		                border: '1px solid var(--color-base-300)',
+		                borderTop: '3px solid var(--color-base-300)',
+		                borderRadius: '10px'
+	                },
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    onClick: function(){} // Callback after click
+                }).showToast();
+			</script>
+		{% endfor %}
+	{% endfor %}
 </div>
+
+<script>
+	setTimeout(() => {
+        $('.toast').hide()
+	}, 10000000)
+</script>

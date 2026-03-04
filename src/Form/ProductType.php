@@ -34,10 +34,10 @@ class ProductType extends AbstractType
             ->add('refSupplier', TextType::class, [
                 'label' => false,
                 'required' => false,
-                'constraints' => [
+                /*'constraints' => [
                     new NotBlank([], 'La référence fournisseur est obligatoire.')
                 ],
-                'error_bubbling' => true,
+                'error_bubbling' => true,*/
             ])
             ->add('sellPrice', TextType::class, [
                 'label' => false,

@@ -42,10 +42,24 @@ class Company
     #[ORM\OneToMany(targetEntity: Deposit::class, mappedBy: 'company', cascade: ['remove'])]
     private Collection $deposits;
 
+    /**
+     * @var Collection<int, Modules>
+     */
+    #[ORM\ManyToMany(targetEntity: Modules::class, inversedBy: 'companies')]
+    private Collection $modules;
+
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'company')]
+    private Collection $products;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->deposits = new ArrayCollection();
+        $this->modules = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,6 +181,60 @@ class Company
             // set the owning side to null (unless already changed)
             if ($deposit->getCompany() === $this) {
                 $deposit->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Modules>
+     */
+    public function getModules(): Collection
+    {
+        return $this->modules;
+    }
+
+    public function addModule(Modules $module): static
+    {
+        if (!$this->modules->contains($module)) {
+            $this->modules->add($module);
+        }
+
+        return $this;
+    }
+
+    public function removeModule(Modules $module): static
+    {
+        $this->modules->removeElement($module);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getCompany() === $this) {
+                $product->setCompany(null);
             }
         }
 

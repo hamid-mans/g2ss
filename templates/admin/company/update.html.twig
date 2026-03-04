@@ -6,68 +6,63 @@
 
 {% block body %}
 
-    {% for msg in app.flashes('error') %}
-        {{ component('Alert', {type: 'error', text: msg}) }}
-    {% endfor %}
 
-    {% for msg in app.flashes('success') %}
-        {{ component('Alert', {type: 'success', text: msg}) }}
-    {% endfor %}
-
-    <div class="ui segment">
-        <h1><i class="green save icon"></i>Société : {{ company.name }}</h1>
-        <br>
-
-        <div class="ui form">
-            {{ form_start(companyForm) }}
-            <div class="field">
-                <label for="company_name">Nom de la société</label>
-                {{ form_row(companyForm.name) }}
-            </div>
-
-            <div class="four fields">
-                <div class="field">
-                    <label for="company_address1">Adresse 1</label>
-                    {{ form_row(companyForm.address1) }}
-                </div>
-
-                <div class="field">
-                    <label for="company_address2">Adresse 2</label>
-                    {{ form_row(companyForm.address2) }}
-                </div>
-
-                <div class="field">
-                    <label for="company_cop">Code Postal</label>
-                    {{ form_row(companyForm.cop) }}
-                </div>
-
-                <div class="field">
-                    <label for="company_city">Ville</label>
-                    {{ form_row(companyForm.city) }}
-                </div>
-            </div>
-
-            <div class="field">
-                {{ component('Modal', { title: "Souhaitez-vous supprimer la société ?", text: "En supprimant la société, plus aucun utilisateur ne pourra y avoir accés, et toutes les données seront supprimées.", url: path('app.dashboard.delete_company', {id: company.id}) }) }}
-                {{ form_widget(companyForm.submit, {label_html: true}) }} <button type="button" onclick="$('.ui.mini.modal').modal('show')" class="ui basic red button"><i class="trash icon"></i>Supprimer la société</button>
-            </div>
-            {{ form_end(companyForm) }}
-
-
+        {{ form_start(companyForm) }}
+        <div class="field">
+            <label for="company_name">Nom de la société</label>
+            {{ form_row(companyForm.name) }}
         </div>
 
-        {{ component('Hr', { icon: 'warehouse', text: 'Dépôts' }) }}
+        <div class="grid grid-cols-4 gap-6">
+            <div class="field">
+                <label for="company_address1">Adresse 1</label>
+                {{ form_row(companyForm.address1) }}
+            </div>
 
-        <a class="ui basic blue button" href="{{ path('app.dashboard.create.deposit', { id: company.id }) }}">
-            <i class="plus icon"></i>
-            Nouveau dépôt
+            <div class="field">
+                <label for="company_address2">Adresse 2</label>
+                {{ form_row(companyForm.address2) }}
+            </div>
+
+            <div class="field">
+                <label for="company_cop">Code Postal</label>
+                {{ form_row(companyForm.cop) }}
+            </div>
+
+            <div class="field">
+                <label for="company_city">Ville</label>
+                {{ form_row(companyForm.city) }}
+            </div>
+        </div>
+
+        <div class="four fields hidden">
+            <div class="field">
+                <label for="company_modules">Modules</label>
+                {{ form_widget(companyForm.modules) }}
+            </div>
+        </div>
+
+        <div class="field">
+            {{ component('Modal', { title: "Souhaitez-vous supprimer la société ?", text: "En supprimant la société, plus aucun utilisateur ne pourra y avoir accés, et toutes les données seront supprimées.", url: path('app.admin.delete_company', {id: company.id}) }) }}
+            {{ form_widget(companyForm.submit, {label_html: true}) }} <a class="btn btn-error" href="{{ path('app.admin.delete_company', {id:company.id}) }}"><i class="ri ri-delete-bin-fill"></i>Supprimer la société</a>
+        </div>
+        {{ form_end(companyForm) }}
+
+
+
+
+
+        <p class="font-bold text-2xl mb-5 mt-5">Dépôts</p>
+
+        <a class="btn btn-primary" href="{{ path('app.admin.create.deposit', { id: company.id }) }}">
+            <i class="ri ri-add-line"></i>
+            Nouveau
         </a><br><br>
 
-        <div class="depots">
-            <table class="ui celled table">
-                <thead>
+        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+            <table class="table">
+                <thead class="bg-base-200">
                     <tr>
-                        <th class="gerer">Gérer</th>
                         <th>Nom</th>
                         <th>Adresse</th>
                         <th>Ville</th>
@@ -75,8 +70,7 @@
                 </thead>
                 <tbody>
                 {% for deposit in deposits %}
-                    <tr>
-                        <td class="gerer"><a href="{{ path('app.dashboard.update.deposit', {id: deposit.id}) }}"><i class="large blue cogs icon"></i></a></td>
+                    <tr class="clickable-row" data-href="{{ path('app.admin.update.deposit', {id: deposit.id}) }}">
                         <td>{{ deposit.name }}</td>
                         <td>{{ deposit.address2 ? deposit.address1 ~ ' | ' ~ deposit.address2 : deposit.address1 }}</td>
                         <td>{{ deposit.cop ~ ' ' ~ deposit.city }}</td>
@@ -86,18 +80,17 @@
             </table>
         </div>
 
-        {{ component('Hr', { icon: 'users', text: 'Utilisateurs' }) }}
+        <p class="font-bold text-2xl mb-5 mt-5">Utilisateurs</p>
 
-        <a  class="ui basic purple button" href="{{ path('app.admin.create_user', { id: company.id }) }}">
-            <i class="magic icon"></i>
-            Générer un utilisateur
+        <a  class="btn btn-primary" href="{{ path('app.admin.create_user', { id: company.id }) }}">
+            <i class="ri ri-add-line"></i>
+            Nouveau
             </a><br><br>
 
-        <div class="utilisateurs">
-            <table class="ui celled table">
-                <thead>
+        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+            <table class="table">
+                <thead class="bg-base-200">
                     <tr>
-                        <th class="gerer">Gérer</th>
                         <th>Nom</th>
                         <th>Prénom</th>
                         <th>Adresse Email</th>
@@ -106,8 +99,7 @@
                 </thead>
                 <tbody>
                     {% for user in users %}
-                        <tr>
-                            <td class="gerer"><a href="{{ path('app.dashboard.update_user', {id: user.id}) }}"><i class="large blue cogs icon"></i></a></td>
+                        <tr class="clickable-row" data-href="{{ path('app.admin.update_user', {id:user.id}) }}">
                             <td>{{ user.lastname }}</td>
                             <td>{{ user.firstname }}</td>
                             <td>{{ user.email }}</td>
@@ -121,5 +113,5 @@
                 </tbody>
             </table>
         </div>
-    </div>
+
 {% endblock %}

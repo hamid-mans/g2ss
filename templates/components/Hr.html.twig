@@ -1,16 +1,16 @@
-<h4 class="ui small horizontal left aligned header Hr-h4">
-    <i class="{{ icon }} icon"></i>
+<p class="ui horizontal divider left aligned Hr-h1">
+    {# <i class="{{ icon }} icon Hr-i"></i>#}
     {{ text }}
-</h4>
-<hr class="Hr-hr">
+</p>
 
 <style>
-    h4.Hr-h4 {
-        margin: 20px 0 10px 0 !important;
+    p.Hr-h1 {
+        margin: {{ margin ? '70px' : '10px' }} 0 20px 0px !important;
+        font-size: 25px !important;
     }
 
-    hr.Hr-hr {
-        margin: 0 0 20px 0 !important;
-        border: 1px solid var(--color-black);
+    i.Hr-i {
+        font-size: 25px !important;
+        margin-right: 10px !important;
     }
 </style>

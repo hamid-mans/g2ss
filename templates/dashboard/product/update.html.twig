@@ -1,135 +1,227 @@
 {% extends 'layouts/dashboard.base.html.twig' %}
 
-{% block title('Produit : ' ~ product.refInterne) %}
+{% block title('Produit - ' ~ product.refInterne) %}
 
 {% block topbar %}
-    <h1 class="ui header">Produit --> {{ product.refInterne }}</h1>
-{% endblock %}
+	<div class="breadcrumbs text-lg">
+		<ul>
+			<li><a href="{{ path('app.dashboard.product.index') }}">Produits</a></li>
+			<li>{{ product.refInterne }}</li>
+		</ul>
+	</div>
+{% endblock topbar %}
 
 {% block body %}
+	{{ form_start(form) }}
+	<div class="tabs tabs-lift">
+		{# GENERAL #}
+		<label class="tab flex gap-2">
+			<input type="radio" name="tab" checked />
+			<i class="ri ri-information-line text-lg"></i>
+			Général
+		</label>
+		<div class="tab-content border-base-300 bg-base-100 p-6">
+			<div class="flex gap-3">
+				<p class="badge badge-info font-bold">
+					Qté. Stock : {{ product.productUnits|length }}
+				</p>
 
-    <p class="ui basic black label">
-        Qté. Stock : {{ product.productUnits|length }}
-    </p>
+				<p class="badge badge-error font-bold" title="Prix Moyen Pondéré (achat)">
+					P.M.P. : {{ pmp }} €
+				</p>
+			</div>
 
-    <p class="ui basic red label" title="Prix Moyen Pondéré (achat)">
-        P.M.P. : {{ pmp }} €
-    </p>
+			<div class="mt-4 grid grid-cols-3 gap-6">
+				<div class="field">
+					<label for="product_refInterne">Référence Interne</label>
+					{{ form_widget(form.refInterne) }}
+				</div>
 
-    <div class="ui top menu">
-        <a class="active item" data-tab="general">Général</a>
-        <a class="item" data-tab="stock">Stock</a>
-    </div>
+				<div class="field">
+					<label for="product_refSupplier">Référence Fournisseur</label>
+					{{ form_widget(form.refSupplier) }}
+				</div>
 
-    {% for msg in app.flashes('success') %}
-        <div class="ui positive message">
-            {{ msg }}
-        </div>
-    {% endfor %}
+				<div class="field">
+					<label for="product_category">Catégorie</label>
+					{{ form_widget(form.category) }}
+				</div>
+			</div>
 
-    <div class="ui bottom tab segment" data-tab="general">
-        <div class="ui form">
-            {{ form_start(form) }}
+			<div class="field">
+				<label for="product_designation">Désignation</label>
+				{{ form_row(form.designation) }}
+			</div>
 
-            {% if form_errors(form) %}
-                <div class="ui red message">
-                    {{ form_errors(form) }}
-                </div>
-            {% endif %}
+			<div class="space"></div>
 
-            {{ component('Hr', { icon: 'thumbtack', text: 'Informations principales' }) }}
+			<div class="field">
+				<label for="product_description">Commentaire</label>
+				{{ form_row(form.description) }}
+			</div>
 
-            <div class="three fields">
-                <div class="field">
-                    <label for="product_refInterne">Référence Interne</label>
-                    {{ form_widget(form.refInterne) }}
-                </div>
+			<div class="field">
+				{{ form_widget(form.submit, { label_html: true }) }}
 
-                <div class="field">
-                    <label for="product_refSupplier">Référence Fournisseur</label>
-                    {{ form_widget(form.refSupplier) }}
-                </div>
+				<!-- href="{{ path('app.dashboard.product.delete', { refInterne: product.refInterne }) }}" -->
 
-                <div class="field">
-                    <label for="product_category">Catégorie</label>
-                    {{ form_widget(form.category) }}
-                </div>
-            </div>
+				<label for="my_modal_7" type="button" class="btn btn-error">
+					<i class="ri ri-delete-bin-line"></i>
+					Supprimer
+				</label>
 
-            <div class="field">
-                <label for="product_designation">Désignation</label>
-                {{ form_row(form.designation) }}
-            </div>
+				<input type="checkbox" id="my_modal_7" class="modal-toggle" />
+				<div class="modal" role="dialog">
+					<div class="modal-box">
+						<h3 class="text-lg font-bold">Attention !</h3>
+						<p class="py-4">Êtes-vous sûr de supprimer ce produit ?<br>L'ensemble des numéros de séries seront également supprimés</p>
 
-            <div class="space"></div>
+						<a class="btn btn-error" href="{{ path('app.dashboard.product.delete', { refInterne: product.refInterne }) }}">
+							<i class="ri ri-delete-bin-line"></i>
+							Supprimer
+						</a>
+					</div>
+					<label class="modal-backdrop" for="my_modal_7">Close</label>
+				</div>
+			</div>
+		</div>
 
-            {{ component('Hr', { icon: 'euro sign', text: 'Tarification' }) }}
 
-            <div class="five fields">
-                <div class="field">
-                    <label for="product_sellPrice">Prix de vente HT</label>
-                    {{ form_row(form.sellPrice) }}
-                </div>
+		{# TARIFICATIONS #}
 
-                <div class="field">
-                    <label>Marge estimée</label>
-                    <input type="text" value="{{ product.sellPrice - pmp }} €" disabled>
-                </div>
-            </div>
+		<label class="tab flex gap-2">
+			<input type="radio" name="tab" class="tab" />
+			<i class="ri ri-money-euro-circle-line text-lg"></i>
+			Tarification
+		</label>
+		<div class="tab-content border-base-300 bg-base-100 p-6">
+			<div class="grid grid-cols-5 gap-6">
+				<div class="field">
+					<label for="product_sellPrice">Prix de vente HT</label>
+					{{ form_row(form.sellPrice) }}
+				</div>
 
-            <div class="field">
-                <label for="product_description">Commentaire</label>
-                {{ form_row(form.description) }}
-            </div>
+				<div class="field">
+					<label>Marge estimée</label>
+					<input type="text" value="{{ product.sellPrice - pmp }} €" disabled>
+				</div>
+			</div>
+		</div>
 
-            <div class="field">
-                {{ form_widget(form.submit, { label_html: true }) }}
-                <a href="{{ path('app.dashboard.product.delete', { refInterne: product.refInterne }) }}" class="ui basic red button">
-                    <i class="trash icon"></i>
-                    Supprimer
-                </a>
-            </div>
+		{{ form_end(form) }}
 
-            {{ form_end(form) }}
-        </div>
-    </div>
+		{# NUMEROS DE SERIES #}
 
-    <div class="ui bottom tab segment" data-tab="stock">
-        {{ component('Hr', { icon: 'box', text: 'Stock' }) }}
+		<label class="tab flex gap-2">
+			<input type="radio" name="tab" class="tab" />
+			<i class="ri ri-box-3-line"></i>
+			Numéros de série
+		</label>
+		<div class="tab-content border-base-300 bg-base-100 p-6">
 
-        <a href="{{ path('app.dashboard.product_unit.create', { productId: product.id }) }}" class="ui black button">
-            <i class="plus icon"></i>
-            Nouveau
-        </a>
 
-        <table class="ui celled table">
-            <thead>
-            <tr>
-                <th class="table-loop">#</th>
-                <th>Numéro de série</th>
-                <th>Dépôt</th>
-                <th>Prix d'achat</th>
-                <th class="table-loop"><i class="cog icon"></i></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for unit in productUnits %}
-            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product_unit.update', { productUnitId: unit.id }) }}">
-                <td class="table-loop">{{ loop.index }}</td>
-                <td>{{ unit.serialNumber }}</td>
-                <td>{{ unit.deposit.name }}</td>
-                <td>{{ unit.buyPrice }} €</td>
-                <td class="table-loop">
-                    <a class="ui basic red label" href="{{ path('app.dashboard.product_unit.delete', { productUnitId: unit.id }) }}">
-                        Supprimer
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+			<label for="modal_create_unit" type="button" class="btn btn-primary">
+				<i class="ri ri-add-large-line"></i>
+				Ajouter
+			</label>
 
+			<input type="checkbox" id="modal_create_unit" class="modal-toggle" />
+			<div class="modal" role="dialog">
+				<div class="modal-box w-11/12 max-w-3xl">
+					<h3 class="text-lg font-bold">Ajouter un numéro de série</h3>
+					<div class="py-4">
+						{{ form_start(formCreateUnit) }}
+
+						<div class="grid grid-cols-2 mt-4 gap-6 w-full">
+							<div class="field">
+								<label for="product_unit_serialNumber">Numéro de série</label>
+								{{ form_widget(formCreateUnit.serialNumber) }}
+							</div>
+
+							<div class="field">
+								<label for="product_unit_buyPrice">Prix d'achat</label>
+								{{ form_widget(formCreateUnit.buyPrice) }}
+							</div>
+						</div>
+
+						<div class="field">
+							<label for="product_unit_deposit">Dépôt</label>
+							{{ form_widget(formCreateUnit.deposit) }}
+						</div>
+
+						<div class="field">
+							<label for="product_unit_description">Commentaire</label>
+							{{ form_widget(formCreateUnit.description) }}
+						</div>
+
+						<div class="field">
+							{{ form_widget(formCreateUnit.submit, { label_html: true }) }}
+						</div>
+
+						{{ form_end(formCreateUnit) }}
+					</div>
+
+				</div>
+				<label class="modal-backdrop" for="modal_create_unit">Close</label>
+			</div>
+
+
+			<div class="tabs tabs-box mt-4">
+				{% for deposit in app.user.company.deposits %}
+					<input type="radio" name="tab_deposits" class="tab" aria-label="{{ deposit.name }}" {{ loop.index == 1 ? 'checked' : '' }} />
+					<div class="tab-content">
+						<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+						<table class="table">
+							<thead class="bg-base-200">
+							<tr>
+								<th class="table-loop">#</th>
+								<th>Numéro de série</th>
+								<th>Dépôt</th>
+								<th>Prix d'achat</th>
+								<th class="w-5 text-center"><i class="ri-delete-bin-line"></i></th>
+							</tr>
+							</thead>
+							<tbody>
+							{% for unit in deposit.productUnits|filter(u => u.product == product) %}
+								<tr class="clickable-row" data-href="{{ path('app.dashboard.product_unit.update', { id: unit.id }) }}">
+									<td>{{ loop.index }}</td>
+									<td>{{ unit.serialNumber }}</td>
+									<td>{{ unit.deposit.name }}</td>
+									<td>{{ unit.buyPrice|format_currency('EUR', locale: 'fr') }}</td>
+									<td onclick="event.stopPropagation()" class="w-5">
+										<label for="modal_delete_unit_{{ unit.id }}" type="button" class="font-bold badge badge-error">
+											<i class="ri-delete-bin-line"></i>
+											Sortir
+										</label>
+
+										<input type="checkbox" id="modal_delete_unit_{{ unit.id }}" class="modal-toggle" />
+										<div class="modal" role="dialog">
+											<div class="modal-box">
+												<div class="py-4">
+													<h3 class="text-lg font-bold">Attention !</h3>
+													<p class="py-4">Êtes-vous sûr de supprimer ce numéro de série ?</p>
+
+													<a class="btn btn-error" data-turbo="false" href="{{ path('app.dashboard.product_unit.delete', { id: unit.id }) }}">
+														<i class="ri ri-delete-bin-line"></i>
+														Supprimer
+													</a>
+												</div>
+
+											</div>
+											<label class="modal-backdrop" for="modal_delete_unit_{{ unit.id }}">Close</label>
+										</div>
+									</td>
+								</tr>
+							{% endfor %}
+							</tbody>
+						</table>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+		</div>
+	</div>
 
 
 {% endblock %}

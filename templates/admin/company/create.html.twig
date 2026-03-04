@@ -4,7 +4,7 @@
 
 {% block body %}
     <div class="ui segment">
-        <h1><i class="blue plus icon"></i>Créer une société</h1>
+        <p class="font-bold text-2xl">Nouvelle société</p>
         <br>
 
         <div class="ui form">
@@ -14,7 +14,7 @@
                 {{ form_row(companyForm.name) }}
             </div>
 
-            <div class="four fields">
+            <div class="grid grid-cols-4 gap-6">
                 <div class="field">
                     <label for="company_address1">Adresse 1</label>
                     {{ form_row(companyForm.address1) }}
@@ -33,6 +33,13 @@
                 <div class="field">
                     <label for="company_city">Ville</label>
                     {{ form_row(companyForm.city) }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-6 hidden">
+                <div class="field">
+                    <label for="company_modules">Modules</label>
+                    {{ form_widget(companyForm.modules) }}
                 </div>
             </div>
 

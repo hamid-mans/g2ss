@@ -4,9 +4,6 @@
 
 {% block body %}
     <div class="ui segment">
-        <h1><i class="green save icon"></i>Dépôt : {{ deposit.name }}</h1>
-        <br>
-
         <div class="ui form">
             {{ form_start(depositForm) }}
             <div class="field">
@@ -14,7 +11,7 @@
                 {{ form_row(depositForm.name) }}
             </div>
 
-            <div class="four fields">
+            <div class="grid grid-cols-4 gap-6">
                 <div class="field">
                     <label for="deposit_address1">Adresse 1</label>
                     {{ form_row(depositForm.address1) }}
@@ -39,7 +36,7 @@
 
             <div class="field">
                 {{ component('Modal', { title: "Souhaitez-vous supprimer le dépôt ?", text: "En supprimant le dépôt, plus aucun utilisateur ne pourra y avoir accés, et toutes ses données seront supprimées.", url: path('app.admin.delete_deposit', {id: deposit.id}) }) }}
-                {{ form_widget(depositForm.submit, {label_html: true}) }} <button class="ui basic red button" type="button" onclick="$('.ui.mini.modal').modal('show')"><i class="trash icon"></i>Supprimer le dépôt</button>
+                {{ form_widget(depositForm.submit, {label_html: true}) }} <button class="btn btn-error" type="button"><i class="ri ri-delete-bin-line"></i>Supprimer</button>
             </div>
             {{ form_end(depositForm) }}
         </div>

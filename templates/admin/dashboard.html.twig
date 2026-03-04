@@ -3,31 +3,23 @@
 {% block title("Espace d'administration") %}
 
 {% block body %}
-    {% for msg in app.flashes('error') %}
-        {{ component('Alert', {type: 'error', text: msg}) }}
-    {% endfor %}
 
-    {% for msg in app.flashes('success') %}
-        {{ component('Alert', {type: 'success', text: msg}) }}
-    {% endfor %}
+    <p class="font-bold text-2xl mb-5">Liste des sociétés</p>
 
-    <div class="ui segment">
-        <h1>Liste des sociétés</h1>
+    <a href="{{ path('app.admin.create_company') }}" class="btn btn-primary mb-5">
+        <i class="ri ri-add-line"></i>
+        Nouvelle société
+    </a>
 
-        <a href="{{ path('app.dashboard.create_company') }}" class="ui basic blue button">
-            <i class="plus icon"></i>
-            Nouvelle société
-        </a>
-        <table class="ui celled table">
-            <thead>
-            <th class="gerer">Gérer</th>
+    <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+        <table class="table">
+            <thead class="bg-base-200">
             <th>Société</th>
             <th>Ville</th>
             </thead>
             <tbody>
             {% for company in companies %}
-                <tr>
-                    <td class="gerer"><a href="{{ path('app.admin.update_company', {id: company.id}) }}"><i class="large blue cogs icon"></i></a></td>
+                <tr class="clickable-row" data-href="{{ path('app.admin.update_company', {id: company.id}) }}">
                     <td><b>{{ company.name }}</b></td>
                     <td>{{ company.cop ~ ' ' ~ company.city }}</td>
                 </tr>
@@ -35,4 +27,5 @@
             </tbody>
         </table>
     </div>
+
 {% endblock %}

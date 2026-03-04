@@ -25,31 +25,31 @@ class GenerateUserType extends AbstractType
                 'label' => false,
             ])
             ->add('lastname', TextType::class, [
-                'label' => false
+                'label' => false,
             ])
             ->add('email', EmailType::class, [
-                'label' => false
+                'label' => false,
             ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => false,
-                'mapped' => false
+                'mapped' => false,
+                'required' => false,
+                'attr' => ['class' => 'input input-bordered w-full', 'placeholder' => 'Laisser vide pour ne pas modifier']
             ])
             ->add('deposits', EntityType::class, [
+                'label' => false,
                 'class' => Deposit::class,
+                'multiple' => true,
+                'expanded' => true, // <--- C'est ça qui transforme le select en checkboxes
                 'query_builder' => function (EntityRepository $er) use ($company) {
-                return $er->createQueryBuilder('d')
-                    ->where('d.company = :company')
-                    ->setParameter('company', $company)
-                    ->orderBy('d.name', 'ASC');
+                    return $er->createQueryBuilder('d')
+                        ->where('d.company = :company')
+                        ->setParameter('company', $company)
+                        ->orderBy('d.name', 'ASC');
                 },
                 'choice_label' => 'name',
                 'by_reference' => false,
-                'multiple' => true,
-                'expanded' => false,
-                'label' => false,
-                'attr' => [
-                    'class' => 'ui fluid search selection dropdown'
-                ]
+                'label' => 'Accès aux dépôts',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],
@@ -64,9 +64,9 @@ class GenerateUserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'submit_label' => false,
-            'submit_class' => false,
-            'company' => null, //
+            'submit_label' => 'Enregistrer',
+            'submit_class' => 'btn btn-primary',
+            'company' => null,
         ]);
     }
 }

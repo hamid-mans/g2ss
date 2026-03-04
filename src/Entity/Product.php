@@ -47,6 +47,9 @@ class Product
     #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'product', orphanRemoval: true)]
     private Collection $productUnits;
 
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Company $company = null;
+
     public function __construct()
     {
         $this->productUnits = new ArrayCollection();
@@ -155,6 +158,18 @@ class Product
                 $productUnit->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
 
         return $this;
     }

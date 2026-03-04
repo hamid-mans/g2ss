@@ -1,69 +1,169 @@
+<!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <title>G2SS - {% block title %}{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.js"></script>
-        <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
-        {% block stylesheets %}
-        {% endblock %}
+<head>
+	<meta charset="UTF-8">
+	<script>
+        if (localStorage.getItem('theme') === 'black') {
+            document.documentElement.setAttribute('data-theme', 'black');
+            document.documentElement.classList.add('dark');
+        }
+	</script>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
+	<title>G2SS - {% block title %}{% endblock %}</title>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
-        <div class="layout">
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-            <div class="logo">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo">
-                <h1 style="margin: 0px 0px 0px 10px" class="title">
-                    G2SS
-                </h1>
-            </div>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
 
-            <div class="topbar">
-                {% block topbar %}{% endblock %}
-            </div>
+	{% block stylesheets %}
+		{{ encore_entry_link_tags('app') }}
+	{% endblock %}
 
-            <div class="sidebar">
+	{% block javascripts %}
+		{{ encore_entry_script_tags('app') }}
+	{% endblock %}
+</head>
+<body id="app">
+{{ include('components/Alert.html.twig') }}
+<div class="grid h-screen [grid-template-columns:270px_1fr] [grid-template-rows:55px_1fr] [grid-template-areas:'logo_topbar''sidebar_content']">
 
-                <div class="company">
-                    <span style="border-bottom: 1px solid black">
-                        {{ app.user.company.name }}
-                    </span>
-                </div>
+	{# LOGO #}
+	<div class="[grid-area:logo] sticky top-0 z-10 flex items-center justify-start gap-3 px-5 bg-base-200 border-b border-r border-base-300">
+		<i class="ri-home-smile-line text-2xl"></i>
+		<span class="text-2xl tracking-[5px]">
+            G2SS
+        </span>
+	</div>
 
-                <div class="navigation">
-                    <nav>
-                        <ul>
-                            <a href="{{ path('app.dashboard.index') }}"><li class="{{ app.request.attributes.get('_route') == 'app.dashboard.index' ? 'active' : '' }}"><i class="map signs icon"></i> Accueil</li></a>
-                            <a href="{{ path('app.dashboard.product.index') }}"><li  class="{{ 'app.dashboard.product' in app.request.attributes.get('_route') ? 'active' : '' }}"><i class="box icon"></i>Produits</li></a>
-                            <a href=""><li><i class="warehouse icon"></i> Dépôts</li></a>
-                        </ul>
-                    </nav>
+	{# TOPBAR #}
+	<div class="[grid-area:topbar] flex items-center px-5 bg-base-100 border-b border-base-300">
+		<div class="flex justify-between items-center w-full">
+			<div>
+				<p class="text-lg">
+					{% block topbar %}{% endblock %}
+				</p>
+			</div>
 
-                    <nav>
-                        <ul>
-                            <a href=""><li><i class="user icon"></i> Hamid</li></a>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+			<button title="Actions rapides" class="btn btn-secondary btn-circle" popovertarget="popover-1" style="anchor-name:--anchor-1">
+				<i class="ri ri-add-line"></i>
+			</button>
+			<ul class="dropdown menu w-52 rounded-box bg-base-100 border border-base-300 shadow-sm"
+			    popover id="popover-1" style="position-anchor:--anchor-1">
+				<li><a><i class="ri ri-money-euro-box-line"></i>Demande d'achat</a></li>
+				<li><a><i class="ri ri-folder-check-line"></i>Bon de livraison</a></li>
+			</ul>
+		</div>
+	</div>
 
-            <div class="content">
-                <div class="content-dashboard">
-                    <div style="padding-right: 20px;">
-                        {% block body %}{% endblock %}
-                    </div>
-                    <script src="{{ asset('js/main.js') }}"></script>
-                </div>
-            </div>
+	{# SIDEBAR #}
+	<div class="[grid-area:sidebar] sticky top-0 z-10 flex flex-col h-full bg-base-200 border-r border-base-300 overflow-hidden">
 
-        </div>
+		<div class="flex-1 overflow-y-auto pt-4 min-h-0">
 
-    </body>
+			<nav>
+				<p class="ml-5 mb-1 text-xs tracking-widest text-base-content/50 uppercase">Principal</p>
+				<ul class="menu menu-sm px-2 w-full gap-2">
+					<li>
+						<a href="{{ path('app.dashboard.index') }}"
+						   class="{{ app.request.attributes.get('_route') == 'app.dashboard.index' ? 'menu-active' : '' }} py-1">
+							<i class="ri-building-2-line text-[17px]"></i> Accueil
+						</a>
+					</li>
+					<li>
+						<a href="">
+							<i class="ri-group-line text-[17px]"></i> Fournisseurs
+						</a>
+					</li>
+					<li>
+						<a href="{{ path('app.dashboard.product.index') }}"
+						   class="{{ 'app.dashboard.product' in app.request.attributes.get('_route') ? 'menu-active' : '' }}">
+							<i class="ri-box-3-line text-[17px]"></i> Produits
+						</a>
+					</li>
+					<li>
+						<a href="">
+							<i class="ri-database-line text-[17px]"></i> Dépôts
+						</a>
+					</li>
+				</ul>
+			</nav>
+
+			<div class="border-t border-base-300 my-4"></div>
+
+			<nav>
+				<p class="ml-5 mb-1 text-xs tracking-widest text-base-content/50 uppercase">Documents</p>
+				<ul class="menu menu-sm px-2 w-full">
+					<li>
+						<a href=""><i class="ri-money-euro-box-line text-lg"></i> Demandes d'achats</a>
+					</li>
+					<li>
+						<a href=""><i class="ri-file-list-3-line text-lg"></i> Commandes</a>
+					</li>
+					<li>
+						<a href=""><i class="ri-folder-check-line text-lg"></i> Bons de livraison</a>
+					</li>
+				</ul>
+			</nav>
+
+			<div class="border-t border-base-300 my-4"></div>
+
+			<nav>
+				<p class="ml-5 mb-1 text-xs tracking-widest text-base-content/50 uppercase">Modules</p>
+				<ul class="menu menu-sm px-2 w-full">
+					<li>
+						<a href=""><i class="ri-file-list-3-line text-lg"></i>Inventaire</a>
+					</li>
+				</ul>
+			</nav>
+
+			<div class="border-t border-base-300 my-4"></div>
+
+			<nav>
+				<p class="ml-5 mb-1 text-xs tracking-widest text-base-content/50 uppercase">Utilitaires</p>
+				<ul class="menu menu-sm px-2 w-full">
+					<li>
+						<a href="{{ path('app.settings.index') }}"><i class="ri-settings-4-line text-lg"></i>Paramètres</a>
+					</li>
+				</ul>
+			</nav>
+
+		</div>
+
+		{# Bottom sidebar #}
+		<div class="flex justify-between items-center p-4 border-t border-base-300">
+			<div class="bg-base-200 p-1 px-3 rounded-box border border-base-300">
+				<div class="avatar avatar-online">
+					<div class="w-8 rounded-full">
+						<img src="{{ asset('build/images/profil.jpg') }}" />
+					</div>
+				</div>
+				<span class="ml-1">{{ app.user.firstname ~ ' ' ~ app.user.lastname }}</span>
+			</div>
+
+			<button id="theme-switcher" class="btn btn-primary btn-sm btn-circle">
+				<span class="dark:hidden">
+					<i class="ri-moon-line"></i>
+                </span>
+
+				<span class="hidden dark:block">
+					<i class="ri-sun-line"></i>
+                </span>
+			</button>
+		</div>
+	</div>
+
+	{# CONTENT #}
+	<div class="[grid-area:content] overflow-y-auto h-full bg-base-100">
+		<div class="p-6 pr-8">
+			{% block body %}{% endblock %}
+		</div>
+	</div>
+
+</div>
+
+</body>
 </html>
