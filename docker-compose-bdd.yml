@@ -15,4 +15,4 @@ services:
       retries: 10
       start_period: 20s
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:
