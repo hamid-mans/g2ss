@@ -1,18 +1,28 @@
+version: "3.8"
+
 services:
   db:
     image: mysql:8.0
     container_name: g2ss-db
     restart: always
+
     environment:
-      MYSQL_ROOT_PASSWORD: g2ss
-      MYSQL_DATABASE: g2ss
-      MYSQL_USER: g2ss
-      MYSQL_PASSWORD: g2ss
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    volumes:
+      - db_data:/var/lib/mysql
+
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pg2ss"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
-    volumes:
-      - db_data:
+
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:
