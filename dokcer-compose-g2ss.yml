@@ -1,3 +1,4 @@
+services:
  app:
     image: fbs124/g2ss-app:latest  # <--- On utilise l'image que tu viens de push
     container_name: g2ss-app
