@@ -8,7 +8,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: "mysql://g2ss:g2ss@db:3306/g2ss?serverVersion=8.0&charset=utf8mb4"
+      DATABASE_URL: "mysql://g2ss:g2ss@212.227.82.6:3306/g2ss?serverVersion=mariadb-10.6"
       MAILER_DSN: "smtp://mailer:1025"
       APP_ENV: "prod"
     entrypoint: /app/entrypoint.sh
