@@ -2,15 +2,15 @@ version: "3.8"
 
 services:
   db:
-    image: mysql:8.0
+    image: mariadb:10.6
     container_name: g2ss-db
     restart: always
 
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
 
     volumes:
       - db_data:/var/lib/mysql
@@ -20,6 +20,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 20s
 
     ports:
       - "3306:3306"
