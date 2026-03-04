@@ -34,13 +34,12 @@ class GenerateUserType extends AbstractType
                 'label' => false,
                 'mapped' => false,
                 'required' => false,
-                'attr' => ['class' => 'input input-bordered w-full', 'placeholder' => 'Laisser vide pour ne pas modifier']
             ])
             ->add('deposits', EntityType::class, [
                 'label' => false,
                 'class' => Deposit::class,
                 'multiple' => true,
-                'expanded' => true, // <--- C'est ça qui transforme le select en checkboxes
+                'expanded' => true,
                 'query_builder' => function (EntityRepository $er) use ($company) {
                     return $er->createQueryBuilder('d')
                         ->where('d.company = :company')
@@ -48,8 +47,7 @@ class GenerateUserType extends AbstractType
                         ->orderBy('d.name', 'ASC');
                 },
                 'choice_label' => 'name',
-                'by_reference' => false,
-                'label' => 'Accès aux dépôts',
+                'by_reference' => false
             ])
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],

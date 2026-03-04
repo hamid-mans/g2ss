@@ -233,13 +233,10 @@ class AdminController extends AbstractController
             $user->setCompany($company);
             $user->setRoles(['ROLE_USER']);
 
-            // Hashage du mot de passe seulement s'il est rempli
             $plainPassword = $userForm->get('plainPassword')->getData();
             if ($plainPassword) {
                 $user->setPassword($hasher->hashPassword($user, $plainPassword));
             }
-
-            // Plus besoin du foreach manuel ici grâce à 'by_reference' => false dans le FormType !
 
             $entityManager->persist($user);
             $entityManager->flush();

@@ -1,27 +1,40 @@
 <div class="toast toast-end toast-top z-[100]">
-	{% for label, messages in app.flashes %}
+	{% for type, messages in app.flashes %}
 		{% for message in messages %}
 			<script>
-                Toastify({
-                    text: "✔ {{ message }}",
-                    duration: 3000,
-                    newWindow: true,
-                    close: false,
-                    gravity: "bottom",
-                    position: "right",
-	                style: {
-                        //background: 'oklch(96% 0.044 156.743)',
-		                background: 'white',
-		                color: 'var(--color-success-content)',
-		                //boxShadow: '0 0 5px var(--color-success)',
-		                boxShadow: 'none',
-		                border: '1px solid var(--color-base-300)',
-		                borderTop: '3px solid var(--color-base-300)',
-		                borderRadius: '10px'
-	                },
-                    stopOnFocus: true, // Prevents dismissing of toast on hover
-                    onClick: function(){} // Callback after click
-                }).showToast();
+                if("{{ type }}" === 'success') {
+                    Toastify({
+                        text: "✔ " + {{ message|json_encode|raw }},
+                        duration: 4000,
+                        gravity: "top",
+                        position: "center",
+                        style: {
+                            background: 'white',
+                            color: '#333',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            border: '1px solid #ddd',
+                            // On change la bordure du haut selon le succès ou l'erreur
+                            borderTop: '4px solid var(--color-success)',
+                            borderRadius: '10px'
+                        }
+                    }).showToast();
+                } else {
+                    Toastify({
+                        text: "❌ " + {{ message|json_encode|raw }},
+                        duration: 4000,
+                        gravity: "top",
+                        position: "center",
+                        style: {
+                            background: 'white',
+                            color: '#333',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            border: '1px solid #ddd',
+                            // On change la bordure du haut selon le succès ou l'erreur
+                            borderTop: '4px solid var(--color-error)',
+                            borderRadius: '10px'
+                        }
+                    }).showToast();
+                }
 			</script>
 		{% endfor %}
 	{% endfor %}

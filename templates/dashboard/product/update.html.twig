@@ -48,9 +48,16 @@
 				</div>
 			</div>
 
-			<div class="field">
-				<label for="product_designation">Désignation</label>
-				{{ form_row(form.designation) }}
+			<div class="grid grid-cols-2 gap-6">
+				<div class="field">
+					<label for="product_designation">Désignation</label>
+					{{ form_row(form.designation) }}
+				</div>
+
+				<div class="field">
+					<label for="product_brands">Marque</label>
+					{{ form_row(form.brands) }}
+				</div>
 			</div>
 
 			<div class="space"></div>
@@ -90,7 +97,7 @@
 		{# TARIFICATIONS #}
 
 		<label class="tab flex gap-2">
-			<input type="radio" name="tab" class="tab" />
+			<input type="radio" name="tab" class="tab" {{ app.request.query.get('tab') == 'prices' ? 'checked' : '' }} />
 			<i class="ri ri-money-euro-circle-line text-lg"></i>
 			Tarification
 		</label>
@@ -113,7 +120,7 @@
 		{# NUMEROS DE SERIES #}
 
 		<label class="tab flex gap-2">
-			<input type="radio" name="tab" class="tab" />
+			<input type="radio" name="tab" class="tab" {{ app.request.query.get('tab') == 'serial' ? 'checked' : '' }} />
 			<i class="ri ri-box-3-line"></i>
 			Numéros de série
 		</label>

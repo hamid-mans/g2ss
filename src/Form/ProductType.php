@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Brand;
 use App\Entity\Category;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -47,6 +48,13 @@ class ProductType extends AbstractType
                 'label' => false,
                 'required' => false,
             ])
+            ->add('brands', EntityType::class, [
+                'label' => false,
+                'class' => Brand::class,
+                'required' => false,
+                'placeholder' => "Aucune marque",
+                'choice_label' => 'label',
+            ])
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],
                 'attr' => [
@@ -56,6 +64,8 @@ class ProductType extends AbstractType
             ->add('category', EntityType::class, [
                 'label' => false,
                 'class' => Category::class,
+                'required' => false,
+                'placeholder' => "Aucune catégorie",
                 'choice_label' => 'label',
                 'attr' => [
                     'class' => 'ui dropdown search'

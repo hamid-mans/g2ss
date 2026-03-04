@@ -36,6 +36,7 @@ class Product
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
@@ -49,6 +50,9 @@ class Product
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     private ?Company $company = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Brand $brands = null;
 
     public function __construct()
     {
@@ -170,6 +174,18 @@ class Product
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getBrands(): ?Brand
+    {
+        return $this->brands;
+    }
+
+    public function setBrands(?Brand $brands): static
+    {
+        $this->brands = $brands;
 
         return $this;
     }

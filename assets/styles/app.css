@@ -26,11 +26,11 @@
     --color-neutral-content: oklch(100% 0 0);
     --color-info: oklch(97% 0.013 236.62);
     --color-info-content: oklch(20% 0.042 265.755);
-    --color-success: oklch(96% 0.044 156.743);
+    --color-success: oklch(0.917 0.067 152.179);
     --color-success-content: oklch(26% 0.065 152.934);
     --color-warning: oklch(96% 0.059 95.617);
     --color-warning-content: oklch(27% 0.077 45.635);
-    --color-error: oklch(88% 0.062 18.334);
+    --color-error: oklch(0.861 0.075 18.727);
     --color-error-content: oklch(25% 0.092 26.042);
     --radius-selector: 0.25rem;
     --radius-field: 0.5rem;
@@ -74,7 +74,7 @@
     --size-selector: 0.25rem;
     --size-field: 0.25rem;
     --border: 1.5px;
-    --depth: 0;
+    --depth: 1;
     --noise: 0;
 }
 *:not(i) {

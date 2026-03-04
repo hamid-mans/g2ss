@@ -150,7 +150,10 @@ final class ProductController extends AbstractController
 
             $this->addFlash('success', 'Numéro de série créé !');
 
-            return $this->redirectToRoute('app.dashboard.product.update', ['refInterne' => $productUnit->getProduct()->getRefInterne()]);
+            return $this->redirectToRoute('app.dashboard.product.update', [
+                'tab' => 'serial',
+                'refInterne' => $productUnit->getProduct()->getRefInterne()
+            ]);
         }
 
         return $this->render('dashboard/product/update.html.twig', [
