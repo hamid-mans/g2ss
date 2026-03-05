@@ -1,0 +1,20 @@
+{% extends 'layouts/admin.base.html.twig' %}
+
+{% block title('Lier des modules') %}
+
+{% block body %}
+	<div class="ui segment">
+		<h1><i class="blue plus icon"></i>{{ company.name }} : Lier des modules</h1>
+		<br>
+
+		<div class="ui form">
+			{{ form_start(form) }}
+
+
+			<div class="field">
+				{{ form_row(form.submit, {label_html: true}) }}
+			</div>
+			{{ form_end(form) }}
+		</div>
+	</div>
+{% endblock %}

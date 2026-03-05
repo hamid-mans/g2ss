@@ -6,11 +6,14 @@ namespace App\Controller;
 
 use App\Entity\Company;
 use App\Entity\Deposit;
+use App\Entity\Modules;
 use App\Entity\User;
 use App\Form\CompanyType;
 use App\Form\DepositType;
 use App\Form\GenerateUserType;
+use App\Form\ModuleType;
 use App\Repository\CompanyRepository;
+use App\Repository\ModulesRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,7 +23,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/administration', 'app.admin.')]
+#[Route('/admin', 'app.admin.')]
 class AdminController extends AbstractController
 {
     #[isGranted('ROLE_SA')]
@@ -38,8 +41,8 @@ class AdminController extends AbstractController
     {
         $company = new Company();
         $createForm = $this->createForm(CompanyType::class, $company, [
-            'submit_label' => '<i class="plus icon"></i>Enregistrer',
-            'submit_class' => 'ui basic blue button'
+            'submit_label' => '<i class="ri ri-add-line"></i>Enregistrer',
+            'submit_class' => 'btn btn-primary',
         ]);
         $createForm->handleRequest($request);
 
@@ -60,15 +63,15 @@ class AdminController extends AbstractController
 
     #[isGranted('ROLE_SA')]
     #[Route('/modifier-societe/{id}', name: 'update_company')]
-    public function updateCompany(UserRepository $userRepository, EntityManagerInterface $entityManager, ?Company $company, Request $request): Response
+    public function updateCompany(ModulesRepository $modulesRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ?Company $company, Request $request): Response
     {
         if($company)
         {
             $users = $userRepository->findBy(['company' => $company], ['lastname' => 'ASC']);
 
             $updateForm = $this->createForm(CompanyType::class, $company, [
-                'submit_label' => '<i class="save icon"></i>Mettre à jour',
-                'submit_class' => 'ui basic green button'
+                'submit_label' => '<i class="ri ri-save-fill"></i>Mettre à jour',
+                'submit_class' => 'btn btn-primary'
             ]);
             $updateForm->handleRequest($request);
 
@@ -76,9 +79,12 @@ class AdminController extends AbstractController
                 $company->setName(strtoupper($company->getName()));
                 $entityManager->flush();
 
+                // Gestion des modules
+                dd($updateForm->getData()->getModules());
+
                 $this->addFlash('success', 'La société a bien été mise à jour');
 
-                return $this->redirectToRoute('app.dashboard.index');
+                return $this->redirectToRoute('app.admin.update_company', ['id' => $company->getId()]);
             }
 
             return $this->render('admin/company/update.html.twig', [
@@ -86,6 +92,7 @@ class AdminController extends AbstractController
                 'companyForm' => $updateForm->createView(),
                 'deposits' => $company->getDeposits(),
                 'users' => $users,
+                'modules' => $modulesRepository->findAll(),
             ]);
         }
         else
@@ -127,8 +134,8 @@ class AdminController extends AbstractController
             $deposit = new Deposit();
 
             $depositForm = $this->createForm(DepositType::class, $deposit, [
-                'submit_label' => '<i class="plus icon"></i>Enregistrer',
-                'submit_class' => 'ui basic blue button'
+                'submit_label' => '<i class="ri ri-add-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary'
             ]);
             $depositForm->handleRequest($request);
 
@@ -141,7 +148,7 @@ class AdminController extends AbstractController
 
                 $this->addFlash('success', 'Le dépôt a été ajouté avec succès');
 
-                return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
+                return $this->redirectToRoute('app.admin.update_company', ['id' => $deposit->getCompany()->getId()]);
             }
             return $this->render('admin/deposit/create.html.twig', [
                 'company' => $company,
@@ -161,8 +168,8 @@ class AdminController extends AbstractController
         if($deposit)
         {
             $depositForm = $this->createForm(DepositType::class, $deposit, [
-                'submit_label' => '<i class="save icon"></i>Mettre à jour',
-                'submit_class' => 'ui basic green button'
+                'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary'
             ]);
             $depositForm->handleRequest($request);
 
@@ -174,7 +181,7 @@ class AdminController extends AbstractController
 
                 $this->addFlash('success', 'Le dépôt a été modifié avec succès');
 
-                return $this->redirectToRoute('app.dashboard.update_company', ['id' => $deposit->getCompany()->getId()]);
+                return $this->redirectToRoute('app.admin.update_company', ['id' => $deposit->getCompany()->getId()]);
             }
             return $this->render('admin/deposit/update.html.twig', [
                 'depositForm' => $depositForm->createView(),
@@ -199,7 +206,7 @@ class AdminController extends AbstractController
 
             $this->addFlash('success', 'Dépôt supprimée avec succès');
 
-            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $companyId]);
+            return $this->redirectToRoute('app.admin.update_company', ['id' => $companyId]);
         }
         else
         {
@@ -215,21 +222,20 @@ class AdminController extends AbstractController
     {
         $user = new User();
         $userForm = $this->createForm(GenerateUserType::class, $user, [
-            'submit_label' => '<i class="plus icon"></i>Enregistrer',
-            'submit_class' => 'ui basic blue button',
+            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+            'submit_class' => 'btn btn-primary',
             'company' => $company,
         ]);
-        $userForm->handleRequest($request);
 
+        $userForm->handleRequest($request);
 
         if ($userForm->isSubmitted() && $userForm->isValid()) {
             $user->setCompany($company);
             $user->setRoles(['ROLE_USER']);
-            $user->setPassword($hasher->hashPassword($user, $userForm->get('plainPassword')->getData()));
 
-            foreach ($userForm->getData()->getDeposits() as $deposit)
-            {
-                $user->addDeposit($deposit);
+            $plainPassword = $userForm->get('plainPassword')->getData();
+            if ($plainPassword) {
+                $user->setPassword($hasher->hashPassword($user, $plainPassword));
             }
 
             $entityManager->persist($user);
@@ -237,11 +243,11 @@ class AdminController extends AbstractController
 
             $this->addFlash('success', "L'utilisateur a bien été créé");
 
-            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $company->getId()]);
+            return $this->redirectToRoute('app.admin.update_company', ['id' => $company->getId()]);
         }
 
         return $this->render('admin/user/create.html.twig', [
-            'id' => $company->getId(),
+            'company' => $company,
             'userForm' => $userForm->createView(),
         ]);
     }
@@ -250,16 +256,30 @@ class AdminController extends AbstractController
     #[Route('/modifier-utilisateur/{id}', name: 'update_user')]
     public function updateUser(UserRepository $userRepository, ?User $user, EntityManagerInterface $entityManager, Request $request): Response
     {
+        $company = $user->getCompany();
         if($user)
         {
             $userForm = $this->createForm(GenerateUserType::class, $user, [
-                'submit_label' => '<i class="save icon"></i>Mettre à jour',
-                'submit_class' => 'ui basic green button'
+                'submit_label' => '<i class="ri ri-save-line"></i>Mettre à jour',
+                'submit_class' => 'btn btn-primary',
+                'company' => $user->getCompany(),
             ]);
             $userForm->handleRequest($request);
 
             if ($userForm->isSubmitted() && $userForm->isValid()) {
+                $user->setRoles(['ROLE_USER']);
 
+                foreach ($userForm->getData()->getDeposits() as $deposit)
+                {
+                    $user->addDeposit($deposit);
+                }
+
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                $this->addFlash('success', "L'utilisateur a bien été modifié");
+
+                return $this->redirectToRoute('app.admin.update_company', ['id' => $company->getId()]);
             }
 
             return $this->render('admin/user/update.html.twig', [

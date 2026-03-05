@@ -42,10 +42,38 @@ class Company
     #[ORM\OneToMany(targetEntity: Deposit::class, mappedBy: 'company', cascade: ['remove'])]
     private Collection $deposits;
 
+    /**
+     * @var Collection<int, Modules>
+     */
+    #[ORM\ManyToMany(targetEntity: Modules::class, inversedBy: 'companies')]
+    private Collection $modules;
+
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'company')]
+    private Collection $products;
+
+    /**
+     * @var Collection<int, Category>
+     */
+    #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $categories;
+
+    /**
+     * @var Collection<int, Brand>
+     */
+    #[ORM\OneToMany(targetEntity: Brand::class, mappedBy: 'company')]
+    private Collection $brands;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->deposits = new ArrayCollection();
+        $this->modules = new ArrayCollection();
+        $this->products = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->brands = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,6 +195,120 @@ class Company
             // set the owning side to null (unless already changed)
             if ($deposit->getCompany() === $this) {
                 $deposit->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Modules>
+     */
+    public function getModules(): Collection
+    {
+        return $this->modules;
+    }
+
+    public function addModule(Modules $module): static
+    {
+        if (!$this->modules->contains($module)) {
+            $this->modules->add($module);
+        }
+
+        return $this;
+    }
+
+    public function removeModule(Modules $module): static
+    {
+        $this->modules->removeElement($module);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getCompany() === $this) {
+                $product->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Category $category): static
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Category $category): static
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getCompany() === $this) {
+                $category->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Brand>
+     */
+    public function getBrands(): Collection
+    {
+        return $this->brands;
+    }
+
+    public function addBrand(Brand $brand): static
+    {
+        if (!$this->brands->contains($brand)) {
+            $this->brands->add($brand);
+            $brand->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrand(Brand $brand): static
+    {
+        if ($this->brands->removeElement($brand)) {
+            // set the owning side to null (unless already changed)
+            if ($brand->getCompany() === $this) {
+                $brand->setCompany(null);
             }
         }
 

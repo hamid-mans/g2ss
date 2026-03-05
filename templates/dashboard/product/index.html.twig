@@ -2,9 +2,7 @@
 
 {% block title('Produits') %}
 
-{% block topbar %}
-    <h1 class="ui header">Produits</h1>
-{% endblock %}
+{% block topbar('Produits') %}
 
 {% block body %}
 
@@ -14,36 +12,127 @@
         </div>
     {% endfor %}
 
-    <a href="{{ path('app.dashboard.product.create') }}" class="ui black button">
-        <i class="plus icon"></i>
-        Nouveau
-    </a>
+    <div class="flex justify-between">
+        <div>
+            <label for="modal_create_product" type="button" class="btn btn-primary">
+                <i class="ri ri-add-large-line"></i>
+                Nouveau
+            </label>
 
-    <button class="ui basic button">
-        <i class="search icon"></i>
-        Rechercher
-    </button>
+            <input type="checkbox" id="modal_create_product" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-11/12 max-w-3xl">
+                    <h3 class="text-2xl font-bold">Nouveau produit</h3>
+                    <div class="py-4">
+                        {{ form_start(formCreateProduct) }}
 
-    <table class="ui celled table">
-        <thead>
-        <tr>
-            <th class="table-loop">#</th>
-            <th>Réf. Interne</th>
-            <th>Réf. Fournisseur</th>
-            <th>Désignation</th>
-            <th>Prix de vente</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for product in products %}
-            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
-                <td class="table-loop">{{ loop.index }}</td>
-                <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
-                <td>{{ product.refSupplier }}</td>
-                <td>{{ product.designation }}</td>
-                <td>{{ product.sellPrice }}</td>
+                        <div class="grid grid-cols-2 gap-5 mt-4">
+                            <div>
+                                <label for="product_refInterne">Référence Interne</label>
+                                {{ form_widget(formCreateProduct.refInterne) }}
+                            </div>
+
+                            <div>
+                                <label for="product_refSupplier">Référence Fournisseur</label>
+                                {{ form_widget(formCreateProduct.refSupplier) }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="product_designation">Désignation</label>
+                            {{ form_row(formCreateProduct.designation) }}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label for="product_sellPrice">Prix de vente HT</label>
+                                {{ form_row(formCreateProduct.sellPrice) }}
+                            </div>
+
+                            <div>
+                                <label for="product_category">Catégorie</label>
+                                {{ form_widget(formCreateProduct.category) }}
+                            </div>
+                        </div>
+
+                        <div class="hidden">
+                            <label for="product_description">Commentaire</label>
+                            {{ form_row(formCreateProduct.description) }}
+                        </div>
+
+                        <div class="mt-4">
+                            {{ form_widget(formCreateProduct.submit, { label_html: true }) }}
+                        </div>
+
+                        {{ form_end(formCreateProduct) }}
+                    </div>
+
+                </div>
+                <label class="modal-backdrop" for="modal_create_product">Close</label>
+            </div>
+
+            <label for="modal_search_product" type="button" class="btn btn-secondary">
+                <i class="ri ri-search-line"></i>
+            </label>
+
+            <input type="checkbox" id="modal_search_product" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-11/12 max-w-3xl">
+                    <h3 class="text-2xl font-bold">Rechercher</h3>
+                    <div class="py-4">
+                        {{ form_start(form) }}
+
+                        <div>
+                            {{ form_row(form.search) }}
+                        </div>
+
+                        <div class="mt-4">
+                            {{ form_widget(form.submit, { label_html: true }) }}
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+
+                </div>
+                <label class="modal-backdrop" for="modal_search_product">Close</label>
+            </div>
+        </div>
+
+        <div class="dropdown dropdown-end">
+            <button popovertarget="export" style="anchor-name:--anchor-export" class="btn btn-success">
+                <i class="ri ri-file-excel-2-line"></i>
+                Exporter
+            </button>
+            <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
+                popover id="export" style="position-anchor:--anchor-export">
+                <li><a data-turbo="false" href="{{ path('app.export.products') }}"><i class="ri ri-box-3-line"></i>Produits</a></li>
+                <li><a data-turbo="false" href="{{ path('app.export.units') }}"><i class="ri ri-hashtag"></i>Stock global</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+        <table class="table">
+            <thead class="bg-base-200">
+            <tr>
+                <th class="table-loop">#</th>
+                <th>Réf. Interne</th>
+                <th>Réf. Fournisseur</th>
+                <th>Désignation</th>
+                <th>Prix de vente</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr class="clickable-row" data-href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
+                    <td class="table-loop">{{ loop.index }}</td>
+                    <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
+                    <td>{{ product.refSupplier }}</td>
+                    <td>{{ product.designation }}</td>
+                    <td>{{ product.sellPrice|format_currency('EUR', locale: 'fr') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

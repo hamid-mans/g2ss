@@ -4,32 +4,36 @@
         <title>G2SS - {% block title %}{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.4/dist/semantic.min.js"></script>
-        <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
         {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
         {% endblock %}
 
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
-    <body>
-    <div class="ui secondary menu">
-        {% if app.user %}
-            <a href="{{ path('app.admin.index') }}" class="item">
-                Sociétés
-            </a>
-            <a href="{{ path('app.security.logout') }}" class="item">
-                Déconnexion
-            </a>
-        {% else %}
-            <a href="{{ path('app.security.login') }}" class="item">
-                Se connecter
-            </a>
-        {% endif %}
-    </div>
-        <div class="content">
+    <body class="administration">
+
+        <div class="navbar bg-base-200 shadow-sm">
+            <div class="flex-1">
+                <a class="btn btn-ghost text-2xl">G2SS ADMIN</a>
+            </div>
+            <div class="flex-none">
+                <ul class="menu menu-horizontal px-1">
+                    <li><a href="{{ path('app.admin.index') }}">Sociétés</a></li>
+                    <li><a data-turbo="false" href="{{ path('app.security.logout') }}">Déconnexion</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="m-10">
             {% block body %}{% endblock %}
             <script src="{{ asset('js/main.js') }}"></script>
         </div>

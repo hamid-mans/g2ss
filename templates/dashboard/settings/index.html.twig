@@ -1,0 +1,285 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Paramètres') %}
+
+{% block topbar('Paramètres') %}
+
+{% block body %}
+    <div class="tabs tabs-border">
+        <br><br>
+
+        {# SOCIETE #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" checked />
+            <i class="ri ri-government-line"></i>
+            Société
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            {{ form_start(formCompany) }}
+                <div class="grid">
+                    <label for="formCompany.name">Raison sociale</label>
+                    {{ form_row(formCompany.name) }}
+
+                    <div class="grid grid-cols-4 gap-6">
+                        <div>
+                            <label for="formCompany.address1">Adresse 1</label>
+                            {{ form_row(formCompany.address1) }}
+                        </div>
+
+                        <div>
+                            <label for="formCompany.address2">Adresse 2</label>
+                            {{ form_row(formCompany.address2) }}
+                        </div>
+
+                        <div>
+                            <label for="formCompany.cop">Code postal</label>
+                            {{ form_row(formCompany.cop) }}
+                        </div>
+
+                        <div>
+                            <label for="formCompany.city">Ville</label>
+                            {{ form_row(formCompany.city) }}
+                        </div>
+                    </div>
+
+                    <div>
+                        {{ form_row(formCompany.submit, { label_html: true }) }}
+                    </div>
+
+                    <div class="hidden">
+                        {{ form_row(formCompany.modules) }}
+                    </div>
+                </div>
+            {{ form_end(formCompany) }}
+        </div>
+
+
+        {# DÉPOTS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'deposits' }} />
+            <i class="ri ri-database-line"></i>
+            Dépôts
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            Rien à voir ici pour l'instant ...
+        </div>
+
+        {# UTILISATEURS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'users' ? 'checked' : '' }} />
+            <i class="ri ri-user-settings-line"></i>
+            Utilisateurs
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            <label for="modal_create_user" class="btn btn-primary">
+                <i class="ri ri-add-line"></i>
+                Nouveau
+            </label>
+
+            <input type="checkbox" id="modal_create_user" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-11/12 max-w-3xl">
+                    <h3 class="text-2xl font-bold mb-3">Nouvel utilisateur</h3>
+                    <div class="py-4">
+                        {{ form_start(formCreateUser) }}
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="field">
+                                <label for="user_firstname">Prénom</label>
+                                {{ form_row(formCreateUser.firstname) }}
+                            </div>
+
+                            <div class="field">
+                                <label for="user_lastname">Nom de famille</label>
+                                {{ form_row(formCreateUser.lastname) }}
+                            </div>
+                        </div>
+
+                        <div class="field mb-1">
+                            <label>Agences</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                {% for child in formCreateUser.deposits %}
+                                    <label class="label cursor-pointer border-2 border-base-300 rounded-box p-2 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                        <div class="flex items-center gap-3">
+                                            {{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+                                            <span class="label-text font-semibold">{{ child.vars.label }}</span>
+                                        </div>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="field">
+                                <label for="user_email">Email</label>
+                                {{ form_row(formCreateUser.email) }}
+                            </div>
+
+                            <div class="field">
+                                <label for="user_password">Mot de passe</label>
+                                {{ form_row(formCreateUser.plainPassword) }}
+                            </div>
+                        </div>
+
+
+                        <div class="field">
+                            {{ form_row(formCreateUser.submit, {label_html: true}) }}
+                        </div>
+                        {{ form_end(formCreateUser) }}
+                    </div>
+                </div>
+                <label class="modal-backdrop" for="modal_create_user">Close</label>
+            </div>
+
+            <p class="badge {{ app.user.company.users|length >= 5 ? 'badge-error' : 'badge-info' }} block mt-4">{{ app.user.company.users|length }} / 5 utilisateurs</p>
+
+            <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                <table class="table">
+                    <thead class="bg-base-200">
+                    <tr>
+                        <th class="table-loop">#</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Agences</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in app.user.company.users %}
+                            <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.user', { id: user.id }) }}">
+                                <td>{{ loop.index }}</td>
+                                <td>{{ user.lastname }}</td>
+                                <td>{{ user.firstname }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.deposits|map(d => d.name)|join(', ') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# PRODUITS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'products' ? 'checked' : '' }} />
+            <i class="ri ri-box-3-line"></i>
+            Produits
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            <div class="grid">
+                <div class="grid grid-cols-2 gap-10">
+                    <div>
+                        <p class="font-bold text-2xl">Catégories</p>
+
+                        <label for="modal_create_category" class="btn btn-primary mt-4">
+                            <i class="ri ri-add-line"></i>
+                            Nouveau
+                        </label>
+                        <input type="checkbox" id="modal_create_category" class="modal-toggle" />
+                        <div class="modal" role="dialog">
+                            <div class="modal-box w-11/12 max-w-3xl">
+                                <h3 class="text-2xl font-bold mb-3">Nouvelle catégorie</h3>
+                                <div class="py-4">
+                                    {{ form_start(formCreateCategory) }}
+
+                                    <div>
+                                        <label for="category_label">Nom</label>
+                                        {{ form_row(formCreateCategory.label) }}
+                                    </div>
+
+
+                                    <div class="field">
+                                        {{ form_row(formCreateCategory.submit, {label_html: true}) }}
+                                    </div>
+                                    {{ form_end(formCreateCategory) }}
+                                </div>
+                            </div>
+                            <label class="modal-backdrop" for="modal_create_category">Close</label>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                            <table class="table">
+                                <thead class="bg-base-200">
+                                <tr>
+                                    <th class="table-loop">#</th>
+                                    <th>Nom</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for category in app.user.company.categories %}
+                                    <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.category', { id: category.id }) }}">
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ category.label }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+                    <div>
+                        <p class="font-bold text-2xl">Marques</p>
+
+                        <label for="modal_create_brand" class="btn btn-primary mt-4">
+                            <i class="ri ri-add-line"></i>
+                            Nouveau
+                        </label>
+                        <input type="checkbox" id="modal_create_brand" class="modal-toggle" />
+                        <div class="modal" role="dialog">
+                            <div class="modal-box w-11/12 max-w-3xl">
+                                <h3 class="text-2xl font-bold mb-3">Nouvelle marque</h3>
+                                <div class="py-4">
+                                    {{ form_start(formCreateBrand) }}
+
+                                    <div>
+                                        <label for="category_label">Nom</label>
+                                        {{ form_row(formCreateBrand.label) }}
+                                    </div>
+
+
+                                    <div class="field">
+                                        {{ form_row(formCreateBrand.submit, {label_html: true}) }}
+                                    </div>
+                                    {{ form_end(formCreateBrand) }}
+                                </div>
+                            </div>
+                            <label class="modal-backdrop" for="modal_create_brand">Close</label>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                            <table class="table">
+                                <thead class="bg-base-200">
+                                <tr>
+                                    <th class="table-loop">#</th>
+                                    <th>Nom</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for brand in app.user.company.brands %}
+                                    <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.brand', { id: brand.id }) }}">
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ brand.label }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        {# DOCUMENTS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'documents' ? 'checked' : '' }} />
+            <i class="ri ri-folder-line"></i>
+            Documents
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            Rien à voir ici pour l'instant ...
+        </div>
+    </div>
+{% endblock %}

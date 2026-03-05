@@ -4,8 +4,6 @@
 
 {% block body %}
     <div class="ui segment">
-        <h1><i class="blue plus icon"></i>Créer un utilisateur</h1>
-        <br>
 
         <div class="ui form">
             {{ form_start(userForm) }}
@@ -21,12 +19,21 @@
                 </div>
             </div>
 
-            <div class="field">
-                <label for="user_deposits">Dépôts</label>
-                {{ form_widget(userForm.deposits) }}
+            <div class="field mb-1">
+                <label>Agences</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {% for child in userForm.deposits %}
+                        <label class="label cursor-pointer border-2 border-base-300 rounded-box p-2 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                            <div class="flex items-center gap-3">
+                                {{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+                                <span class="label-text font-semibold">{{ child.vars.label }}</span>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
             </div>
 
-            <div class="two fields">
+            <div class="grid grid-cols-2 gap-6">
                 <div class="field">
                     <label for="user_email">Email</label>
                     {{ form_row(userForm.email) }}

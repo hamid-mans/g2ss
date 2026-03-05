@@ -1,3 +1,121 @@
-body {
-    background-color: skyblue;
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+@plugin "daisyui" {
+    themes: lofi --default, black --prefersdark;
 }
+
+@plugin "daisyui/theme" {
+    name: "lofi";
+    default: true;
+    prefersdark: false;
+    color-scheme: "light";
+    --font-sans: "Geist Variable", sans-serif !important;
+    --default-font-family: "Geist Variable", sans-serif;
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(96% 0.007 247.896);
+    --color-base-300: oklch(87% 0 0);
+    --color-base-content: oklch(0% 0 0);
+    --color-primary: oklch(15.906% 0 0);
+    --color-primary-content: oklch(100% 0 0);
+    --color-secondary: oklch(96% 0.007 247.896);
+    --color-secondary-content: oklch(12% 0.042 264.695);
+    --color-accent: oklch(26.861% 0 0);
+    --color-accent-content: oklch(100% 0 0);
+    --color-neutral: oklch(0% 0 0);
+    --color-neutral-content: oklch(100% 0 0);
+    --color-info: oklch(97% 0.013 236.62);
+    --color-info-content: oklch(20% 0.042 265.755);
+    --color-success: oklch(0.917 0.067 152.179);
+    --color-success-content: oklch(26% 0.065 152.934);
+    --color-warning: oklch(96% 0.059 95.617);
+    --color-warning-content: oklch(27% 0.077 45.635);
+    --color-error: oklch(0.861 0.075 18.727);
+    --color-error-content: oklch(25% 0.092 26.042);
+    --radius-selector: 0.25rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1.5px;
+    --depth: 1;
+    --noise: 0;
+}
+
+
+@plugin "daisyui/theme" {
+    name: "black";
+    default: false;
+    prefersdark: true;
+    color-scheme: "dark";
+    --color-base-100: oklch(19% 0 0);
+    --color-base-200: oklch(0% 0 0);
+    --color-base-300: oklch(27.7% 0 0);
+    --color-base-content: oklch(87.609% 0 0);
+    --color-primary: oklch(100% 0 0);
+    --color-primary-content: oklch(0% 0 0);
+    --color-secondary: oklch(27.7% 0 0);
+    --color-secondary-content: oklch(100% 0 0);
+    --color-accent: oklch(100% 0 0);
+    --color-accent-content: oklch(0% 0 0);
+    --color-neutral: oklch(21% 0.006 285.885);
+    --color-neutral-content: oklch(100% 0 0);
+    --color-info: oklch(93% 0.032 255.585);
+    --color-info-content: oklch(0% 0 0);
+    --color-success: oklch(96% 0.044 156.743);
+    --color-success-content: oklch(0% 0 0);
+    --color-warning: oklch(96% 0.059 95.617);
+    --color-warning-content: oklch(0% 0 0);
+    --color-error: oklch(88% 0.062 18.334);
+    --color-error-content: oklch(12.559% 0.051 29.233);
+    --radius-selector: 0.25rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1.5px;
+    --depth: 1;
+    --noise: 0;
+}
+*:not(i) {
+    font-family: 'Geist', sans-serif !important;
+}
+
+.menu li > a:active {
+    background-color: var(--color-base-100);
+    box-shadow: 0 0 3px var(--color-base-300);
+    color: var(--color-base-content);
+}
+.menu li:hover > a:hover {
+    background-color: var(--color-base-100);
+    box-shadow: 0 0 3px var(--color-base-300);
+    color: var(--color-base-content);
+}
+.menu .menu-active {
+    background-color: var(--color-base-100);
+    box-shadow: 0 0 3px var(--color-base-300);
+    color: var(--color-base-content);
+}
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+select,
+textarea {
+    @apply input w-full mt-1 mb-2 outline-none;
+}
+textarea { @apply textarea h-40; }
+label { @apply font-bold; }
+i.ri { @apply text-lg; }
+tr:not(thead):hover { @apply bg-base-200/50 cursor-pointer; }
+
+.modal-box { @apply border-2 border-base-300; }
+.modal-backdrop { @apply backdrop-blur-none bg-black/10 transition-all duration-500 ease-in-out; }
+.modal-open .modal-backdrop, .modal-toggle:checked + .modal .modal-backdrop { @apply backdrop-blur-sm bg-black/10; }
+
+.badge { @apply border border-base-300; }
+.turbo-progress-bar { @apply hidden; }
+@source "../templates";
+@source "./app.js";

@@ -4,8 +4,6 @@
 
 {% block body %}
     <div class="ui segment">
-        <h1><i class="blue plus icon"></i>{{ company.name }} : Nouveau dépôt</h1>
-        <br>
 
         <div class="ui form">
             {{ form_start(depositForm) }}
@@ -14,7 +12,7 @@
                 {{ form_row(depositForm.name) }}
             </div>
 
-            <div class="four fields">
+            <div class="grid grid-cols-4 gap-6">
                 <div class="field">
                     <label for="deposit_address1">Adresse 1</label>
                     {{ form_row(depositForm.address1) }}
