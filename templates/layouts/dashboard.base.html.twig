@@ -141,7 +141,7 @@
 						<img src="{{ asset('build/images/profil.jpg') }}" />
 					</div>
 				</div>
-				<span class="ml-1">{{ app.user.firstname ~ ' ' ~ app.user.lastname }}</span>
+				<span class="ml-1">{{ app.user.firstname ?? 'Connectez-vous' ~ ' ' ~ app.user.lastname ?? '' }}</span>
 			</div>
 
 			<button id="theme-switcher" class="btn btn-primary btn-sm btn-circle">
