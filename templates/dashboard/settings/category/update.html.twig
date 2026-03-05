@@ -22,7 +22,7 @@
 
 	<div class="field">
 		{{ form_widget(form.submit, {label_html: true}) }}
-		<a href="{{ path('app.dashboard.settings.delete.category', {id: category.id}) }}" class="btn btn-error">
+		<a data-turbo="false" href="{{ path('app.dashboard.settings.delete.category', {id: category.id}) }}" class="btn btn-error">
 			<i class="ri ri-delete-bin-line"></i>
 			Supprimer
 		</a>

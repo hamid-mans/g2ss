@@ -173,7 +173,7 @@
 			</div>
 
 
-			<div class="tabs tabs-box mt-4">
+			<div class="tabs tabs-border mt-4">
 				{% for deposit in app.user.company.deposits %}
 					<input type="radio" name="tab_deposits" class="tab" aria-label="{{ deposit.name }}" {{ loop.index == 1 ? 'checked' : '' }} />
 					<div class="tab-content">

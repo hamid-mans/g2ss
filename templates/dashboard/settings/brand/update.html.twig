@@ -19,10 +19,9 @@
 		{{ form_row(form.label) }}
 	</div>
 
-
 	<div class="field">
 		{{ form_widget(form.submit, {label_html: true}) }}
-		<a href="{{ path('app.dashboard.settings.delete.brand', {id: brand.id}) }}" class="btn btn-error">
+		<a data-turbo="false" href="{{ path('app.dashboard.settings.delete.brand', {id: brand.id}) }}" class="btn btn-error">
 			<i class="ri ri-delete-bin-line"></i>
 			Supprimer
 		</a>

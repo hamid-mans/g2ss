@@ -160,10 +160,25 @@ final class SettingsController extends AbstractController
             return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'users']);
         }
 
-        return $this->render('dashboard/settings/category/update.html.twig', [
+        return $this->render('dashboard/settings/user/update.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/utilisateur/supprimer/{id}', 'delete.user')]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    {
+        if($user !== null) {
+            $entityManager->remove($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Utilisateur supprimée !');
+        } else {
+            $this->addFlash('error', "L'utilisateur n'existe pas !");
+        }
+
+        return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'users']);
     }
 
 
