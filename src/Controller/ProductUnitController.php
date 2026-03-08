@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Entity\ProductUnit;
 use App\Form\ProductUnitType;
+use App\Repository\ProductRepository;
 use App\Repository\ProductUnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,75 +23,94 @@ final class ProductUnitController extends AbstractController
     {
         $productUnit = $entityManager->getRepository(ProductUnit::class)->find($request->get('id'));
 
-        $form = $this->createForm(ProductUnitType::class, $productUnit, [
-            'submit_label' => "<i class='ri ri-save-line'></i>Enregistrer",
-            'submit_class' => "btn btn-primary",
-            'company' => $productUnit->getProduct()->getCompany(),
-        ]);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($productUnit);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Numéro de série modifié !');
-
-            return $this->redirectToRoute('app.dashboard.product.update', [
-                'tab' => 'serial',
-                'refInterne' => $productUnit->getProduct()->getRefInterne()
+        if($productUnit && $productUnit->getProduct()->getCompany() == $this->getUser()->getCompany()){
+            $form = $this->createForm(ProductUnitType::class, $productUnit, [
+                'submit_label' => "<i class='ri ri-save-line'></i>Enregistrer",
+                'submit_class' => "btn btn-primary",
+                'company' => $productUnit->getProduct()->getCompany(),
+                'user' => $this->getUser(),
             ]);
-        }
+            $form->handleRequest($request);
 
-        return $this->render('dashboard/product/product_unit/update.html.twig', [
-            'form' => $form->createView(),
-            'productUnit' => $productUnit,
-        ]);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($productUnit);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Numéro de série modifié !');
+
+                return $this->redirectToRoute('app.dashboard.product.update', [
+                    'tab' => 'serial',
+                    'refInterne' => $productUnit->getProduct()->getRefInterne()
+                ]);
+            }
+
+            return $this->render('dashboard/product/product_unit/update.html.twig', [
+                'form' => $form->createView(),
+                'productUnit' => $productUnit,
+            ]);
+        } else {
+            throw $this->createNotFoundException("Cette produit n'existe pas !");
+        }
     }
 
     #[Route('ajouter/{refInterne}', name: 'create')]
-    public function create(Product $product, Request $request, EntityManagerInterface $entityManager): Response
+    public function create(String $refInterne, Request $request, EntityManagerInterface $entityManager, ProductRepository $productRepository): Response
     {
-        $productUnit = new ProductUnit();
+        $product = $productRepository->findOneBy(['refInterne' => $refInterne]);
 
-        $form = $this->createForm(ProductUnitType::class, $productUnit, [
-            'submit_label' => "<i class='ri ri-save-line'></i>Enregistrer",
-            'submit_class' => "btn btn-primary",
-            'company' => $product->getCompany(),
-        ]);
-        $form->handleRequest($request);
+        if($product && $product->getCompany() == $this->getUser()->getCompany()){
+            $productUnit = new ProductUnit();
+            $product = null;
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $productUnit->setProduct($product);
-            $entityManager->persist($productUnit);
-            $entityManager->flush();
+            $form = $this->createForm(ProductUnitType::class, $productUnit, [
+                'submit_label' => "<i class='ri ri-save-line'></i>Enregistrer",
+                'submit_class' => "btn btn-primary",
+                'company' => $this->getUser()->getCompany(),
+            ]);
+            $form->handleRequest($request);
 
-            $this->addFlash('success', 'Numéro de série créé !');
+            if ($form->isSubmitted() && $form->isValid()) {
+                $product = $productRepository->findBy([
+                    'refInterne' => $refInterne,
+                    'company' => $this->getUser()->getCompany()
+                ]);
+                $productUnit->setProduct($product);
+                $entityManager->persist($productUnit);
+                $entityManager->flush();
 
-            return $this->redirectToRoute('app.dashboard.product.update', ['tab' => 'serial', 'refInterne' => $productUnit->getProduct()->getRefInterne()]);
-        }
+                $this->addFlash('success', 'Numéro de série créé !');
 
-        return $this->render('dashboard/product/product_unit/create.html.twig', [
-            'form' => $form->createView(),
-            'product' => $product,
-        ]);
+                return $this->redirectToRoute('app.dashboard.product.update', ['tab' => 'serial', 'refInterne' => $productUnit->getProduct()->getRefInterne()]);
+            }
+
+            return $this->render('dashboard/product/product_unit/create.html.twig', [
+                'form' => $form->createView(),
+                'product' => $product,
+            ]);
+        } else { throw $this->createNotFoundException("Cette produit n'existe pas !"); }
     }
 
     #[Route('supprimer/{id}', name: 'delete')]
     public function delete(int $id, ProductUnitRepository $productUnitRepository, EntityManagerInterface $entityManager): Response
     {
-        $productUnit = $productUnitRepository->find($id);
-        $productRef = $productUnit->getProduct()->getRefInterne();
+        $productUnit = $productUnitRepository->findOneBy([
+            'id' => $id
+        ]);
 
-        if($productRef){
+        if($productUnit && $productUnit->getProduct()->getCompany() == $this->getUser()->getCompany()){
+            $productRef = $productUnit->getProduct()->getRefInterne();
+
             $entityManager->remove($productUnit);
             $entityManager->flush();
 
             $this->addFlash('success', 'Numéro de série supprimé !');
+
+            return $this->redirectToRoute('app.dashboard.product.update', [
+                'tab' => 'serial',
+                'refInterne' => $productRef
+            ]);
         }
 
-        return $this->redirectToRoute('app.dashboard.product.update', [
-            'tab' => 'serial',
-            'refInterne' => $productRef
-        ]);
+        throw $this->createNotFoundException("Cette produit n'existe pas !");
     }
 }

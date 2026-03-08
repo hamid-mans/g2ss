@@ -35,16 +35,32 @@
             </div>
         </div>
 
-        <div class="four fields hidden">
-            <div class="field">
-                <label for="company_modules">Modules</label>
-                {{ form_widget(companyForm.modules) }}
-            </div>
-        </div>
 
         <div class="field">
-            {{ component('Modal', { title: "Souhaitez-vous supprimer la société ?", text: "En supprimant la société, plus aucun utilisateur ne pourra y avoir accés, et toutes les données seront supprimées.", url: path('app.admin.delete_company', {id: company.id}) }) }}
-            {{ form_widget(companyForm.submit, {label_html: true}) }} <a class="btn btn-error" href="{{ path('app.admin.delete_company', {id:company.id}) }}"><i class="ri ri-delete-bin-fill"></i>Supprimer la société</a>
+
+            {{ form_widget(companyForm.submit, {label_html: true}) }}
+            <label for="modal_delete_company" class="btn btn-error">
+                <i class="ri ri-delete-bin-fill"></i>
+                Supprimer la société
+            </label>
+
+            <input type="checkbox" id="modal_delete_company" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box">
+                    <div class="py-4">
+                        <h3 class="text-2xl font-bold">Attention !</h3>
+                        <p class="py-4">Êtes-vous sûr de supprimer cette société ?<br><br>
+                        L'ensemble des données seront effacées (Utilisateurs, dépôts, produits, etc... Pensez à faire une sauvegarde des données.</p>
+
+                        <a class="btn btn-error" data-turbo="false" href="{{ path('app.admin.delete_company', { id: company.id }) }}">
+                            <i class="ri ri-delete-bin-line"></i>
+                            Supprimer
+                        </a>
+                    </div>
+
+                </div>
+                <label class="modal-backdrop" for="modal_delete_company">Close</label>
+            </div>
         </div>
         {{ form_end(companyForm) }}
 

@@ -104,10 +104,14 @@ input[type="date"],
 input[type="search"],
 select,
 textarea {
-    @apply input w-full mt-1 mb-2 outline-none;
+    @apply input w-full outline-none;
 }
 textarea { @apply textarea h-40; }
-label { @apply font-bold; }
+label { @apply font-bold text-sm; }
+div.field { @apply mb-2; }
+div.divider::before,
+div.divider::after { @apply bg-base-300 mt-4; }
+
 i.ri { @apply text-lg; }
 tr:not(thead):hover { @apply bg-base-200/50 cursor-pointer; }
 

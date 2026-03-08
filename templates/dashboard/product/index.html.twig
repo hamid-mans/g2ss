@@ -27,29 +27,29 @@
                         {{ form_start(formCreateProduct) }}
 
                         <div class="grid grid-cols-2 gap-5 mt-4">
-                            <div>
+                            <div class="field">
                                 <label for="product_refInterne">Référence Interne</label>
                                 {{ form_widget(formCreateProduct.refInterne) }}
                             </div>
 
-                            <div>
+                            <div class="field">
                                 <label for="product_refSupplier">Référence Fournisseur</label>
                                 {{ form_widget(formCreateProduct.refSupplier) }}
                             </div>
                         </div>
 
-                        <div>
+                        <div class="field">
                             <label for="product_designation">Désignation</label>
                             {{ form_row(formCreateProduct.designation) }}
                         </div>
 
                         <div class="grid grid-cols-2 gap-6">
-                            <div>
+                            <div class="field">
                                 <label for="product_sellPrice">Prix de vente HT</label>
                                 {{ form_row(formCreateProduct.sellPrice) }}
                             </div>
 
-                            <div>
+                            <div class="field">
                                 <label for="product_category">Catégorie</label>
                                 {{ form_widget(formCreateProduct.category) }}
                             </div>
@@ -58,11 +58,14 @@
                         <div class="hidden">
                             <label for="product_description">Commentaire</label>
                             {{ form_row(formCreateProduct.description) }}
+                            {{ form_row(formCreateProduct.brands) }}
                         </div>
 
-                        <div class="mt-4">
-                            {{ form_widget(formCreateProduct.submit, { label_html: true }) }}
+                        <div class="field">
+                            {{ form_row(formCreateProduct.submit, { label_html: true }) }}
                         </div>
+
+
 
                         {{ form_end(formCreateProduct) }}
                     </div>

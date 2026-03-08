@@ -4,10 +4,12 @@ namespace App\Form;
 
 use App\Entity\Brand;
 use App\Entity\Category;
+use App\Entity\Color;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -35,12 +37,8 @@ class ProductType extends AbstractType
             ->add('refSupplier', TextType::class, [
                 'label' => false,
                 'required' => false,
-                /*'constraints' => [
-                    new NotBlank([], 'La référence fournisseur est obligatoire.')
-                ],
-                'error_bubbling' => true,*/
             ])
-            ->add('sellPrice', TextType::class, [
+            ->add('sellPrice', NumberType::class, [
                 'label' => false,
                 'required' => false,
             ])
@@ -55,12 +53,6 @@ class ProductType extends AbstractType
                 'placeholder' => "Aucune marque",
                 'choice_label' => 'label',
             ])
-            ->add('submit', SubmitType::class, [
-                'label' => $options['submit_label'],
-                'attr' => [
-                    'class' => $options['submit_class']
-                ]
-            ])
             ->add('category', EntityType::class, [
                 'label' => false,
                 'class' => Category::class,
@@ -69,6 +61,35 @@ class ProductType extends AbstractType
                 'choice_label' => 'label',
                 'attr' => [
                     'class' => 'ui dropdown search'
+                ]
+            ])
+            ->add('color', EntityType::class, [
+                'label' => false,
+                'class' => Color::class,
+                'required' => false,
+                'placeholder' => "Aucune couleur",
+                'choice_label' => 'label',
+            ])
+            ->add('weightKg', NumberType::class, [
+                'label' => false,
+                'required' => false,
+            ])
+            ->add('length', NumberType::class, [
+                'label' => false,
+                'required' => false,
+            ])
+            ->add('width', NumberType::class, [
+                'label' => false,
+                'required' => false,
+            ])
+            ->add('height', NumberType::class, [
+                'label' => false,
+                'required' => false,
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => $options['submit_label'],
+                'attr' => [
+                    'class' => $options['submit_class']
                 ]
             ])
         ;

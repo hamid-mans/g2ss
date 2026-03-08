@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Color;
 use App\Entity\Company;
 use App\Entity\Deposit;
 use App\Entity\Modules;
@@ -51,9 +52,41 @@ class AdminController extends AbstractController
             $entityManager->persist($company);
             $entityManager->flush();
 
+            $deposit = new Deposit();
+            $deposit->setCompany($company);
+            $deposit->setName("AGENCE 1");
+            $deposit->setAddress1($company->getAddress1());
+            $deposit->setAddress2($company->getAddress2());
+            $deposit->setCop($company->getCop());
+            $deposit->setCity($company->getCity());
+            $entityManager->persist($deposit);
+
+            $user = new User();
+            $user->setCompany($company);
+            $user->setFirstname("Administrateur");
+            $user->setLastname("1");
+            $user->setRoles(['ROLE_ADMIN']);
+            $user->setEmail('email@email.fr');
+            $user->setPassword("");
+            $user->addDeposit($deposit);
+            $entityManager->persist($user);
+
+            $colors = [
+                "Blanc", "Noir", "Rouge", "Vert", "Bleu"
+            ];
+
+            foreach ($colors as $color) {
+                $color = new Color();
+                $color->setLabel($color);
+                $color->setCompany($company);
+                $entityManager->persist($color);
+            }
+
+            $entityManager->flush();
+
             $this->addFlash('success', 'La société a bien été créée');
 
-            return $this->redirectToRoute('app.dashboard.index');
+            return $this->redirectToRoute('app.admin.index');
         }
 
         return $this->render('admin/company/create.html.twig', [
@@ -78,9 +111,6 @@ class AdminController extends AbstractController
             if ($updateForm->isSubmitted() && $updateForm->isValid()) {
                 $company->setName(strtoupper($company->getName()));
                 $entityManager->flush();
-
-                // Gestion des modules
-                dd($updateForm->getData()->getModules());
 
                 $this->addFlash('success', 'La société a bien été mise à jour');
 
@@ -112,11 +142,11 @@ class AdminController extends AbstractController
 
             $this->addFlash('success', 'Société supprimée avec succès');
 
-            return $this->redirectToRoute('app.dashboard.index');
+            return $this->redirectToRoute('app.admin.index');
         }
         else
         {
-            return $this->redirectToRoute('app.dashboard.index');
+            return $this->redirectToRoute('app.admin.index');
         }
     }
 
@@ -231,7 +261,6 @@ class AdminController extends AbstractController
 
         if ($userForm->isSubmitted() && $userForm->isValid()) {
             $user->setCompany($company);
-            $user->setRoles(['ROLE_USER']);
 
             $plainPassword = $userForm->get('plainPassword')->getData();
             if ($plainPassword) {
@@ -254,11 +283,13 @@ class AdminController extends AbstractController
 
     #[isGranted('ROLE_SA')]
     #[Route('/modifier-utilisateur/{id}', name: 'update_user')]
-    public function updateUser(UserRepository $userRepository, ?User $user, EntityManagerInterface $entityManager, Request $request): Response
+    public function updateUser(UserPasswordHasherInterface $hasher, UserRepository $userRepository, ?User $user, EntityManagerInterface $entityManager, Request $request): Response
     {
         $company = $user->getCompany();
         if($user)
         {
+            $isSuperAdmin = in_array('ROLE_SA', $user->getRoles());
+
             $userForm = $this->createForm(GenerateUserType::class, $user, [
                 'submit_label' => '<i class="ri ri-save-line"></i>Mettre à jour',
                 'submit_class' => 'btn btn-primary',
@@ -267,7 +298,17 @@ class AdminController extends AbstractController
             $userForm->handleRequest($request);
 
             if ($userForm->isSubmitted() && $userForm->isValid()) {
-                $user->setRoles(['ROLE_USER']);
+                $newRoles = $user->getRoles();
+                if ($isSuperAdmin) {
+                    $newRoles[] = 'ROLE_SA';
+                }
+
+                $user->setRoles(array_unique($newRoles));
+
+                $plainPassword = $userForm->get('plainPassword')->getData();
+                if ($plainPassword) {
+                    $user->setPassword($hasher->hashPassword($user, $plainPassword));
+                }
 
                 foreach ($userForm->getData()->getDeposits() as $deposit)
                 {
@@ -304,7 +345,7 @@ class AdminController extends AbstractController
             $entityManager->remove($user);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app.dashboard.update_company', ['id' => $companyId]);
+            return $this->redirectToRoute('app.admin.update_company', ['id' => $companyId]);
         }
         else
         {

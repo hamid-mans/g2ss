@@ -36,7 +36,7 @@ class CompanyType extends AbstractType
                 'label' => false,
                 'required' => false
             ])
-            ->add('modules', EntityType::class, [
+            /*->add('modules', EntityType::class, [
                 'label' => false,
                 'multiple' => true,
                 'class' => Modules::class,
@@ -44,7 +44,7 @@ class CompanyType extends AbstractType
                 'attr' => [
                     'class' => 'ui search dropdown',
                 ]
-            ])
+            ])*/
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],
                 'attr' => [

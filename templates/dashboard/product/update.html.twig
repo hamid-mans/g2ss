@@ -17,7 +17,7 @@
 		{# GENERAL #}
 		<label class="tab flex gap-2">
 			<input type="radio" name="tab" checked />
-			<i class="ri ri-information-line text-lg"></i>
+			<i class="ri ri-store-2-line"></i>
 			Général
 		</label>
 		<div class="tab-content border-base-300 bg-base-100 p-6">
@@ -94,6 +94,44 @@
 		</div>
 
 
+		{# INFORMATIONS COMPLEMENTAIRES #}
+
+		<label class="tab flex gap-2">
+			<input type="radio" name="tab" class="tab" {{ app.request.query.get('tab') == 'details' ? 'checked' : '' }} />
+			<i class="ri ri-information-line"></i>
+			Infos complémentaires
+		</label>
+		<div class="tab-content border-base-300 bg-base-100 p-6">
+			<div class="grid grid-cols-5 gap-6">
+				<div class="field">
+					<label for="product_weightKg">Poids ({{ app.user.company.weightUnit }})</label>
+					{{ form_row(form.weightKg) }}
+				</div>
+
+				<div class="field">
+					<label for="product_length">Longueur ({{ app.user.company.dimensionsUnit }})</label>
+					{{ form_row(form.length) }}
+				</div>
+
+				<div class="field">
+					<label for="product_width">Largeur ({{ app.user.company.dimensionsUnit }})</label>
+					{{ form_row(form.width) }}
+				</div>
+
+				<div class="field">
+					<label for="product_height">Hauteur ({{ app.user.company.dimensionsUnit }})</label>
+					{{ form_row(form.height) }}
+				</div>
+
+				<div class="field">
+					<label for="product_color">Couleur</label>
+					{{ form_row(form.color) }}
+				</div>
+			</div>
+		</div>
+
+
+
 		{# TARIFICATIONS #}
 
 		<label class="tab flex gap-2">
@@ -105,7 +143,7 @@
 			<div class="grid grid-cols-5 gap-6">
 				<div class="field">
 					<label for="product_sellPrice">Prix de vente HT</label>
-					{{ form_row(form.sellPrice) }}
+					{{ form_widget(form.sellPrice) }}
 				</div>
 
 				<div class="field">
@@ -174,7 +212,7 @@
 
 
 			<div class="tabs tabs-border mt-4">
-				{% for deposit in app.user.company.deposits %}
+				{% for deposit in app.user.deposits|sort((a, b) => a.name <=> b.name) %}
 					<input type="radio" name="tab_deposits" class="tab" aria-label="{{ deposit.name }}" {{ loop.index == 1 ? 'checked' : '' }} />
 					<div class="tab-content">
 						<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">

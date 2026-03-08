@@ -7,7 +7,6 @@
         <p class="font-bold text-2xl">Nouvelle société</p>
         <br>
 
-        <div class="ui form">
             {{ form_start(companyForm) }}
             <div class="field">
                 <label for="company_name">Nom de la société</label>
@@ -36,18 +35,10 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-4 gap-6 hidden">
-                <div class="field">
-                    <label for="company_modules">Modules</label>
-                    {{ form_widget(companyForm.modules) }}
-                </div>
-            </div>
-
-
             <div class="field">
                 {{ form_row(companyForm.submit, {label_html: true}) }}
             </div>
             {{ form_end(companyForm) }}
         </div>
-    </div>
+
 {% endblock %}
