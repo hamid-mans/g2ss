@@ -8,6 +8,7 @@ use App\Entity\ProductUnit;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -19,12 +20,13 @@ class ProductUnitType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $company = $options['company'];
+        $user = $options['user'];
 
         $builder
             ->add('serialNumber', TextType::class, [
                 'label' => false
             ])
-            ->add('buyPrice', TextType::class, [
+            ->add('buyPrice', NumberType::class, [
                 'label' => false,
                 'required' => false
             ])
@@ -34,12 +36,18 @@ class ProductUnitType extends AbstractType
             ])
             ->add('deposit', EntityType::class, [
                 'class' => Deposit::class,
-                'query_builder' => function (EntityRepository $er) use ($company) {
-                    return $er->createQueryBuilder('d')
-                        ->innerJoin('d.productUnits', 'pu')
-                        ->innerJoin('pu.product', 'p')
-                        ->where('p.company = :company')
+                'query_builder' => function (EntityRepository $er) use ($company, $user) {
+                    $qb = $er->createQueryBuilder('d')
+                        ->where('d.company = :company')
                         ->setParameter('company', $company);
+
+                    if ($user) {
+                        $qb->innerJoin('d.users', 'u')
+                            ->andWhere('u.id = :userId')
+                            ->setParameter('userId', $user->getId());
+                    }
+
+                    return $qb->orderBy('d.name', 'ASC');
                 },
                 'choice_label' => 'name',
                 'label' => false,
@@ -63,6 +71,7 @@ class ProductUnitType extends AbstractType
             'submit_label' => null,
             'submit_class' => null,
             'company' => null,
+            'user' => null,
         ]);
 
         $resolver->setRequired('company');

@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/administration/se-connecter', name: 'app.security.login')]
+    #[Route(path: '/se-connecter', name: 'app.security.login')]
     public function login(UserPasswordHasherInterface $hasher, AuthenticationUtils $authenticationUtils): Response
     {
         // if ($this->getUser()) {

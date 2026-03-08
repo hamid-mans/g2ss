@@ -51,7 +51,7 @@ class Company
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'company')]
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'company', cascade: ['remove'])]
     private Collection $products;
 
     /**
@@ -66,6 +66,18 @@ class Company
     #[ORM\OneToMany(targetEntity: Brand::class, mappedBy: 'company')]
     private Collection $brands;
 
+    /**
+     * @var Collection<int, Color>
+     */
+    #[ORM\OneToMany(targetEntity: Color::class, mappedBy: 'company')]
+    private Collection $colors;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $dimensions_unit = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $weight_unit = null;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -74,6 +86,7 @@ class Company
         $this->products = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->brands = new ArrayCollection();
+        $this->colors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -311,6 +324,60 @@ class Company
                 $brand->setCompany(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Color>
+     */
+    public function getColors(): Collection
+    {
+        return $this->colors;
+    }
+
+    public function addColor(Color $color): static
+    {
+        if (!$this->colors->contains($color)) {
+            $this->colors->add($color);
+            $color->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeColor(Color $color): static
+    {
+        if ($this->colors->removeElement($color)) {
+            // set the owning side to null (unless already changed)
+            if ($color->getCompany() === $this) {
+                $color->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDimensionsUnit(): ?string
+    {
+        return $this->dimensions_unit;
+    }
+
+    public function setDimensionsUnit(?string $dimensions_unit): static
+    {
+        $this->dimensions_unit = $dimensions_unit;
+
+        return $this;
+    }
+
+    public function getWeightUnit(): ?string
+    {
+        return $this->weight_unit;
+    }
+
+    public function setWeightUnit(?string $weight_unit): static
+    {
+        $this->weight_unit = $weight_unit;
 
         return $this;
     }

@@ -42,7 +42,7 @@ class Deposit
     /**
      * @var Collection<int, ProductUnit>
      */
-    #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'deposit')]
+    #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'deposit', orphanRemoval: true)]
     private Collection $productUnits;
 
     public function __construct()

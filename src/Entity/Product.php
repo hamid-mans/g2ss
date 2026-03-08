@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use BcMath\Number;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -10,10 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity(
-    fields: ['refInterne'],
-        message: 'Cette référence interne existe déjà.'
-)]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
@@ -26,7 +23,7 @@ class Product
     private ?string $designation = null;
 
     #[Assert\NotBlank(message: "La référence interne est obligatoire.")]
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255, unique: false)]
     private ?string $refInterne = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -53,6 +50,21 @@ class Product
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     private ?Brand $brands = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Color $color = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $weightKg = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $length = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $width = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $height = null;
 
     public function __construct()
     {
@@ -186,6 +198,66 @@ class Product
     public function setBrands(?Brand $brands): static
     {
         $this->brands = $brands;
+
+        return $this;
+    }
+
+    public function getColor(): ?Color
+    {
+        return $this->color;
+    }
+
+    public function setColor(?Color $color): static
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getWeightKg(): ?string
+    {
+        return $this->weightKg;
+    }
+
+    public function setWeightKg(?string $weightKg): static
+    {
+        $this->weightKg = $weightKg;
+
+        return $this;
+    }
+
+    public function getLength(): ?string
+    {
+        return $this->length;
+    }
+
+    public function setLength(?string $length): static
+    {
+        $this->length = $length;
+
+        return $this;
+    }
+
+    public function getWidth(): ?string
+    {
+        return $this->width;
+    }
+
+    public function setWidth(?string $width): static
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getHeight(): ?string
+    {
+        return $this->height;
+    }
+
+    public function setHeight(?string $height): static
+    {
+        $this->height = $height;
 
         return $this;
     }

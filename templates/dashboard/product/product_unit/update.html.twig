@@ -7,7 +7,7 @@
         <ul>
             <li><a href="{{ path('app.dashboard.product.index') }}">Produits</a></li>
             <li><a href="{{ path('app.dashboard.product.update', { refInterne: productUnit.product.refInterne }) }}">{{ productUnit.product.refInterne }}</a></li>
-            <li>Numéro de série</li>
+            <li><a href="{{ path('app.dashboard.product.update', { refInterne: productUnit.product.refInterne, tab: 'serial' }) }}">Numéro de série</a></li>
             <li>{{ productUnit.serialNumber }}</li>
         </ul>
     </div>

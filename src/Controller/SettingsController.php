@@ -4,12 +4,18 @@ namespace App\Controller;
 
 use App\Entity\Brand;
 use App\Entity\Category;
+use App\Entity\Color;
+use App\Entity\Deposit;
 use App\Entity\User;
 use App\Form\BrandType;
 use App\Form\CategoryType;
+use App\Form\ColorType;
 use App\Form\CompanyType;
+use App\Form\CompanyUnitsType;
+use App\Form\DepositType;
 use App\Form\GenerateUserType;
 use App\Repository\CompanyRepository;
+use App\Repository\DepositRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +30,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class SettingsController extends AbstractController
 {
     #[Route('/', name: 'index')]
-    public function index(UserPasswordHasherInterface $hasher, UserRepository $userRepository, CompanyRepository $companyRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function index(DepositRepository $depositRepository, UserPasswordHasherInterface $hasher, UserRepository $userRepository, CompanyRepository $companyRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
 
         // MODIFIER LA SOCIÉTÉ
@@ -44,6 +50,55 @@ final class SettingsController extends AbstractController
             $this->addFlash('success', 'Société enregistrée !');
 
             return $this->redirectToRoute('app.dashboard.settings.index');
+        }
+
+        // MODIFIER LES UNITES DE LA SOCIETE
+
+        $formComanyUnits = $this->createForm(CompanyUnitsType::class, $company, [
+            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+            'submit_class' => 'btn btn-primary',
+        ]);
+        $formComanyUnits->handleRequest($request);
+        if ($formComanyUnits->isSubmitted() && $formComanyUnits->isValid()) {
+            $companyUnits = $formComanyUnits->getData();
+            $entityManager->persist($companyUnits);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Unités enregistrées !');
+
+            return $this->redirectToRoute('app.dashboard.settings.index', [ 'tab' => 'products' ]);
+        }
+
+
+
+        // CRÉER UN DÉPÔT
+
+        $deposit = new Deposit();
+        $formCreateDeposit = $this->createForm(DepositType::class, $deposit, [
+            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+            'submit_class' => 'btn btn-primary',
+        ]);
+        $formCreateDeposit->handleRequest($request);
+
+        if ($formCreateDeposit->isSubmitted() && $formCreateDeposit->isValid()) {
+            if(count($depositRepository->findBy(['company' => $this->getUser()->getCompany()])) <= 10){
+                $deposit = $formCreateDeposit->getData();
+                $deposit->setCompany($this->getUser()->getCompany());
+                $entityManager->persist($deposit);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Dépôt créé !');
+
+                return $this->redirectToRoute('app.dashboard.settings.index', [
+                    'tab' => 'deposits',
+                ]);
+            } else {
+                $this->addFlash('error', 'Nombre maximum de dépôts atteint sur cette licence. Contactez votre revendeur');
+
+                return $this->redirectToRoute('app.dashboard.settings.index', [
+                    'tab' => 'deposits',
+                ]);
+            }
         }
 
 
@@ -132,38 +187,79 @@ final class SettingsController extends AbstractController
         }
 
 
+        // CRÉER UNE COULEUR
+
+        $color = new Color();
+        $formCreateColor = $this->createForm(ColorType::class, $color, [
+            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+            'submit_class' => 'btn btn-primary',
+        ]);
+        $formCreateColor->handleRequest($request);
+
+        if ($formCreateColor->isSubmitted() && $formCreateColor->isValid()) {
+            $color = $formCreateColor->getData();
+            $color->setCompany($this->getUser()->getCompany());
+            $color->setLabel(strtoupper($color->getLabel()));
+            $entityManager->persist($color);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Couleur créée !');
+
+            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+        }
+
+
 
         return $this->render('dashboard/settings/index.html.twig', [
             'formCompany' => $formCompany->createView(),
             'formCreateUser' => $formCreateUser->createView(),
             'formCreateCategory' => $formCreateCategory->createView(),
             'formCreateBrand' => $formCreateBrand->createView(),
+            'formCreateDeposit' => $formCreateDeposit->createView(),
+            'formCreateColor' => $formCreateColor->createView(),
+            'formComanyUnits' => $formComanyUnits->createView(),
         ]);
     }
 
     #[Route('/utilisateur/{id}', name: 'update.user')]
-    public function updateUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    public function updateUser(UserPasswordHasherInterface $hasher, Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(GenerateUserType::class, $user, [
-            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
-            'submit_class' => 'btn btn-primary',
-            'company' => $this->getUser()->getCompany(),
-        ]);
-        $form->handleRequest($request);
+        if($user->getCompany() === $this->getUser()->getCompany()) {
+            $isSuperAdmin = in_array('ROLE_SA', $user->getRoles());
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $form = $this->createForm(GenerateUserType::class, $user, [
+                'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary',
+                'company' => $this->getUser()->getCompany(),
+            ]);
+            $form->handleRequest($request);
 
-            $this->addFlash('success', 'Utilisateur modifié !');
+            if ($form->isSubmitted() && $form->isValid()) {
+                $newRoles = $user->getRoles();
+                if ($isSuperAdmin) {
+                    $newRoles[] = 'ROLE_SA';
+                }
 
-            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'users']);
+                $user->setRoles(array_unique($newRoles));
+
+                if($form->get('plainPassword')->getData()) {
+                    $user->setPassword($hasher->hashPassword($user, $form->get('plainPassword')->getData()));
+                }
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Utilisateur modifié !');
+
+                return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'users']);
+            }
+
+            return $this->render('dashboard/settings/user/update.html.twig', [
+                'user' => $user,
+                'form' => $form->createView(),
+            ]);
         }
 
-        return $this->render('dashboard/settings/user/update.html.twig', [
-            'user' => $user,
-            'form' => $form->createView(),
-        ]);
+        throw $this->createNotFoundException("Le utilisateur n'existe pas !");
     }
 
     #[Route('/utilisateur/supprimer/{id}', 'delete.user')]
@@ -185,80 +281,175 @@ final class SettingsController extends AbstractController
     #[Route('/categorie/{id}', name: 'update.category')]
     public function updateCategory(Request $request, Category $category, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(CategoryType::class, $category, [
-            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
-            'submit_class' => 'btn btn-primary',
-        ]);
-        $form->handleRequest($request);
+        if($category->getCompany() === $this->getUser()->getCompany()) {
+            $form = $this->createForm(CategoryType::class, $category, [
+                'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary',
+            ]);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $category->setLabel(strtoupper($category->getLabel()));
-            $entityManager->persist($category);
-            $entityManager->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $category->setLabel(strtoupper($category->getLabel()));
+                $entityManager->persist($category);
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Catégorie modifié !');
+                $this->addFlash('success', 'Catégorie modifié !');
 
-            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+                return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+            }
+
+            return $this->render('dashboard/settings/category/update.html.twig', [
+                'category' => $category,
+                'form' => $form->createView(),
+            ]);
         }
 
-        return $this->render('dashboard/settings/category/update.html.twig', [
-            'category' => $category,
-            'form' => $form->createView(),
-        ]);
+        throw $this->createNotFoundException("La catégorie n'existe pas !");
     }
 
     #[Route('/categorie/supprimer/{id}', 'delete.category')]
     public function deleteCategory(Request $request, Category $category, EntityManagerInterface $entityManager): Response
     {
-        if($category !== null) {
+        if($category && $category->getCompany() === $this->getUser()->getCompany()) {
             $entityManager->remove($category);
             $entityManager->flush();
 
             $this->addFlash('success', 'Catégorie supprimée !');
-        } else {
-            $this->addFlash('error', "La catégorie n'existe pas !");
+
+            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
         }
 
-        return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+        throw $this->createNotFoundException("La catégorie n'existe pas");
     }
 
 
     #[Route('/marque/{id}', name: 'update.brand')]
     public function updateBrand(Request $request, Brand $brand, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(BrandType::class, $brand, [
-            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
-            'submit_class' => 'btn btn-primary',
-        ]);
-        $form->handleRequest($request);
+        if($brand && $brand->getCompany() === $this->getUser()->getCompany()) {
+            $form = $this->createForm(BrandType::class, $brand, [
+                'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary',
+            ]);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($brand);
-            $entityManager->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($brand);
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Marque modifié !');
+                $this->addFlash('success', 'Marque modifié !');
 
-            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+                return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+            }
+
+            return $this->render('dashboard/settings/brand/update.html.twig', [
+                'brand' => $brand,
+                'form' => $form->createView(),
+            ]);
         }
 
-        return $this->render('dashboard/settings/brand/update.html.twig', [
-            'brand' => $brand,
-            'form' => $form->createView(),
-        ]);
+        throw $this->createNotFoundException("La marque n'existe pas !");
     }
 
     #[Route('/marque/supprimer/{id}', 'delete.brand')]
     public function deleteBrand(Request $request, Brand $brand, EntityManagerInterface $entityManager): Response
     {
-        if($brand !== null) {
+        if($brand && $brand->getCompany() === $this->getUser()->getCompany()) {
             $entityManager->remove($brand);
             $entityManager->flush();
 
             $this->addFlash('success', 'Marque supprimée !');
-        } else {
-            $this->addFlash('error', "La marque n'existe pas !");
+
+            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
         }
 
-        return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+        throw $this->createNotFoundException("La marque n'existe pas !");
+    }
+
+
+    #[Route('/depot/{id}', name: 'update.deposit')]
+    public function updateDeposit(Deposit $deposit, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if($deposit && $deposit->getCompany() === $this->getUser()->getCompany()) {
+            $form = $this->createForm(DepositType::class, $deposit, [
+                'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary',
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($deposit);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Dépôt modifié !');
+
+                return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'deposits']);
+            }
+
+            return $this->render('dashboard/settings/deposit/update.html.twig', [
+                'deposit' => $deposit,
+                'form' => $form->createView(),
+            ]);
+        }
+
+        throw $this->createNotFoundException("La depot n'existe pas !");
+    }
+
+    #[Route('/depot/supprimer/{id}', 'delete.deposit')]
+    public function deleteDeposit(Request $request, Deposit $deposit, EntityManagerInterface $entityManager): Response
+    {
+        if($deposit && $deposit->getCompany() === $this->getUser()->getCompany()) {
+            $entityManager->remove($deposit);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Dépôt supprimé');
+
+            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'deposits']);
+        }
+
+        throw $this->createNotFoundException("Le depot n'existe pas !");
+    }
+
+    #[Route('/couleur/{id}', name: 'update.color')]
+    public function updateColor(Color $color, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if($color && $color->getCompany() === $this->getUser()->getCompany()) {
+            $form = $this->createForm(ColorType::class, $color, [
+                'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary',
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($color);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Couleur modifié !');
+
+                return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+            }
+
+            return $this->render('dashboard/settings/color/update.html.twig', [
+                'color' => $color,
+                'form' => $form->createView(),
+            ]);
+        }
+
+        throw $this->createNotFoundException("La couleur n'existe pas !");
+    }
+
+    #[Route('/couleur/supprimer/{id}', 'delete.color')]
+    public function deleteColor(Request $request, Color $color, EntityManagerInterface $entityManager): Response
+    {
+        if($color && $color->getCompany() === $this->getUser()->getCompany()) {
+            $entityManager->remove($color);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Couleur supprimée');
+
+            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+        }
+
+        throw $this->createNotFoundException("La couleur n'existe pas !");
     }
 }

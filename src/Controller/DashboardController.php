@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[isGranted('ROLE_USER')]
-#[Route('/dashboard', 'app.dashboard.')]
+#[Route('/', 'app.dashboard.')]
 final class DashboardController extends AbstractController
 {
     #[Route('/', name: 'index')]

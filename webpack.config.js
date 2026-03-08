@@ -69,7 +69,11 @@ Encore
     // uncomment if you use React
     //.enableReactPreset()
 
-    .enablePostCssLoader()
+    .enablePostCssLoader((options) => {
+        options.postcssOptions = {
+            config: true
+        };
+    })
 
     // uncomment to get integrity="..." attributes on your script & link tags
     // requires WebpackEncoreBundle 1.4 or higher
