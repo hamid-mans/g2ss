@@ -49,6 +49,8 @@ class AdminController extends AbstractController
 
         if ($createForm->isSubmitted() && $createForm->isValid()) {
             $company->setName(strtoupper($company->getName()));
+            $company->setDimensionsUnit("cm");
+            $company->setWeightUnit("kg");
             $entityManager->persist($company);
             $entityManager->flush();
 
