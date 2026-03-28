@@ -6,6 +6,7 @@ use App\Entity\Brand;
 use App\Entity\Category;
 use App\Entity\Color;
 use App\Entity\Deposit;
+use App\Entity\TVA;
 use App\Entity\User;
 use App\Form\BrandType;
 use App\Form\CategoryType;
@@ -14,6 +15,7 @@ use App\Form\CompanyType;
 use App\Form\CompanyUnitsType;
 use App\Form\DepositType;
 use App\Form\GenerateUserType;
+use App\Form\TVAType;
 use App\Repository\CompanyRepository;
 use App\Repository\DepositRepository;
 use App\Repository\UserRepository;
@@ -209,6 +211,27 @@ final class SettingsController extends AbstractController
         }
 
 
+        // CRÉER UN TAUX DE TVA
+
+        $tva = new TVA();
+        $formCreateTVA = $this->createForm(TVAType::class, $tva, [
+            'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+            'submit_class' => 'btn btn-primary',
+        ]);
+        $formCreateTVA->handleRequest($request);
+
+        if ($formCreateTVA->isSubmitted() && $formCreateTVA->isValid()) {
+            $tva->setCompany($this->getUser()->getCompany());
+
+            $entityManager->persist($tva);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Taux de TVA créée !');
+
+            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+        }
+
+
 
         return $this->render('dashboard/settings/index.html.twig', [
             'formCompany' => $formCompany->createView(),
@@ -218,6 +241,7 @@ final class SettingsController extends AbstractController
             'formCreateDeposit' => $formCreateDeposit->createView(),
             'formCreateColor' => $formCreateColor->createView(),
             'formComanyUnits' => $formComanyUnits->createView(),
+            'formCreateTVA' => $formCreateTVA->createView(),
         ]);
     }
 
@@ -451,5 +475,48 @@ final class SettingsController extends AbstractController
         }
 
         throw $this->createNotFoundException("La couleur n'existe pas !");
+    }
+
+    #[Route('/tva/{id}', name: 'update.tva')]
+    public function updateTva(Tva $tva, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if($tva && $tva->getCompany() === $this->getUser()->getCompany()) {
+            $form = $this->createForm(TvaType::class, $tva, [
+                'submit_label' => '<i class="ri ri-save-line"></i>Enregistrer',
+                'submit_class' => 'btn btn-primary',
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($tva);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Taux de TVA modifié !');
+
+                return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+            }
+
+            return $this->render('dashboard/settings/tva/update.html.twig', [
+                'tva' => $tva,
+                'form' => $form->createView(),
+            ]);
+        }
+
+        throw $this->createNotFoundException("La tva n'existe pas !");
+    }
+
+    #[Route('/tva/supprimer/{id}', 'delete.tva')]
+    public function deleteTva(Request $request, TVA $tva, EntityManagerInterface $entityManager): Response
+    {
+        if($tva && $tva->getCompany() === $this->getUser()->getCompany()) {
+            $entityManager->remove($tva);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Taux de TVA supprimée');
+
+            return $this->redirectToRoute('app.dashboard.settings.index', ['tab' => 'products']);
+        }
+
+        throw $this->createNotFoundException("La tva n'existe pas !");
     }
 }

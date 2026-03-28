@@ -1,0 +1,83 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Nouveau mouvement') %}
+
+{% block topbar %}
+	<div class="breadcrumbs text-lg">
+		<ul>
+			<li><a href="{{ path('app.dashboard.movements.index') }}">Mouvements</a></li>
+			<li>Entrée</li>
+			<li>{{ product.refInterne }}</li>
+		</ul>
+	</div>
+{% endblock %}
+
+{% block body %}
+
+	{{ form_start(form) }}
+		<div class="flex items-end gap-3">
+			<div>
+				<label class="form-label fw-bold">Nombre de lignes</label>
+				<input type="number" id="bulk-qty" value="1" min="1">
+			</div>
+			<div>
+				<button type="button" id="btn-generate" class="btn btn-secondary">
+					<i class="ri ri-add-line"></i> Ajouter
+				</button>
+			</div>
+		</div>
+
+		<div class="divider"></div>
+
+		<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+			<table class="table">
+				<thead class="bg-base-200">
+				<tr>
+					<th style="width: 50px;">#</th>
+					<th>Numéro de série</th>
+					<th>Prix d'Achat (HT)</th>
+					<th class="text-center"><i class="ri ri-delete-bin-line"></i></th>
+				</tr>
+				</thead>
+				<tbody id="units-container"
+				       data-prototype="{{ _self.render_row(form.productUnits.vars.prototype)|e('html_attr') }}">
+				{% for unitForm in form.productUnits %}
+					{{ _self.render_row(unitForm) }}
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="flex items-end gap-3 mt-4">
+			<div>
+				<label>Dépôt cible</label>
+				<input type="text" value="{{ deposit.name }}" disabled>
+			</div>
+			<div>
+				<button type="submit" class="btn btn-primary">
+					<i class="ri ri-contract-left-line"></i>
+					Intégrer
+				</button>
+			</div>
+		</div>
+	{{ form_end(form) }}
+
+	{% macro render_row(unitForm) %}
+		<tr class="unit-row">
+			<td class="text-muted fw-bold index-column">
+				{{ loop.index ?? 1 }}
+			</td>
+			<td>
+				{{ form_row(unitForm.serialNumber, {'attr': {'placeholder': 'Ex: SN-12345'}}) }}
+			</td>
+			<td>
+				{{ form_row(unitForm.buyPrice, {'attr': {'placeholder': '0.00 €'}}) }}
+			</td>
+			<td class="text-center">
+				<span type="button" class="badge badge-error remove-line" title="Supprimer cette ligne">
+					<i class="ri ri-delete-bin-line"></i>
+				</span>
+			</td>
+		</tr>
+	{% endmacro %}
+{% endblock %}

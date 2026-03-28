@@ -78,6 +78,18 @@ class Company
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $weight_unit = null;
 
+    /**
+     * @var Collection<int, TVA>
+     */
+    #[ORM\OneToMany(targetEntity: TVA::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $tVAs;
+
+    /**
+     * @var Collection<int, Movement>
+     */
+    #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $movements;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -87,6 +99,8 @@ class Company
         $this->categories = new ArrayCollection();
         $this->brands = new ArrayCollection();
         $this->colors = new ArrayCollection();
+        $this->tVAs = new ArrayCollection();
+        $this->movements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -378,6 +392,66 @@ class Company
     public function setWeightUnit(?string $weight_unit): static
     {
         $this->weight_unit = $weight_unit;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TVA>
+     */
+    public function getTVAs(): Collection
+    {
+        return $this->tVAs;
+    }
+
+    public function addTVA(TVA $tVA): static
+    {
+        if (!$this->tVAs->contains($tVA)) {
+            $this->tVAs->add($tVA);
+            $tVA->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTVA(TVA $tVA): static
+    {
+        if ($this->tVAs->removeElement($tVA)) {
+            // set the owning side to null (unless already changed)
+            if ($tVA->getCompany() === $this) {
+                $tVA->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Movement>
+     */
+    public function getMovements(): Collection
+    {
+        return $this->movements;
+    }
+
+    public function addMovement(Movement $movement): static
+    {
+        if (!$this->movements->contains($movement)) {
+            $this->movements->add($movement);
+            $movement->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovement(Movement $movement): static
+    {
+        if ($this->movements->removeElement($movement)) {
+            // set the owning side to null (unless already changed)
+            if ($movement->getCompany() === $this) {
+                $movement->setCompany(null);
+            }
+        }
 
         return $this;
     }

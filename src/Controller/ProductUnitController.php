@@ -96,6 +96,7 @@ final class ProductUnitController extends AbstractController
         $productUnit = $productUnitRepository->findOneBy([
             'id' => $id
         ]);
+        $id = $productUnit->getDeposit()->getId();
 
         if($productUnit && $productUnit->getProduct()->getCompany() == $this->getUser()->getCompany()){
             $productRef = $productUnit->getProduct()->getRefInterne();
@@ -107,6 +108,7 @@ final class ProductUnitController extends AbstractController
 
             return $this->redirectToRoute('app.dashboard.product.update', [
                 'tab' => 'serial',
+                'depositTab' => $id,
                 'refInterne' => $productRef
             ]);
         }

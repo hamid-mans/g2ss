@@ -8,7 +8,9 @@ use App\Entity\ProductUnit;
 use App\Form\GenerateUserType;
 use App\Form\ProductType;
 use App\Form\ProductUnitType;
+use App\Form\Search\SearchDepositType;
 use App\Form\SearchType;
+use App\Repository\MovementRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ProductUnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -110,7 +112,7 @@ final class ProductController extends AbstractController
     }
 
     #[Route('{refInterne}', name: 'update')]
-    public function update(#[MapEntity(mapping: ['refInterne' => 'refInterne'])] Product $product, ProductUnitRepository $productUnitRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function update(#[MapEntity(mapping: ['refInterne' => 'refInterne'])] Product $product, MovementRepository $movementRepository, ProductUnitRepository $productUnitRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         if($product->getCompany() == $this->getUser()->getCompany()) {
             $form = $this->createForm(ProductType::class, $product, [
@@ -146,7 +148,7 @@ final class ProductController extends AbstractController
             $productUnit = new ProductUnit();
 
             $formCreateUnit = $this->createForm(ProductUnitType::class, $productUnit, [
-                'submit_label' => "<i class='ri ri-save-line'></i>Enregistrer",
+                'submit_label' => "<i class='ri ri-add-line'></i>Ajouter",
                 'submit_class' => "btn btn-primary",
                 'company' => $product->getCompany(),
             ]);
@@ -165,12 +167,42 @@ final class ProductController extends AbstractController
                 ]);
             }
 
+
+            // Mouvements
+
+            $formSearchDeposit = $this->createForm(SearchDepositType::class, null, [
+                'user' => $this->getUser(),
+                'company' => $this->getUser()->getCompany(),
+            ]);
+            $formSearchDeposit->handleRequest($request);
+
+            if ($formSearchDeposit->isSubmitted() && $formSearchDeposit->isValid()) {
+                $deposit = $formSearchDeposit->get('deposits')->getData();
+                $action = $request->request->get('action');
+
+                if ($action === 'entry') {
+                    return $this->redirectToRoute('app.dashboard.movements.entry', [
+                        'product' => $product->getId(),
+                        'deposit' => $deposit->getId()
+                    ]);
+                } else {
+                    return $this->redirectToRoute('app.dashboard.movements.exit', [
+                        'product' => $product->getId(),
+                        'deposit' => $deposit->getId()
+                    ]);
+                }
+            }
+
             return $this->render('dashboard/product/update.html.twig', [
                 'product' => $product,
                 'form' => $form,
                 'formCreateUnit' => $formCreateUnit->createView(),
+                'formSearchDeposit' => $formSearchDeposit->createView(),
                 'productUnits' => $productUnits,
                 'pmp' => number_format($pmp, 2),
+                'movements' => $movementRepository->findBy([
+                    'product' => $product
+                ])
             ]);
         } else {
             throw $this->createNotFoundException("Cette produit n'existe pas !");

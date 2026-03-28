@@ -1,22 +1,15 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Search;
 
 use App\Entity\Deposit;
-use App\Entity\Product;
-use App\Entity\ProductUnit;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProductUnitType extends AbstractType
+class SearchDepositType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -24,18 +17,8 @@ class ProductUnitType extends AbstractType
         $user = $options['user'];
 
         $builder
-            ->add('serialNumber', TextType::class, [
-                'label' => false
-            ])
-            ->add('buyPrice', NumberType::class, [
+            ->add('deposits', EntityType::class, [
                 'label' => false,
-                'required' => false
-            ])
-            ->add('description', TextareaType::class, [
-                'label' => false,
-                'required' => false
-            ])
-            ->add('deposit', EntityType::class, [
                 'class' => Deposit::class,
                 'query_builder' => function (EntityRepository $er) use ($company, $user) {
                     $qb = $er->createQueryBuilder('d')
@@ -50,17 +33,11 @@ class ProductUnitType extends AbstractType
 
                     return $qb->orderBy('d.name', 'ASC');
                 },
-                'choice_label' => 'name',
-                'label' => false,
-            ])
-            ->add('createdAt', DateType::class, [
-                'label' => false,
-                'disabled' => true,
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => $options['submit_label'],
+                'choice_label' => function (Deposit $deposit) {
+                    return $deposit->getName();
+                },
                 'attr' => [
-                    'class' => $options['submit_class'],
+                    'class' => 'mb-3',
                 ]
             ])
         ;
@@ -69,13 +46,8 @@ class ProductUnitType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ProductUnit::class,
-            'submit_label' => null,
-            'submit_class' => null,
             'company' => null,
             'user' => null,
         ]);
-
-        $resolver->setRequired('company');
     }
 }

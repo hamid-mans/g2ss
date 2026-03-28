@@ -3,10 +3,18 @@
 <head>
 	<meta charset="UTF-8">
 	<script>
-        if (localStorage.getItem('theme') === 'black') {
-            document.documentElement.setAttribute('data-theme', 'black');
-            document.documentElement.classList.add('dark');
-        }
+        (function() {
+            const saved = localStorage.getItem('theme-choice') || 'system';
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let themeToApply = saved;
+
+            if (saved === 'system') {
+                themeToApply = systemDark ? 'g2ss-dark' : 'g2ss-light';
+            }
+
+            document.documentElement.setAttribute('data-theme', themeToApply);
+            document.documentElement.classList.toggle('dark', themeToApply === 'g2ss-dark');
+        })();
 	</script>
 
 	<title>G2SS - {% block title %}{% endblock %}</title>
@@ -32,7 +40,7 @@
 <div class="grid h-screen [grid-template-columns:270px_1fr] [grid-template-rows:55px_1fr] [grid-template-areas:'logo_topbar''sidebar_content']">
 
 	{# LOGO #}
-	<div class="[grid-area:logo] sticky top-0 z-10 flex items-center justify-start gap-3 px-5 bg-base-200 border-b border-r border-base-300">
+	<div class="[grid-area:logo] sticky top-0 z-10 flex items-center justify-start gap-3 px-5 bg-base-200 border-r border-b border-base-300">
 		<i class="ri-home-smile-line text-2xl"></i>
 		<span class="text-2xl tracking-[5px]">
             G2SS
@@ -48,7 +56,7 @@
 				</p>
 			</div>
 
-			<button title="Actions rapides" class="btn btn-secondary btn-circle" popovertarget="popover-1" style="anchor-name:--anchor-1">
+			<button title="Actions rapides" class="btn btn-secondary btn-circle btn-sm" popovertarget="popover-1" style="anchor-name:--anchor-1">
 				<i class="ri ri-add-line"></i>
 			</button>
 			<ul class="dropdown menu w-52 rounded-box bg-base-100 border border-base-300 shadow-sm"
@@ -88,6 +96,17 @@
 						<a href="">
 							<i class="ri-database-line text-[17px]"></i> Dépôts
 						</a>
+					</li>
+				</ul>
+			</nav>
+
+			<div class="border-t border-base-300 my-4"></div>
+
+			<nav>
+				<p class="ml-5 mb-1 text-xs tracking-widest text-base-content/50 uppercase">Entrées / Sorties</p>
+				<ul class="menu menu-sm px-2 w-full">
+					<li>
+						<a href="{{ path('app.dashboard.movements.index') }}"><i class="ri ri-arrow-left-right-line"></i>Mouvements</a>
 					</li>
 				</ul>
 			</nav>
@@ -147,18 +166,31 @@
 					<span class="ml-1">{{ app.user.firstname ?? 'Connectez-vous' ~ ' ' ~ app.user.lastname ?? '' }}</span>
 				</div>
 				<ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm gap-3">
-					<li>
-						<button type="button" id="theme-switcher" class="btn btn-primary">
-							<div class="dark:hidden">
-								<i class="ri-moon-line"></i>
-								<span>Thème sombre</span>
-			                </div>
-
-							<div class="hidden dark:block">
-								<i class="ri-sun-line"></i>
-								<span>Thème clair</span>
-			                </div>
-						</button>
+					{# Remplace l'ancien <li> du theme-switcher par celui-ci #}
+					<li class="dropdown dropdown-top w-full">
+						<div tabindex="0" role="button" class="btn btn-primary w-full flex justify-between px-4">
+					        <span class="flex items-center gap-2">
+					            <i class="ri-palette-line"></i> Thème
+					        </span>
+							<i class="ri-arrow-up-s-line"></i>
+						</div>
+						<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-lg border border-base-300 mb-2">
+							<li>
+								<button type="button" class="theme-btn" data-set-theme="g2ss-light">
+									<i class="ri-sun-line text-orange-500"></i> Clair
+								</button>
+							</li>
+							<li>
+								<button type="button" class="theme-btn" data-set-theme="g2ss-dark">
+									<i class="ri-moon-line text-purple-500"></i> Sombre
+								</button>
+							</li>
+							<li>
+								<button type="button" class="theme-btn" data-set-theme="system">
+									<i class="ri-computer-line text-blue-500"></i> Système
+								</button>
+							</li>
+						</ul>
 					</li>
 					<li>
 						<a data-turbo="false" href="{{ path('app.security.logout') }}" class="btn btn-error">Se déconnecter</a>

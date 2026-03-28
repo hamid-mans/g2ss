@@ -66,9 +66,19 @@ class Product
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?string $height = null;
 
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?TVA $tva = null;
+
+    /**
+     * @var Collection<int, Movement>
+     */
+    #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'product', orphanRemoval: true)]
+    private Collection $movements;
+
     public function __construct()
     {
         $this->productUnits = new ArrayCollection();
+        $this->movements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -146,6 +156,15 @@ class Product
         $this->sellPrice = $sellPrice;
 
         return $this;
+    }
+
+    public function getPriceTtc(): float
+    {
+        if (!$this->tva) {
+            return $this->sellPrice;
+        }
+
+        return $this->sellPrice * (1 + ($this->tva->getValue() / 100));
     }
 
     /**
@@ -258,6 +277,48 @@ class Product
     public function setHeight(?string $height): static
     {
         $this->height = $height;
+
+        return $this;
+    }
+
+    public function getTva(): ?TVA
+    {
+        return $this->tva;
+    }
+
+    public function setTva(?TVA $tva): static
+    {
+        $this->tva = $tva;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Movement>
+     */
+    public function getMovements(): Collection
+    {
+        return $this->movements;
+    }
+
+    public function addMovement(Movement $movement): static
+    {
+        if (!$this->movements->contains($movement)) {
+            $this->movements->add($movement);
+            $movement->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovement(Movement $movement): static
+    {
+        if ($this->movements->removeElement($movement)) {
+            // set the owning side to null (unless already changed)
+            if ($movement->getProduct() === $this) {
+                $movement->setProduct(null);
+            }
+        }
 
         return $this;
     }
