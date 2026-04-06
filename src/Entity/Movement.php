@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MovementRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -37,6 +39,18 @@ class Movement
     #[ORM\ManyToOne(inversedBy: 'movements')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
+
+    /**
+     * @var Collection<int, ProductUnit>
+     */
+    #[ORM\ManyToMany(targetEntity: ProductUnit::class, inversedBy: 'movements')]
+    private Collection $productUnits;
+
+
+    public function __construct()
+    {
+        $this->productUnits = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -111,6 +125,30 @@ class Movement
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductUnit>
+     */
+    public function getProductUnits(): Collection
+    {
+        return $this->productUnits;
+    }
+
+    public function addProductUnit(ProductUnit $productUnit): static
+    {
+        if (!$this->productUnits->contains($productUnit)) {
+            $this->productUnits->add($productUnit);
+        }
+
+        return $this;
+    }
+
+    public function removeProductUnit(ProductUnit $productUnit): static
+    {
+        $this->productUnits->removeElement($productUnit);
 
         return $this;
     }

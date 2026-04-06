@@ -250,7 +250,7 @@
 					</thead>
 					<tbody>
 					{% for movement in movements %}
-						<tr class="clickable-row" data-href="{{ path('app.dashboard.product.update', { refInterne: movement.id }) }}">
+						<tr data-modal-trigger="modal_detail_movement_{{ movement.id }}">
 							<td class="table-loop">{{ loop.index }}</td>
 							<td class="{{ movement.type == 0 ? 'bg-red-500/25' : 'bg-green-500/25' }}">{{ movement.type == 0 ? 'Sortie' : 'Entrée' }}</td>
 							<td>{{ movement.deposit.name }}</td>
@@ -259,6 +259,62 @@
 					{% endfor %}
 					</tbody>
 				</table>
+
+				{% for movement in movements %}
+					{# Détail d'un mouvement #}
+					{% embed 'components/Modal.html.twig' with {'id': 'modal_detail_movement_' ~ movement.id} %}
+
+						{% block modal_title %}Détail du mouvement{% endblock %}
+
+						{% block modal_body %}
+							<div class="field">
+								<label>Type</label>
+								<input type="text" value="{{ movement.type == 1 ? 'Entrée' : 'Sortie' }}" disabled>
+							</div>
+
+							<div class="field">
+								<label>Dépôt</label>
+								<input type="text" value="{{ movement.deposit.name }}" disabled>
+							</div>
+							<div class="grid">
+								<div class="grid grid-cols-2 gap-6">
+									<div class="field">
+										<label>Utilisateur</label>
+										<input type="text" value="{{ movement.user.firstname ~ ' ' ~ movement.user.lastname }}" disabled>
+									</div>
+
+									<div class="field">
+										<label>Date du mouvement</label>
+										<input type="text" value="{{ movement.createdAt|date('d-m-Y') }}" disabled>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label>Détail des lignes <span class="bg-base-200 border border-base-300 px-2 py-1 m-1 rounded-box">{{ movement.productUnits|length }}</span></label>
+								<div class="overflow-x-auto max-h-60 rounded-box border border-base-300 bg-base-100 mt-1">
+									<table class="table overflow-scroll">
+										<thead class="bg-base-200">
+										<tr>
+											<th>Numéro de série</th>
+											<th>Prix achat</th>
+										</tr>
+										</thead>
+										<tbody>
+										{% for unit in movement.productUnits %}
+											<tr>
+												<td>{{ unit.serialNumber }}</td>
+												<td>{{ unit.buyPrice }}</td>
+											</tr>
+										{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						{% endblock %}
+
+					{% endembed %}
+				{% endfor %}
 			</div>
 		</div>
 	</div>

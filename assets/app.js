@@ -2,10 +2,10 @@ import './styles/app.css';
 import './js/bulk-entry';
 import * as Turbo from "@hotwired/turbo";
 
-// Gestion du thème (définie à l'extérieur pour être réutilisable)
+// --- 1. GESTION DU THÈME (GLOBALE) ---
 const applyTheme = (theme) => {
     document.documentElement.setAttribute('data-theme', theme);
-    if (theme === 'dark') {
+    if (theme === 'g2ss-dark') {
         document.documentElement.classList.add('dark');
     } else {
         document.documentElement.classList.remove('dark');
@@ -13,28 +13,44 @@ const applyTheme = (theme) => {
     localStorage.setItem('theme', theme);
 };
 
-// Initialisation du thème dès le premier chargement
-//const savedTheme = localStorage.getItem('theme') || 'g2ss-light';
-//applyTheme(savedTheme);
+// Initialisation immédiate (évite le flash blanc au chargement)
+const savedTheme = localStorage.getItem('theme') || 'g2ss-light';
+applyTheme(savedTheme);
 
-// Tout ce qui doit être ré-initialisé à chaque changement de page Turbo
-document.addEventListener('turbo:load', () => {
-    // 1. Gestion des lignes cliquables
-    document.addEventListener('click', (e) => {
-        const row = e.target.closest('.clickable-row');
-        if (row && !e.target.closest('a, button, label, input, .modal')) {
-            Turbo.visit(row.dataset.href);
-        }
-    });
+// --- 2. DÉLÉGATION DE CLIC UNIQUE (SUR WINDOW) ---
+// On définit cet écouteur UNE SEULE FOIS en dehors du turbo:load
+window.addEventListener('click', (e) => {
 
-    // 2. Gestion du switcher de thème
-    const switcher = document.getElementById('theme-switcher');
-    if (switcher) {
-        // On supprime l'ancien listener s'il existe (pour éviter les déclenchements multiples)
-        switcher.onclick = () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const nextTheme = currentTheme === 'g2ss-light' ? 'g2ss-dark' : 'g2ss-light';
-            applyTheme(nextTheme);
-        };
+    // A. Gestion des lignes cliquables (Redirection URL)
+    const row = e.target.closest('.clickable-row');
+    if (row && row.dataset.href && !e.target.closest('a, button, label, input, .modal, .dropdown-content')) {
+        Turbo.visit(row.dataset.href);
+        return;
     }
+
+    // B. Gestion de l'ouverture des Modals via TR (nouveau)
+    const modalTrigger = e.target.closest('[data-modal-trigger]');
+    if (modalTrigger && !e.target.closest('a, button, label, input')) {
+        const modalId = modalTrigger.dataset.modalTrigger;
+        const checkbox = document.getElementById(modalId);
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+        return;
+    }
+
+    // C. Switcher de thème (Délégation pour qu'il marche partout)
+    const switcher = e.target.closest('#theme-switcher');
+    if (switcher) {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const nextTheme = currentTheme === 'g2ss-light' ? 'g2ss-dark' : 'g2ss-light';
+        applyTheme(nextTheme);
+    }
+});
+
+// --- 3. INITIALISATION TURBO (À CHAQUE PAGE) ---
+document.addEventListener('turbo:load', () => {
+    // Ici, tu peux placer du code qui doit scanner le DOM
+    // à chaque nouvelle page (ex: initialisation de graphiques)
+    console.log("Page chargée via Turbo");
 });

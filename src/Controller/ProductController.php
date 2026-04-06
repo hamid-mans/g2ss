@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Company;
+use App\Entity\Movement;
 use App\Entity\Product;
 use App\Entity\ProductUnit;
 use App\Form\GenerateUserType;
@@ -160,6 +161,16 @@ final class ProductController extends AbstractController
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Numéro de série créé !');
+
+                $movement = new Movement();
+                $movement->setProduct($product);
+                $movement->setCompany($this->getUser()->getCompany());
+                $movement->setType(1);
+                $movement->setDeposit($productUnit->getDeposit());
+                $movement->setUser($this->getUser());
+                $movement->addProductUnit($productUnit);
+                $entityManager->persist($movement);
+                $entityManager->flush();
 
                 return $this->redirectToRoute('app.dashboard.product.update', [
                     'tab' => 'serial',

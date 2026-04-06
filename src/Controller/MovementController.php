@@ -55,6 +55,9 @@ final class MovementController extends AbstractController
                 $movement->setDeposit($deposit);
                 $movement->setUser($this->getUser());
                 $movement->setCompany($this->getUser()->getCompany());
+                foreach ($ghostProduct->getProductUnits() as $unit) {
+                    $movement->addProductUnit($unit);
+                }
                 $movement->setType('1');
 
                 $entityManager->persist($movement);
