@@ -48,6 +48,9 @@ class ProductUnit
     #[ORM\ManyToMany(targetEntity: Movement::class, mappedBy: 'productUnits')]
     private Collection $movements;
 
+    #[ORM\Column]
+    private ?bool $deleted = null;
+
     public function __construct()
     {
         $this->movements = new ArrayCollection();
@@ -165,6 +168,18 @@ class ProductUnit
         if ($this->movements->removeElement($movement)) {
             $movement->removeProductUnit($this);
         }
+
+        return $this;
+    }
+
+    public function isDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): static
+    {
+        $this->deleted = $deleted;
 
         return $this;
     }

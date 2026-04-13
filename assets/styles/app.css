@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 
@@ -89,7 +89,7 @@
 }
 
 *:not(i) {
-    font-family: 'Geist', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
 .menu li > a:active {
@@ -132,9 +132,7 @@ tr:not(thead):hover { @apply bg-base-200/50 cursor-pointer; }
 .modal-backdrop { @apply backdrop-blur-none bg-black/10 transition-all duration-500 ease-in-out; }
 .modal-open .modal-backdrop, .modal-toggle:checked + .modal .modal-backdrop { @apply backdrop-blur-sm bg-black/10; }
 
-.btn { @apply shadow-md; }
-
-.badge { @apply rounded-box border border-neutral-400 dark:border-neutral-800 font-bold p-4; }
+.badge { @apply rounded-box opacity-85 dark:border-neutral-800 p-3; }
 .turbo-progress-bar { @apply hidden; }
 @source "../templates";
 @source "./app.js";

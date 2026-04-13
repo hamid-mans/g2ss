@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Movement;
 use App\Entity\Product;
 use App\Entity\ProductUnit;
 use App\Form\ProductUnitType;
@@ -99,9 +100,19 @@ final class ProductUnitController extends AbstractController
         $id = $productUnit->getDeposit()->getId();
 
         if($productUnit && $productUnit->getProduct()->getCompany() == $this->getUser()->getCompany()){
+            $product = $productUnit->getProduct();
             $productRef = $productUnit->getProduct()->getRefInterne();
 
-            $entityManager->remove($productUnit);
+            $movement = new Movement();
+            $movement->setType('0');
+            $movement->setUser($this->getUser());
+            $movement->setCompany($this->getUser()->getCompany());
+            $movement->setProduct($product);
+            $movement->setDeposit($productUnit->getDeposit());
+            $movement->addProductUnit($productUnit);
+            $entityManager->persist($movement);
+
+            $productUnit->setDeleted(true);
             $entityManager->flush();
 
             $this->addFlash('success', 'Numéro de série supprimé !');

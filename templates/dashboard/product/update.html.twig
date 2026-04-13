@@ -22,11 +22,11 @@
 		</label>
 		<div class="tab-content border-base-300 bg-base-100 p-6">
 			<div class="flex gap-3">
-				<p class="badge badge-secondary font-bold">
+				<p class="badge badge-secondary">
 					Qté. Stock : {{ product.productUnits|length }}
 				</p>
 
-				<p class="badge badge-error font-bold" title="Prix Moyen Pondéré (achat)">
+				<p class="badge badge-error" title="Prix Moyen Pondéré (achat)">
 					P.M.P. : {{ pmp }} €
 				</p>
 			</div>
@@ -184,7 +184,7 @@
 								</tr>
 								</thead>
 								<tbody>
-								{% for unit in deposit.productUnits|filter(u => u.product == product) %}
+								{% for unit in deposit.productUnits|filter(u => u.product == product)|filter(u => u.deleted == false) %}
 									<tr class="clickable-row" data-href="{{ path('app.dashboard.product_unit.update', { id: unit.id }) }}">
 										<td>{{ loop.index }}</td>
 										<td>{{ unit.serialNumber }}</td>
@@ -246,15 +246,17 @@
 						<th><i class="ri ri-arrow-left-right-line"></i></th>
 						<th>Dépôt</th>
 						<th>Utilisateur</th>
+						<th>Date</th>
 					</tr>
 					</thead>
 					<tbody>
-					{% for movement in movements %}
+					{% for movement in movements|sort((a, b) => b.createdAt <=> a.createdAt) %}
 						<tr data-modal-trigger="modal_detail_movement_{{ movement.id }}">
 							<td class="table-loop">{{ loop.index }}</td>
 							<td class="{{ movement.type == 0 ? 'bg-red-500/25' : 'bg-green-500/25' }}">{{ movement.type == 0 ? 'Sortie' : 'Entrée' }}</td>
 							<td>{{ movement.deposit.name }}</td>
 							<td>{{ movement.user.firstname ~ ' ' ~ movement.user.lastname|upper }}</td>
+							<td>{{ movement.createdAt|date('d/m/Y H:m') }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>
@@ -404,15 +406,10 @@
 
 		{% block modal_footer %}
 
-			<div class="grid grid-cols-2 gap-4">
+			<div class="">
 				<button type="submit" name="action" value="entry" class="btn btn-success">
 					<i class="ri ri-contract-left-line"></i>
 					Entrée
-				</button>
-
-				<button type="submit" name="action" value="exit" class="btn btn-error">
-					Sortie
-					<i class="ri ri-expand-right-line"></i>
 				</button>
 			</div>
 
