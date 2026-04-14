@@ -68,7 +68,7 @@ final class DashboardController extends AbstractController
         ]);
 
         if (count($otherProducts) > 0) {
-            $categories[] = "Autres";
+            $categories[] = "N/A";
             $otherUnits = 0;
             $otherPrice = 0;
 

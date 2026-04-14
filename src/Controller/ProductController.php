@@ -22,14 +22,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[isGranted("ROLE_USER")]
 #[Route('/produits/', 'app.dashboard.product.')]
 final class ProductController extends AbstractController
 {
     #[Route('', name: 'index')]
-    public function index(EntityManagerInterface $entityManager, Request $request, ProductRepository $productRepository): Response
-    {
+    public function index(
+        EntityManagerInterface $entityManager,
+        Request $request,
+        ProductRepository $productRepository,
+        PaginatorInterface $paginator
+    ): Response {
         $form = $this->createForm(SearchType::class, null, [
             'method' => 'GET',
         ]);
@@ -42,18 +47,19 @@ final class ProductController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $search = $form->getData()['search'];
-
-            $qb->andWhere('p.designation LIKE :search OR p.refInterne LIKE :search OR p.refSupplier LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
+            if ($search) {
+                $qb->andWhere('p.designation LIKE :search OR p.refInterne LIKE :search OR p.refSupplier LIKE :search')
+                    ->setParameter('search', '%' . $search . '%');
+            }
         }
 
-        $products = $qb->getQuery()->getResult();
-
-
-        // Créer un produit
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->query->getInt('page', 1),
+            15
+        );
 
         $product = new Product();
-
         $formCreateProduct = $this->createForm(ProductType::class, $product, [
             'submit_label' => '<i class="ri ri-add-large-line"></i> Ajouter',
             'submit_class' => 'btn btn-primary',
@@ -61,10 +67,13 @@ final class ProductController extends AbstractController
         $formCreateProduct->handleRequest($request);
 
         if ($formCreateProduct->isSubmitted() && $formCreateProduct->isValid()) {
-            $productsExist = $productRepository->findBy(['company' => $this->getUser()->getCompany(), 'refInterne' => $formCreateProduct->get('refInterne')->getData()]);
+            $productsExist = $productRepository->findBy([
+                'company' => $this->getUser()->getCompany(),
+                'refInterne' => $formCreateProduct->get('refInterne')->getData()
+            ]);
+
             if(count($productsExist) > 0) {
                 $this->addFlash('error', 'Cette référence interne existe déjà.');
-
                 return $this->redirectToRoute('app.dashboard.product.index');
             }
 
@@ -75,12 +84,11 @@ final class ProductController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Produit créé avec succès !');
-
             return $this->redirectToRoute('app.dashboard.product.update', ['refInterne' => $product->getRefInterne()]);
         }
 
         return $this->render('dashboard/product/index.html.twig', [
-            'products' => $products,
+            'products' => $pagination,
             'form' => $form->createView(),
             'formCreateProduct' => $formCreateProduct->createView(),
         ], new Response(null, $formCreateProduct->isSubmitted() ? 422 : 200));
@@ -114,9 +122,13 @@ final class ProductController extends AbstractController
     }
 
     #[Route('{refInterne}', name: 'update')]
-    public function update(#[MapEntity(mapping: ['refInterne' => 'refInterne'])] Product $product, MovementRepository $movementRepository, ProductUnitRepository $productUnitRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function update(#[MapEntity(mapping: ['refInterne' => 'refInterne'])] Product $product, PaginatorInterface $paginator, MovementRepository $movementRepository, ProductUnitRepository $productUnitRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         if($product->getCompany() == $this->getUser()->getCompany()) {
+            if ($product->getCompany() !== $this->getUser()->getCompany()) {
+                throw $this->createNotFoundException("Ce produit n'existe pas !");
+            }
+
             $form = $this->createForm(ProductType::class, $product, [
                 'submit_label' => '<i class="ri ri-save-line"></i> Enregistrer',
                 'submit_class' => 'btn btn-primary',
@@ -124,27 +136,37 @@ final class ProductController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $product = $form->getData();
                 $product->setRefInterne(strtoupper($product->getRefInterne()));
-                $entityManager->persist($product);
                 $entityManager->flush();
-
                 $this->addFlash('success', 'Produit modifié !');
-
                 return $this->redirectToRoute('app.dashboard.product.update', ['refInterne' => $product->getRefInterne()]);
             }
 
-            $productUnits = $productUnitRepository->findBy(['product' => $product], [
-                'serialNumber' => 'ASC',
-            ]);
+            // On prépare la requête pour les unités non supprimées de ce produit
+            $qbUnits = $productUnitRepository->createQueryBuilder('u')
+                ->where('u.product = :product')
+                ->andWhere('u.deleted = false')
+                ->setParameter('product', $product)
+                ->orderBy('u.serialNumber', 'ASC');
 
-            $sommeUnit = 0;
-
-            foreach ($productUnits as $unit) {
-                $sommeUnit += $unit->getBuyPrice();
+            // On récupère le dépôt sélectionné (depuis l'URL via un paramètre 'deposit')
+            $currentDepositId = $request->query->get('depositTab');
+            if ($currentDepositId) {
+                $qbUnits->andWhere('u.deposit = :deposit')
+                    ->setParameter('deposit', $currentDepositId);
             }
 
-            $pmp = ($sommeUnit !== 0) ? $sommeUnit / count($productUnits) : 0;
+            $paginationUnits = $paginator->paginate(
+                $qbUnits,
+                $request->query->getInt('page', 1),
+                1,
+                ['pageParameterName' => 'page']
+            );
+
+            // Calcul PMP (sur toutes les unités non supprimées du produit)
+            $allUnits = $productUnitRepository->findBy(['product' => $product, 'deleted' => false]);
+            $sommeUnit = array_reduce($allUnits, fn($carry, $u) => $carry + $u->getBuyPrice(), 0);
+            $pmp = count($allUnits) > 0 ? $sommeUnit / count($allUnits) : 0;
 
             // Créer un numéro de série
             $productUnit = new ProductUnit();
@@ -210,7 +232,7 @@ final class ProductController extends AbstractController
                 'form' => $form,
                 'formCreateUnit' => $formCreateUnit->createView(),
                 'formSearchDeposit' => $formSearchDeposit->createView(),
-                'productUnits' => $productUnits,
+                'productUnits' => $paginationUnits,
                 'pmp' => number_format($pmp, 2),
                 'movements' => $movementRepository->findBy([
                     'product' => $product
