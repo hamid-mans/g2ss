@@ -21,11 +21,13 @@ use App\Repository\DepositRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[IsGranted("ROLE_ADMIN")]
 #[Route('/parametres', 'app.dashboard.settings.')]
@@ -246,7 +248,7 @@ final class SettingsController extends AbstractController
     }
 
     #[Route('/utilisateur/{id}', name: 'update.user')]
-    public function updateUser(UserPasswordHasherInterface $hasher, Request $request, User $user, EntityManagerInterface $entityManager): Response
+    public function updateUser(SluggerInterface $slugger, UserPasswordHasherInterface $hasher, Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         if($user->getCompany() === $this->getUser()->getCompany()) {
             $isSuperAdmin = in_array('ROLE_SA', $user->getRoles());
@@ -259,6 +261,33 @@ final class SettingsController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                $avatarFile = $form->get('avatar')->getData();
+
+                if ($avatarFile) {
+                    $originalFilename = pathinfo($avatarFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$avatarFile->guessExtension();
+
+                    try {
+                        $avatarFile->move(
+                            $this->getParameter('avatars_directory'),
+                            $newFilename
+                        );
+
+                        if ($user->getAvatar()) {
+                            $oldFile = $this->getParameter('avatars_directory').'/'.$user->getAvatar();
+                            if (file_exists($oldFile)) {
+                                unlink($oldFile);
+                            }
+                        }
+
+                        $user->setAvatar($newFilename);
+                    } catch (FileException $e) {
+
+                    }
+                }
+
+
                 $newRoles = $user->getRoles();
                 if ($isSuperAdmin) {
                     $newRoles[] = 'ROLE_SA';

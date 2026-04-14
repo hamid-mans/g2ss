@@ -174,7 +174,7 @@
 
 						<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
 							<table class="table">
-								<thead class="bg-base-200">
+								<thead class="bg-base-200/50">
 								<tr>
 									<th class="table-loop">#</th>
 									<th>Numéro de série</th>
@@ -240,7 +240,7 @@
 
 			<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
 				<table class="table">
-					<thead class="bg-base-200">
+					<thead class="bg-base-200/50">
 					<tr>
 						<th class="table-loop">#</th>
 						<th><i class="ri ri-arrow-left-right-line"></i></th>
@@ -256,7 +256,7 @@
 							<td class="{{ movement.type == 0 ? 'bg-red-500/25' : 'bg-green-500/25' }}">{{ movement.type == 0 ? 'Sortie' : 'Entrée' }}</td>
 							<td>{{ movement.deposit.name }}</td>
 							<td>{{ movement.user.firstname ~ ' ' ~ movement.user.lastname|upper }}</td>
-							<td>{{ movement.createdAt|date('d/m/Y H:m') }}</td>
+							<td>{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>
@@ -287,7 +287,7 @@
 
 									<div class="field">
 										<label>Date du mouvement</label>
-										<input type="text" value="{{ movement.createdAt|date('d-m-Y') }}" disabled>
+										<input type="text" value="{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}" disabled>
 									</div>
 								</div>
 							</div>
@@ -296,7 +296,7 @@
 								<label>Détail des lignes <span class="bg-base-200 border border-base-300 px-2 py-1 m-1 rounded-box">{{ movement.productUnits|length }}</span></label>
 								<div class="overflow-x-auto max-h-60 rounded-box border border-base-300 bg-base-100 mt-1">
 									<table class="table overflow-scroll">
-										<thead class="bg-base-200">
+										<thead class="bg-base-200/50">
 										<tr>
 											<th>Numéro de série</th>
 											<th>Prix achat</th>

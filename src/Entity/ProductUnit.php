@@ -49,7 +49,7 @@ class ProductUnit
     private Collection $movements;
 
     #[ORM\Column]
-    private ?bool $deleted = null;
+    private ?bool $deleted = false;
 
     public function __construct()
     {

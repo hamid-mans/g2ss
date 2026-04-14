@@ -70,6 +70,7 @@ final class ProductController extends AbstractController
 
             $product->setCompany($this->getUser()->getCompany());
             $product->setRefInterne(strtoupper($product->getRefInterne()));
+
             $entityManager->persist($product);
             $entityManager->flush();
 

@@ -1,5 +1,7 @@
+import './stimulus_bootstrap.js';
 import './styles/app.css';
 import './js/bulk-entry';
+import './js/charts';
 import * as Turbo from "@hotwired/turbo";
 
 // --- 1. GESTION DU THÈME (GLOBALE) ---
@@ -48,9 +50,6 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// --- 3. INITIALISATION TURBO (À CHAQUE PAGE) ---
 document.addEventListener('turbo:load', () => {
-    // Ici, tu peux placer du code qui doit scanner le DOM
-    // à chaque nouvelle page (ex: initialisation de graphiques)
     console.log("Page chargée via Turbo");
 });

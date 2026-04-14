@@ -103,17 +103,6 @@
 			<div class="border-t border-base-300 my-4"></div>
 
 			<nav>
-				<p class="ml-5 mb-1 text-xs tracking-widest text-base-content/50 uppercase">Entrées / Sorties</p>
-				<ul class="menu menu-sm px-2 w-full">
-					<li>
-						<a href="{{ path('app.dashboard.movements.index') }}"><i class="ri ri-arrow-left-right-line"></i>Mouvements</a>
-					</li>
-				</ul>
-			</nav>
-
-			<div class="border-t border-base-300 my-4"></div>
-
-			<nav>
 				<p class="ml-5 mb-1 text-xs tracking-widest text-base-content/50 uppercase">Documents</p>
 				<ul class="menu menu-sm px-2 w-full">
 					<li>
@@ -160,7 +149,7 @@
 				<div tabindex="0" role="button" class="btn m-1">
 					<div class="avatar avatar-online">
 						<div class="w-8 rounded-full">
-							<img src="{{ asset('build/images/profil.jpg') }}" />
+							<img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" />
 						</div>
 					</div>️
 					<span class="ml-1">{{ app.user.firstname ?? 'Connectez-vous' ~ ' ' ~ app.user.lastname ?? '' }}</span>

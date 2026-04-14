@@ -164,7 +164,7 @@ class Product
             return $this->sellPrice;
         }
 
-        return $this->sellPrice * (1 + ($this->tva->getValue() / 100));
+        return ($this->sellPrice ?? 0) * (1 + ($this->tva->getValue() / 100));
     }
 
     /**
