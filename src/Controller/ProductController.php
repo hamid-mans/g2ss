@@ -163,6 +163,8 @@ final class ProductController extends AbstractController
 
         $qbMovements->orderBy('m.createdAt', 'DESC');
 
+        $countMovementsWithFilter = count($qbMovements->getQuery()->getResult());
+
         $paginationMovements = $paginator->paginate(
             $qbMovements,
             $request->query->getInt('page_mov', 1),
@@ -205,14 +207,9 @@ final class ProductController extends AbstractController
         $formSearchDeposit->handleRequest($request);
 
         if ($formSearchDeposit->isSubmitted() && $formSearchDeposit->isValid()) {
-
             $deposit = $formSearchDeposit->get('deposits')->getData();
-
             $action = $request->request->get('action');
-
             $route = ($action === 'entry') ? 'app.dashboard.movements.entry' : 'app.dashboard.movements.exit';
-
-
 
             return $this->redirectToRoute($route, [
 
@@ -234,6 +231,7 @@ final class ProductController extends AbstractController
             'movements' => $paginationMovements,
             'searchForm' => $searchForm->createView(),
             'countUnitsWithFilter' => $countUnitsWithFilter,
+            'countMovementsWithFilter' => $countMovementsWithFilter,
             'movementSearchForm' => $movementSearchForm->createView(),
         ]);
     }
