@@ -63,6 +63,18 @@
 
 		<div class="grid grid-cols-2 gap-6">
 			<div class="field">
+				<label for="user_timezone">Fuseau horaire</label>
+				{{ form_row(form.timezone) }}
+			</div>
+
+			<div class="field">
+				<label for="user_avatar">Photo de profil</label>
+				{{ form_row(form.avatar) }}
+			</div>
+		</div>
+
+		<div class="grid grid-cols-2 gap-6">
+			<div class="field">
 				<label for="user_email">Email</label>
 				{{ form_row(form.email) }}
 			</div>

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -49,9 +50,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
+    /**
+     * @var Collection<int, Movement>
+     */
+    #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'user')]
+    private Collection $movements;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $timezone = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $avatar = null;
+
     public function __construct()
     {
         $this->deposits = new ArrayCollection();
+        $this->movements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -191,6 +205,60 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Movement>
+     */
+    public function getMovements(): Collection
+    {
+        return $this->movements;
+    }
+
+    public function addMovement(Movement $movement): static
+    {
+        if (!$this->movements->contains($movement)) {
+            $this->movements->add($movement);
+            $movement->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovement(Movement $movement): static
+    {
+        if ($this->movements->removeElement($movement)) {
+            // set the owning side to null (unless already changed)
+            if ($movement->getUser() === $this) {
+                $movement->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTimezone(): ?string
+    {
+        return $this->timezone;
+    }
+
+    public function setTimezone(?string $timezone): static
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): static
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }

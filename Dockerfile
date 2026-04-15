@@ -1,45 +1,52 @@
-FROM dunglas/frankenphp:1-php8.4-alpine
+FROM php:8.4-fpm
 
-# Installation des dépendances système et extensions PHP nécessaires pour Symfony
-RUN apk add --no-cache \
+# Installation des dépendances système
+RUN apt-get update && apt-get install -y \
     git \
     unzip \
-    icu-dev \
+    libicu-dev \
     libzip-dev \
-    mysql-client
+    libpq-dev \
+    libonig-dev \
+    libxml2-dev \
+    # Pour l'extension GD (images)
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    mariadb-client \
+    nodejs \
+    npm \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install \
+# Configuration et installation des extensions PHP
+# On configure GD pour supporter JPEG et Freetype
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
     intl \
+    zip \
     pdo \
     pdo_mysql \
-    zip
+    bcmath \
+    gd
 
-# Installation de Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Installation de Redis via PECL
+RUN pecl install redis && docker-php-ext-enable redis
 
 WORKDIR /app
 
-# Variable pour indiquer à Symfony qu'on est en prod
-ENV APP_ENV=prod
-ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+# Installation de Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copie des fichiers de configuration d'abord (optimise le cache des layers Docker)
-COPY composer.json composer.lock ./
-RUN composer install --no-interaction --no-dev --no-scripts --no-autoloader
+# Gestion du script d'entrée
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Copie du reste du code
-COPY . .
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Finalisation de Composer (génération de l'autoloader optimisé)
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+COPY . /app
 
-# Droits sur les dossiers de cache/logs
-RUN chown -R www-data:www-data var/
+RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
 
-# Port standard web
-EXPOSE 80
+ENTRYPOINT ["entrypoint.sh"]
 
-# On garde votre entrypoint s'il fait des migrations de DB
-ENTRYPOINT ["/app/entrypoint.sh"]
-
-# FrankenPHP démarre automatiquement, pas besoin de "php -S"
+CMD ["php-fpm"]

@@ -64,6 +64,8 @@
                 Nouveau
             </label>
 
+            <span class="badge {{ app.user.company.deposits|length >= 10 ? 'badge-error' : 'badge-secondary' }}">{{ app.user.company.deposits|length }} / 10 dépôts</span>
+
             <input type="checkbox" id="modal_create_deposit" class="modal-toggle" />
             <div class="modal" role="dialog">
                 <div class="modal-box w-11/12 max-w-3xl">
@@ -109,7 +111,6 @@
                 <label class="modal-backdrop" for="modal_create_deposit">Close</label>
             </div>
 
-            <p class="badge {{ app.user.company.deposits|length >= 10 ? 'badge-error' : 'badge-info' }} block mt-4">{{ app.user.company.deposits|length }} / 10 dépôts</p>
 
             <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
                 <table class="table">
@@ -148,6 +149,8 @@
                 <i class="ri ri-add-line"></i>
                 Nouveau
             </label>
+
+            <span class="badge {{ app.user.company.users|length >= 5 ? 'badge-error' : 'badge-secondary' }}">{{ app.user.company.users|length }} / 5 utilisateurs</span>
 
             <input type="checkbox" id="modal_create_user" class="modal-toggle" />
             <div class="modal" role="dialog">
@@ -224,7 +227,6 @@
                 <label class="modal-backdrop" for="modal_create_user">Close</label>
             </div>
 
-            <p class="badge {{ app.user.company.users|length >= 5 ? 'badge-error' : 'badge-info' }} block mt-4">{{ app.user.company.users|length }} / 5 utilisateurs</p>
 
             <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
                 <table class="table">
@@ -280,6 +282,52 @@
             </div>
 
             {{ form_end(formComanyUnits) }}
+
+            <div class="divider"></div>
+
+            <p class="font-bold text-2xl">Taux de TVA</p>
+            <label for="modal_create_tva" class="btn btn-primary mt-4">
+                <i class="ri ri-add-line"></i>
+                Nouveau
+            </label>
+            <input type="checkbox" id="modal_create_tva" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-11/12 max-w-3xl">
+                    <h3 class="text-2xl font-bold mb-3">Ajouter un taux</h3>
+                    <div class="py-4">
+                        {{ form_start(formCreateTVA) }}
+                            <div>
+                                <label for="tva_value">Valeur</label>
+                                {{ form_row(formCreateTVA.value) }}
+                            </div>
+
+                            <div class="mt-2">
+                                {{ form_row(formCreateTVA.submit, { label_html: true }) }}
+                            </div>
+                        {{ form_end(formCreateTVA) }}
+                    </div>
+                </div>
+                <label class="modal-backdrop" for="modal_create_tva">Close</label>
+            </div>
+
+            <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                <table class="table">
+                    <thead class="bg-base-200">
+                    <tr>
+                        <th class="table-loop">#</th>
+                        <th>Taux</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for tva in app.user.company.tVAs %}
+                        <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.tva', { id: tva.id }) }}">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ tva.value }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
             <div class="divider"></div>
 

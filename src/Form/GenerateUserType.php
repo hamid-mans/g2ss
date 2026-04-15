@@ -9,9 +9,11 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -57,6 +59,27 @@ class GenerateUserType extends AbstractType
                 ],
                 'multiple' => true,
                 'expanded' => true,
+            ])
+            ->add('timezone', TimezoneType::class, [
+                'label' => false,
+                'attr' => ['class' => 'select select-bordered w-full']
+            ])
+            ->add('avatar', FileType::class, [
+                'label' => false,
+                'mapped' => false, // Important : ce n'est pas l'objet File qui va en base, mais le string
+                'required' => false,
+                'constraints' => [
+                    new \Symfony\Component\Validator\Constraints\File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                        ],
+                        'mimeTypesMessage' => 'Merci d\'uploader une image valide (JPG, PNG, WEBP)',
+                    ])
+                ],
+                'attr' => ['class' => 'file-input file-input-bordered w-full']
             ])
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],

@@ -13,7 +13,7 @@
 
 {% block body %}
 	{{ form_start(form) }}
-	<div class="tabs tabs-lift">
+	<div class="tabs tabs-border"><br><br>
 		{# GENERAL #}
 		<label class="tab flex gap-2">
 			<input type="radio" name="tab" checked />
@@ -21,12 +21,13 @@
 			Général
 		</label>
 		<div class="tab-content border-base-300 bg-base-100 p-6">
+
 			<div class="flex gap-3">
-				<p class="badge badge-info font-bold">
+				<p class="badge badge-secondary">
 					Qté. Stock : {{ product.productUnits|length }}
 				</p>
 
-				<p class="badge badge-error font-bold" title="Prix Moyen Pondéré (achat)">
+				<p class="badge badge-error" title="Prix Moyen Pondéré (achat)">
 					P.M.P. : {{ pmp }} €
 				</p>
 			</div>
@@ -72,24 +73,10 @@
 
 				<!-- href="{{ path('app.dashboard.product.delete', { refInterne: product.refInterne }) }}" -->
 
-				<label for="my_modal_7" type="button" class="btn btn-error">
+				<label for="modal_delete_product" type="button" class="btn btn-error">
 					<i class="ri ri-delete-bin-line"></i>
 					Supprimer
 				</label>
-
-				<input type="checkbox" id="my_modal_7" class="modal-toggle" />
-				<div class="modal" role="dialog">
-					<div class="modal-box">
-						<h3 class="text-lg font-bold">Attention !</h3>
-						<p class="py-4">Êtes-vous sûr de supprimer ce produit ?<br>L'ensemble des numéros de séries seront également supprimés</p>
-
-						<a class="btn btn-error" href="{{ path('app.dashboard.product.delete', { refInterne: product.refInterne }) }}">
-							<i class="ri ri-delete-bin-line"></i>
-							Supprimer
-						</a>
-					</div>
-					<label class="modal-backdrop" for="my_modal_7">Close</label>
-				</div>
 			</div>
 		</div>
 
@@ -147,7 +134,17 @@
 				</div>
 
 				<div class="field">
-					<label>Marge estimée</label>
+					<label for="product_tva">Taux TVA</label>
+					{{ form_row(form.tva) }}
+				</div>
+
+				<div class="field">
+					<label for="product_sellPriceTTC">Prix de vente TTC</label>
+					<input disabled type="text" value="{{ product.priceTtc }} €" id="product_sellPriceTTC">
+				</div>
+
+				<div class="field">
+					<label>Marge estimée HT</label>
 					<input type="text" value="{{ product.sellPrice - pmp }} €" disabled>
 				</div>
 			</div>
@@ -155,118 +152,340 @@
 
 		{{ form_end(form) }}
 
-		{# NUMEROS DE SERIES #}
+		{# Stock #}
 
 		<label class="tab flex gap-2">
 			<input type="radio" name="tab" class="tab" {{ app.request.query.get('tab') == 'serial' ? 'checked' : '' }} />
 			<i class="ri ri-box-3-line"></i>
-			Numéros de série
+			Stock
 		</label>
 		<div class="tab-content border-base-300 bg-base-100 p-6">
 
-
-			<label for="modal_create_unit" type="button" class="btn btn-primary">
-				<i class="ri ri-add-large-line"></i>
-				Ajouter
+			<label for="modal_create_unit" type="button" class="btn btn-success">
+				<i class="ri ri-contract-left-line"></i>
+				Entrée
 			</label>
 
-			<input type="checkbox" id="modal_create_unit" class="modal-toggle" />
-			<div class="modal" role="dialog">
-				<div class="modal-box w-11/12 max-w-3xl">
-					<h3 class="text-lg font-bold">Ajouter un numéro de série</h3>
-					<div class="py-4">
-						{{ form_start(formCreateUnit) }}
+			<div class="border-base-300 bg-base-100">
 
-						<div class="grid grid-cols-2 mt-4 gap-6 w-full">
-							<div class="field">
-								<label for="product_unit_serialNumber">Numéro de série</label>
-								{{ form_widget(formCreateUnit.serialNumber) }}
-							</div>
+				<span class="badge badge-secondary my-3">Qté. stock : {{ countUnitsWithFilter }}</span>
 
-							<div class="field">
-								<label for="product_unit_buyPrice">Prix d'achat</label>
-								{{ form_widget(formCreateUnit.buyPrice) }}
-							</div>
-						</div>
-
-						<div class="field">
-							<label for="product_unit_deposit">Dépôt</label>
-							{{ form_widget(formCreateUnit.deposit) }}
-						</div>
-
-						<div class="field">
-							<label for="product_unit_description">Commentaire</label>
-							{{ form_widget(formCreateUnit.description) }}
-						</div>
-
-						<div class="field">
-							{{ form_widget(formCreateUnit.submit, { label_html: true }) }}
-						</div>
-
-						{{ form_end(formCreateUnit) }}
+				<div class="mb-6">
+					{{ form_start(searchForm, {'attr': {'class': 'flex flex-wrap gap-4 items-end'}}) }}
+					<input type="hidden" name="tab" value="serial">
+					<div class="field w-full max-w-xs">
+						<label>Recherche</label>
+						{{ form_widget(searchForm.q, {'attr': {'class': 'input input-bordered input-sm'}}) }}
 					</div>
 
+					<div class="field w-full max-w-xs">
+						<label>Dépôt</label>
+						{{ form_widget(searchForm.deposit, {'attr': {'class': 'select select-bordered select-sm'}}) }}
+					</div>
+
+					<div class="field">
+						<button type="submit" class="btn btn-primary">
+							<i class="ri-filter-line"></i> Filtrer
+						</button>
+					</div>
+
+					<div class="field">
+						<a href="{{ path('app.dashboard.product.update', {refInterne: product.refInterne, tab: 'serial'}) }}" class="btn">
+							Réinitialiser
+						</a>
+					</div>
+					{{ form_end(searchForm) }}
 				</div>
-				<label class="modal-backdrop" for="modal_create_unit">Close</label>
+
+				<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+					<table class="table">
+						<thead class="bg-base-200/50">
+						<tr>
+							<th class="table-loop">#</th>
+							<th>Numéro de série</th>
+							<th>Dépôt</th>
+							<th>Prix d'achat</th>
+							<th class="w-5 text-center"><i class="ri ri-expand-right-line"></i></th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for unit in productUnits %}
+							<tr class="clickable-row" data-href="{{ path('app.dashboard.product_unit.update', { id: unit.id }) }}">
+								<td>{{ loop.index }}</td>
+								<td>{{ unit.serialNumber }}</td>
+								<td>{{ unit.deposit.name }}</td>
+								<td>{{ unit.buyPrice|format_currency('EUR', locale: 'fr') }}</td>
+								<td onclick="event.stopPropagation()" class="w-5">
+									<label for="modal_delete_unit_{{ unit.id }}" type="button" class="font-bold badge badge-error">
+										Sortir
+										<i class="ri ri-expand-right-line"></i>
+									</label>
+
+									{# Supprimer un numéro de série #}
+									{% embed 'components/Modal.html.twig' with {'id': 'modal_delete_unit_' ~ unit.id} %}
+
+										{% block modal_title %}Attention !{% endblock %}
+
+										{% block modal_body %}
+											Êtes-vous sûr de vouloir sortir définitivement le numéro de série <b>{{ unit.serialNumber }}</b> ?
+										{% endblock %}
+
+										{% block modal_footer %}
+											<a class="btn btn-error" data-turbo="false" href="{{ path('app.dashboard.product_unit.delete', { id: unit.id }) }}">
+												Supprimer
+												<i class="ri ri-expand-right-line"></i>
+											</a>
+										{% endblock %}
+
+									{% endembed %}
+								</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+
+				<div class="navigation">
+					{{ knp_pagination_render(productUnits, null, {
+						'tab': 'serial',
+						'q': app.request.query.all('product_unit_search')['q'] ?? null,
+					}) }}
+				</div>
+			</div>
+		</div>
+
+
+		{# MOUVEMENTS #}
+
+		<label class="tab flex gap-2">
+			<input type="radio" name="tab" class="tab" {{ app.request.query.get('tab') == 'movements' ? 'checked' : '' }} />
+			<i class="ri ri-arrow-left-right-line"></i>
+			Mouvements
+		</label>
+		<div class="tab-content border-base-300 bg-base-100 p-6">
+			<label for="modal_create_movement" class="btn btn-primary">
+				<i class="ri ri-add-line"></i>
+				Nouveau
+			</label>
+
+			{{ form_start(movementSearchForm) }}
+			<input type="hidden" name="tab" value="movements">
+
+			<div class="grid grid-cols-8 gap-6">
+				<div class="col-span-2 field">
+					<label>Type</label>
+					{{ form_widget(movementSearchForm.type) }}
+				</div>
+
+				<div class="field col-span-2">
+					<label>Utilisateur</label>
+					{{ form_widget(movementSearchForm.user) }}
+				</div>
+
+				<div class="grid grid-cols-3 gap-6 col-span-4">
+					<div class="field">
+						<label>Du</label>
+						{{ form_widget(movementSearchForm.dateFrom) }}
+					</div>
+
+					<div class="field">
+						<label>Au</label>
+						{{ form_widget(movementSearchForm.dateTo) }}
+					</div>
+
+					<div class="field">
+						<button type="submit" class="btn btn-secondary"><i class="ri-filter-line"></i> Filtrer</button>
+						<a href="{{ path('app.dashboard.product.update', {refInterne: product.refInterne, tab: 'movements'}) }}" class="btn">Réinitialiser</a>
+					</div>
+				</div>
 			</div>
 
 
-			<div class="tabs tabs-border mt-4">
-				{% for deposit in app.user.deposits|sort((a, b) => a.name <=> b.name) %}
-					<input type="radio" name="tab_deposits" class="tab" aria-label="{{ deposit.name }}" {{ loop.index == 1 ? 'checked' : '' }} />
-					<div class="tab-content">
-						<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
-						<table class="table">
-							<thead class="bg-base-200">
-							<tr>
-								<th class="table-loop">#</th>
-								<th>Numéro de série</th>
-								<th>Dépôt</th>
-								<th>Prix d'achat</th>
-								<th class="w-5 text-center"><i class="ri-delete-bin-line"></i></th>
-							</tr>
-							</thead>
-							<tbody>
-							{% for unit in deposit.productUnits|filter(u => u.product == product) %}
-								<tr class="clickable-row" data-href="{{ path('app.dashboard.product_unit.update', { id: unit.id }) }}">
-									<td>{{ loop.index }}</td>
-									<td>{{ unit.serialNumber }}</td>
-									<td>{{ unit.deposit.name }}</td>
-									<td>{{ unit.buyPrice|format_currency('EUR', locale: 'fr') }}</td>
-									<td onclick="event.stopPropagation()" class="w-5">
-										<label for="modal_delete_unit_{{ unit.id }}" type="button" class="font-bold badge badge-error">
-											<i class="ri-delete-bin-line"></i>
-											Sortir
-										</label>
+			{{ form_end(movementSearchForm) }}
 
-										<input type="checkbox" id="modal_delete_unit_{{ unit.id }}" class="modal-toggle" />
-										<div class="modal" role="dialog">
-											<div class="modal-box">
-												<div class="py-4">
-													<h3 class="text-lg font-bold">Attention !</h3>
-													<p class="py-4">Êtes-vous sûr de supprimer ce numéro de série ?</p>
+			<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+				<table class="table">
+					<thead class="bg-base-200/50">
+					<tr>
+						<th class="table-loop">#</th>
+						<th><i class="ri ri-arrow-left-right-line"></i></th>
+						<th>Dépôt</th>
+						<th>Utilisateur</th>
+						<th>Date</th>
+					</tr>
+					</thead>
+					<tbody>
+					{% for movement in movements|sort((a, b) => b.createdAt <=> a.createdAt) %}
+						<tr data-modal-trigger="modal_detail_movement_{{ movement.id }}">
+							<td class="table-loop">{{ loop.index }}</td>
+							<td class="{{ movement.type == 0 ? 'bg-red-500/25' : 'bg-green-500/25' }}">{{ movement.type == 0 ? 'Sortie' : 'Entrée' }}</td>
+							<td>{{ movement.deposit.name }}</td>
+							<td>{{ movement.user.firstname ~ ' ' ~ movement.user.lastname|upper }}</td>
+							<td>{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
 
-													<a class="btn btn-error" data-turbo="false" href="{{ path('app.dashboard.product_unit.delete', { id: unit.id }) }}">
-														<i class="ri ri-delete-bin-line"></i>
-														Supprimer
-													</a>
-												</div>
+				{% for movement in movements %}
+					{# Détail d'un mouvement #}
+					{% embed 'components/Modal.html.twig' with {'id': 'modal_detail_movement_' ~ movement.id} %}
 
-											</div>
-											<label class="modal-backdrop" for="modal_delete_unit_{{ unit.id }}">Close</label>
-										</div>
-									</td>
-								</tr>
-							{% endfor %}
-							</tbody>
-						</table>
-						</div>
-					</div>
+						{% block modal_title %}Détail du mouvement{% endblock %}
+
+						{% block modal_body %}
+							<div class="field">
+								<label>Type</label>
+								<input type="text" value="{{ movement.type == 1 ? 'Entrée' : 'Sortie' }}" disabled>
+							</div>
+
+							<div class="field">
+								<label>Dépôt</label>
+								<input type="text" value="{{ movement.deposit.name }}" disabled>
+							</div>
+							<div class="grid">
+								<div class="grid grid-cols-2 gap-6">
+									<div class="field">
+										<label>Utilisateur</label>
+										<input type="text" value="{{ movement.user.firstname ~ ' ' ~ movement.user.lastname }}" disabled>
+									</div>
+
+									<div class="field">
+										<label>Date du mouvement</label>
+										<input type="text" value="{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}" disabled>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label>Détail des lignes <span class="bg-base-200 border border-base-300 px-2 py-1 m-1 rounded-box">{{ movement.productUnits|length }}</span></label>
+								<div class="overflow-x-auto max-h-60 rounded-box border border-base-300 bg-base-100 mt-1">
+									<table class="table overflow-scroll">
+										<thead class="bg-base-200/50">
+										<tr>
+											<th>Numéro de série</th>
+											<th>Prix achat</th>
+										</tr>
+										</thead>
+										<tbody>
+										{% for unit in movement.productUnits %}
+											<tr>
+												<td>{{ unit.serialNumber }}</td>
+												<td>{{ unit.buyPrice }}</td>
+											</tr>
+										{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						{% endblock %}
+
+					{% endembed %}
 				{% endfor %}
 			</div>
-		</div>
+			<div class="navigation">
+				{{ knp_pagination_render(movements, null, {
+					'tab': 'movements'
+				}) }}
+			</div>
 		</div>
 	</div>
+
+
+
+
+	{# ========================================================== #}
+	{#                    SECTION DES MODALS                      #}
+	{# ========================================================== #}
+
+
+	{# Supprimer le produit #}
+	{% embed 'components/Modal.html.twig' with {'id': 'modal_delete_product'} %}
+
+		{% block modal_title %}Attention !{% endblock %}
+
+		{% block modal_body %}
+			Êtes-vous sûr de vouloir supprimer définitivement la référence <b>{{ product.refInterne }}</b> ?
+		{% endblock %}
+
+		{% block modal_footer %}
+			<a class="btn btn-error" href="{{ path('app.dashboard.product.delete', { refInterne: product.refInterne }) }}">
+				<i class="ri ri-delete-bin-line"></i>
+				Supprimer
+			</a>
+		{% endblock %}
+
+	{% endembed %}
+
+	{# Créer un numéro de série #}
+	{% embed 'components/Modal.html.twig' with {'id': 'modal_create_unit', modalForm: formCreateUnit} %}
+
+		{% block modal_title %}Entrée manuelle{% endblock %}
+
+		{% block modal_body %}
+			<div class="grid grid-cols-2 gap-6 w-full">
+				<div class="field">
+					<label>Numéro de série</label>
+					{{ form_widget(formCreateUnit.serialNumber) }}
+				</div>
+				<div class="field">
+					<label>Prix d'achat</label>
+					{{ form_widget(formCreateUnit.buyPrice) }}
+				</div>
+			</div>
+
+			<div class="field mt-4">
+				<label>Dépôt</label>
+				{{ form_widget(formCreateUnit.deposit) }}
+			</div>
+
+			<div class="field mt-4">
+				<label>Commentaire</label>
+				{{ form_widget(formCreateUnit.description) }}
+			</div>
+
+			<div class="hidden">
+				{{ form_row(formCreateUnit.createdAt) }}
+			</div>
+
+		{% endblock %}
+
+		{% block modal_footer %}
+
+			<div>
+				{{ form_widget(formCreateUnit.submit, { label_html: true }) }}
+			</div>
+
+		{% endblock %}
+
+	{% endembed %}
+
+	{# Créer un mouvement #}
+	{% embed 'components/Modal.html.twig' with {'id': 'modal_create_movement', modalForm: formSearchDeposit} %}
+
+		{% block modal_title %}Nouveau mouvement{% endblock %}
+
+		{% block modal_body %}
+
+			<div>
+				<label>Dépôt cible</label>
+				{{ form_widget(formSearchDeposit.deposits) }}
+			</div>
+
+		{% endblock %}
+
+		{% block modal_footer %}
+
+			<div class="">
+				<button type="submit" name="action" value="entry" class="btn btn-success">
+					<i class="ri ri-contract-left-line"></i>
+					Entrée
+				</button>
+			</div>
+
+		{% endblock %}
+
+	{% endembed %}
 
 
 {% endblock %}

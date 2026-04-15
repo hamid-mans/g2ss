@@ -8,6 +8,7 @@ use App\Entity\ProductUnit;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -51,9 +52,10 @@ class ProductUnitType extends AbstractType
                 },
                 'choice_label' => 'name',
                 'label' => false,
-                'attr' => [
-                    'class' => 'ui search dropdown'
-                ]
+            ])
+            ->add('createdAt', DateType::class, [
+                'label' => false,
+                'disabled' => true,
             ])
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],

@@ -63,6 +63,7 @@ final class ExportController extends AbstractController
         $units = $unitRepository->createQueryBuilder('u')
             ->join('u.product', 'p')
             ->where('p.company = :company')
+            ->andWhere('u.deleted = 0')
             ->setParameter('company', $this->getUser()->getCompany())
             ->getQuery()
             ->getResult();

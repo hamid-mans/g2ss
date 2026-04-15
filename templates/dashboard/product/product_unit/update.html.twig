@@ -15,7 +15,7 @@
 
 {% block body %}
 
-    <a href="{{ path('app.dashboard.product.update', { refInterne: productUnit.product.refInterne }) }}" class="btn btn-secondary">
+    <a href="{{ path('app.dashboard.product.update', { refInterne: productUnit.product.refInterne, tab: 'serial' }) }}" class="btn btn-secondary">
         <i class="ri-arrow-go-back-line"></i>
         Annuler
     </a>
@@ -31,13 +31,20 @@
                 </div>
 
                 <div class="field">
-                    <label for="product_unit_buyPrice">Prix d'achat</label>
+                    <label for="product_unit_buyPrice">Prix d'achat HT</label>
                     {{ form_widget(form.buyPrice) }}
                 </div>
 
                 <div class="field">
                     <label for="product_unit_deposit">Dépôt</label>
                     {{ form_widget(form.deposit) }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3">
+                <div class="field">
+                    <label>Date d'entrée</label>
+                    {{ form_row(form.createdAt) }}
                 </div>
             </div>
 
