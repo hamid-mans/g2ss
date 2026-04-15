@@ -17,7 +17,7 @@
         })();
 	</script>
 
-	<title>G2SS - {% block title %}{% endblock %}</title>
+	<title>G2S - {% block title %}{% endblock %}</title>
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
 	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -43,7 +43,7 @@
 	<div class="[grid-area:logo] sticky top-0 z-10 flex items-center justify-start gap-3 px-5 bg-base-200 border-r border-b border-base-300">
 		<i class="ri-home-smile-line text-2xl"></i>
 		<span class="text-2xl tracking-[5px]">
-            G2SS
+            G2S
         </span>
 	</div>
 
@@ -149,7 +149,7 @@
 				<div tabindex="0" role="button" class="btn m-1">
 					<div class="avatar avatar-online">
 						<div class="w-8 rounded-full">
-							<img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" />
+							<img src="{{ app.user ? asset('uploads/avatars/' ~ app.user.avatar) : asset('build/images/profil.webp') }}" />
 						</div>
 					</div>️
 					<span class="ml-1">{{ app.user.firstname ?? 'Connectez-vous' ~ ' ' ~ app.user.lastname ?? '' }}</span>
