@@ -4,17 +4,16 @@
 
 {% block body %}
     <div class="ui segment">
-        <h1><i class="blue plus icon"></i>Créer une société</h1>
+        <p class="font-bold text-2xl">Nouvelle société</p>
         <br>
 
-        <div class="ui form">
             {{ form_start(companyForm) }}
             <div class="field">
                 <label for="company_name">Nom de la société</label>
                 {{ form_row(companyForm.name) }}
             </div>
 
-            <div class="four fields">
+            <div class="grid grid-cols-4 gap-6">
                 <div class="field">
                     <label for="company_address1">Adresse 1</label>
                     {{ form_row(companyForm.address1) }}
@@ -36,11 +35,10 @@
                 </div>
             </div>
 
-
             <div class="field">
                 {{ form_row(companyForm.submit, {label_html: true}) }}
             </div>
             {{ form_end(companyForm) }}
         </div>
-    </div>
+
 {% endblock %}

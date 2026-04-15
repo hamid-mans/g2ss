@@ -1,0 +1,93 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Paramètres - ' ~ user.firstname ~ ' ' ~ user.lastname) %}
+
+{% block topbar %}
+	<div class="breadcrumbs text-lg">
+		<ul>
+			<li><a href="{{ path('app.dashboard.settings.index') }}">Paramètres</a></li>
+			<li><a href="{{ path('app.dashboard.settings.index', { tab: 'users' }) }}">Utilisateurs</a></li>
+			<li>{{ user.firstname ~ ' ' ~ user.lastname }}</li>
+		</ul>
+	</div>
+{% endblock %}
+
+{% block body %}
+	{{ form_start(form) }}
+		<div class="grid grid-cols-2 gap-6">
+			<div class="field">
+				<label for="user_firstname">Prénom</label>
+				{{ form_row(form.firstname) }}
+			</div>
+
+			<div class="field">
+				<label for="user_lastname">Nom de famille</label>
+				{{ form_row(form.lastname) }}
+			</div>
+		</div>
+
+		<div class="field">
+			<label>Agences</label>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+				{% for child in form.deposits %}
+					<label class="label cursor-pointer border-2 border-base-300 rounded-box p-2 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+						<div class="flex items-center gap-3">
+							{{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+							<span class="label-text font-semibold">{{ child.vars.label }}</span>
+						</div>
+					</label>
+				{% endfor %}
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="font-bold mb-2 block">Rôle de l'utilisateur</label>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+				{% for child in form.roles %}
+					<label class="label cursor-pointer border-2 border-base-300 rounded-box p-3 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+						<div class="flex items-center gap-3">
+							{# On garde le widget caché ou stylisé, et on affiche le label proprement #}
+							{{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+							<span class="label-text font-semibold">
+                        {{ child.vars.label }}
+                    </span>
+						</div>
+						{# Petit ajout pour expliquer le rôle #}
+						<div class="text-xs opacity-50">
+							{{ child.vars.value == 'ROLE_ADMIN' ? 'Accès total' : 'Accès limité' }}
+						</div>
+					</label>
+				{% endfor %}
+			</div>
+		</div>
+
+		<div class="grid grid-cols-2 gap-6">
+			<div class="field">
+				<label for="user_timezone">Fuseau horaire</label>
+				{{ form_row(form.timezone) }}
+			</div>
+
+			<div class="field">
+				<label for="user_avatar">Photo de profil</label>
+				{{ form_row(form.avatar) }}
+			</div>
+		</div>
+
+		<div class="grid grid-cols-2 gap-6">
+			<div class="field">
+				<label for="user_email">Email</label>
+				{{ form_row(form.email) }}
+			</div>
+
+			<div class="field">
+				<label for="user_password">Mot de passe</label>
+				{{ form_row(form.plainPassword, { attr: { placeholder: "Laisser vide pour ne pas modifier le mot de passe" } }) }}
+			</div>
+		</div>
+
+
+		<div class="field">
+			{{ form_row(form.submit, {label_html: true}) }}
+		</div>
+	{{ form_end(form) }}
+{% endblock %}

@@ -1,3 +1,138 @@
-body {
-    background-color: skyblue;
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+@plugin "daisyui" {
+    themes: g2ss-light --default --preferslight, g2ss-dark --prefersdark;
 }
+
+@plugin "daisyui/theme" {
+    name: "g2ss-light";
+    default: true;
+    prefersdark: false;
+    color-scheme: "light";
+
+    --color-base-100: oklch(99% 0.005 60);
+    --color-base-200: oklch(93% 0.015 60);
+    --color-base-300: oklch(88% 0.025 60);
+    --color-base-content: oklch(20% 0.02 45);
+
+    --color-primary: oklch(70% 0.16 45);
+    --color-primary-content: oklch(99% 0 0);
+
+    --color-secondary: oklch(40% 0.08 45);
+    --color-secondary-content: oklch(99% 0 0);
+
+    --color-accent: oklch(72% 0.12 185);
+    --color-accent-content: oklch(15% 0.03 185);
+
+    --color-neutral: oklch(28% 0.02 45);
+    --color-neutral-content: oklch(99% 0 0);
+
+    --color-info: oklch(68% 0.12 225);
+    --color-info-content: oklch(99% 0 0);
+    --color-success: oklch(62% 0.15 145);
+    --color-success-content: oklch(99% 0 0);
+    --color-warning: oklch(82% 0.14 80);
+    --color-warning-content: oklch(25% 0.05 80);
+    --color-error: oklch(62% 0.18 25);
+    --color-error-content: oklch(99% 0 0);
+
+    --radius-selector: 0.5rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.6rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+    name: "g2ss-dark";
+    color-scheme: "dark";
+
+    --color-base-100: oklch(25% 0.01 60);
+    --color-base-200: oklch(18% 0.015 60);
+    --color-base-300: oklch(14% 0.02 60);
+    --color-base-content: oklch(92% 0.01 60);
+
+    --color-primary: oklch(75% 0.14 45);
+    --color-primary-content: oklch(15% 0.05 45);
+
+    --color-secondary: oklch(45% 0.06 45);
+    --color-secondary-content: oklch(98% 0.01 60);
+
+    --color-accent: oklch(78% 0.10 185);
+    --color-accent-content: oklch(15% 0.05 185);
+
+    --color-neutral: oklch(35% 0.02 60);
+    --color-neutral-content: oklch(95% 0 0);
+
+    --color-info: oklch(65% 0.10 230);
+    --color-info-content: oklch(98% 0 0);
+    --color-success: oklch(68% 0.12 150);
+    --color-success-content: oklch(15% 0.05 150);
+    --color-warning: oklch(82% 0.12 85);
+    --color-warning-content: oklch(20% 0.05 85);
+    --color-error: oklch(65% 0.15 25);
+    --color-error-content: oklch(98% 0 0);
+
+    --radius-selector: 0.25rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.6rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1.5px;
+    --depth: 0;
+    --noise: 0;
+}
+
+*:not(i) {
+    font-family: 'Inter', sans-serif !important;
+}
+
+.menu li > a:active {
+    background-color: var(--color-base-100);
+    box-shadow: 0 0 4px var(--color-base-300);
+    color: var(--color-base-content);
+}
+.menu li:hover > a:hover {
+    background-color: var(--color-base-100);
+    box-shadow: 0 0 4px var(--color-base-300);
+    color: var(--color-base-content);
+}
+.menu .menu-active {
+    background-color: var(--color-base-100);
+    box-shadow: 0 0 4px var(--color-base-300);
+    color: var(--color-base-content);
+}
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+select,
+textarea {
+    @apply input w-full outline-none dark:bg-[oklch(22%_0.01_60)] dark:border-[oklch(18%_0.015_60)] dark:hover:bg-[oklch(20%_0.01_60)] dark:focus:bg-[oklch(18%_0.01_60)] dark:focus:border-primary focus:outline-none transition-colors duration-200;
+}
+select { @apply select }
+textarea { @apply textarea h-40; }
+label { @apply font-bold text-sm; }
+div.field { @apply mb-2; }
+
+div.divider::before,
+div.divider::after { @apply bg-base-300 mt-4; }
+
+i.ri { @apply text-lg; }
+tr:not(thead):hover { @apply bg-base-200/50 cursor-pointer; }
+
+.modal-box { @apply border-2 border-base-300; }
+.modal-backdrop { @apply backdrop-blur-none bg-black/10 transition-all duration-500 ease-in-out; }
+.modal-open .modal-backdrop, .modal-toggle:checked + .modal .modal-backdrop { @apply backdrop-blur-sm bg-black/10; }
+
+.badge { @apply rounded-box opacity-85 dark:border-neutral-800 p-3; }
+.turbo-progress-bar { @apply hidden; }
+@source "../templates";
+@source "./app.js";

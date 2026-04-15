@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use BcMath\Number;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -10,10 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity(
-    fields: ['refInterne'],
-        message: 'Cette référence interne existe déjà.'
-)]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
@@ -26,7 +23,7 @@ class Product
     private ?string $designation = null;
 
     #[Assert\NotBlank(message: "La référence interne est obligatoire.")]
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255, unique: false)]
     private ?string $refInterne = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -36,6 +33,7 @@ class Product
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
@@ -47,9 +45,40 @@ class Product
     #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'product', orphanRemoval: true)]
     private Collection $productUnits;
 
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Company $company = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Brand $brands = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Color $color = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $weightKg = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $length = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $width = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $height = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?TVA $tva = null;
+
+    /**
+     * @var Collection<int, Movement>
+     */
+    #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'product', orphanRemoval: true)]
+    private Collection $movements;
+
     public function __construct()
     {
         $this->productUnits = new ArrayCollection();
+        $this->movements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -129,6 +158,15 @@ class Product
         return $this;
     }
 
+    public function getPriceTtc(): float
+    {
+        if (!$this->tva) {
+            return $this->sellPrice;
+        }
+
+        return ($this->sellPrice ?? 0) * (1 + ($this->tva->getValue() / 100));
+    }
+
     /**
      * @return Collection<int, ProductUnit>
      */
@@ -153,6 +191,132 @@ class Product
             // set the owning side to null (unless already changed)
             if ($productUnit->getProduct() === $this) {
                 $productUnit->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    public function getBrands(): ?Brand
+    {
+        return $this->brands;
+    }
+
+    public function setBrands(?Brand $brands): static
+    {
+        $this->brands = $brands;
+
+        return $this;
+    }
+
+    public function getColor(): ?Color
+    {
+        return $this->color;
+    }
+
+    public function setColor(?Color $color): static
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getWeightKg(): ?string
+    {
+        return $this->weightKg;
+    }
+
+    public function setWeightKg(?string $weightKg): static
+    {
+        $this->weightKg = $weightKg;
+
+        return $this;
+    }
+
+    public function getLength(): ?string
+    {
+        return $this->length;
+    }
+
+    public function setLength(?string $length): static
+    {
+        $this->length = $length;
+
+        return $this;
+    }
+
+    public function getWidth(): ?string
+    {
+        return $this->width;
+    }
+
+    public function setWidth(?string $width): static
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getHeight(): ?string
+    {
+        return $this->height;
+    }
+
+    public function setHeight(?string $height): static
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
+    public function getTva(): ?TVA
+    {
+        return $this->tva;
+    }
+
+    public function setTva(?TVA $tva): static
+    {
+        $this->tva = $tva;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Movement>
+     */
+    public function getMovements(): Collection
+    {
+        return $this->movements;
+    }
+
+    public function addMovement(Movement $movement): static
+    {
+        if (!$this->movements->contains($movement)) {
+            $this->movements->add($movement);
+            $movement->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovement(Movement $movement): static
+    {
+        if ($this->movements->removeElement($movement)) {
+            // set the owning side to null (unless already changed)
+            if ($movement->getProduct() === $this) {
+                $movement->setProduct(null);
             }
         }
 

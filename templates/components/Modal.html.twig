@@ -1,27 +1,31 @@
-<style>
-    .inmodal {
-        padding: 20px;
-        line-height: 28px;
-    }
-</style>
+<input type="checkbox" id="{{ id }}" class="modal-toggle" />
 
-<div class="ui mini modal">
-    <div class="header">
-        {{ title }}
-    </div>
+<div class="modal modal-bottom sm:modal-middle" role="dialog">
+	<div class="modal-box p-0 overflow-visible border border-white/10 bg-base-100 shadow-2xl {{ max_width|default('max-w-2xl') }}">
 
-    <div class="inmodal">
-        {{ text }}
-    </div>
+		{% if modalForm is defined and modalForm is not null %}
+			{{ form_start(modalForm, {'attr': {'id': 'form_' ~ id }}) }}
+		{% endif %}
 
-    <div class="actions">
-        <button class="ui basic black deny button">
-            <i class="minus icon"></i>
-            Annuler
-        </button>
-        <a href="{{ url }}" class="ui basic positive right button">
-            <i class="checkmark icon"></i>
-            Confirmer
-        </a>
-    </div>
+		{# ... Header ... #}
+		<div class="px-6 py-4 border-b border-base-200 bg-base-200/30">
+			<h3 class="text-xl font-bold">{% block modal_title %}{% endblock %}</h3>
+		</div>
+
+		{# Body #}
+		<div class="px-6 py-6">
+			{% block modal_body %}{% endblock %}
+		</div>
+
+		{# Footer #}
+		<div class="px-6 py-4 bg-base-200/20 border-t border-base-200 flex justify-end gap-3">
+			{% block modal_footer %}{% endblock %}
+		</div>
+
+		{% if modalForm is defined and modalForm is not null %}
+			{{ form_end(modalForm) }}
+		{% endif %}
+
+	</div>
+	<label class="modal-backdrop bg-neutral/60 backdrop-blur-sm" for="{{ id }}">Close</label>
 </div>

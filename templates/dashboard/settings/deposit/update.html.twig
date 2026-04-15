@@ -1,0 +1,73 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Paramètres - ' ~ deposit.name) %}
+
+{% block topbar %}
+	<div class="breadcrumbs text-lg">
+		<ul>
+			<li><a href="{{ path('app.dashboard.settings.index') }}">Paramètres</a></li>
+			<li><a href="{{ path('app.dashboard.settings.index', { tab: 'deposits' }) }}">Dépôts</a></li>
+			<li>{{ deposit.name }}</li>
+		</ul>
+	</div>
+{% endblock %}
+
+{% block body %}
+	{{ form_start(form) }}
+		<div class="field">
+			<label for="deposit_name">Nom</label>
+			{{ form_row(form.name) }}
+		</div>
+
+		<div class="grid grid-cols-2 gap-6">
+			<div class="field">
+				<label for="deposit_address1">Adresse 1</label>
+				{{ form_row(form.address1) }}
+			</div>
+
+			<div class="field">
+				<label for="deposit_address2">Adresse 2</label>
+				{{ form_row(form.address2) }}
+			</div>
+		</div>
+
+		<div class="grid grid-cols-2 gap-6">
+			<div class="field">
+				<label for="deposit_cop">Code postal</label>
+				{{ form_row(form.cop) }}
+			</div>
+
+			<div class="field">
+				<label for="deposit_city">Ville</label>
+				{{ form_row(form.city) }}
+			</div>
+		</div>
+
+
+		<div class="field">
+			{{ form_widget(form.submit, {label_html: true}) }}
+			<label for="modal_delete_company" class="btn btn-error">
+				<i class="ri ri-delete-bin-fill"></i>
+				Supprimer
+			</label>
+
+			<input type="checkbox" id="modal_delete_company" class="modal-toggle" />
+			<div class="modal" role="dialog">
+				<div class="modal-box">
+					<div class="py-4">
+						<h3 class="text-2xl font-bold">Attention !</h3>
+						<p class="py-4">Êtes-vous sûr de supprimer ce dépôt ?<br>
+							L'ensemble des données seront effacées (Produits, numéros de série...</p>
+
+						<a class="btn btn-error" data-turbo="false" href="{{ path('app.dashboard.settings.delete.deposit', { id: deposit.id }) }}">
+							<i class="ri ri-delete-bin-line"></i>
+							Supprimer
+						</a>
+					</div>
+
+				</div>
+				<label class="modal-backdrop" for="modal_delete_company">Close</label>
+			</div>
+		</div>
+	{{ form_end(form) }}
+{% endblock %}

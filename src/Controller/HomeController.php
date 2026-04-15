@@ -12,13 +12,17 @@ use Symfony\Component\Routing\Attribute\Route;
 class HomeController extends AbstractController
 {
     #[Route('/', 'app.home.index')]
-    public function index(): Response
+    public function index()
     {
         if(!$this->getUser())
         {
             return $this->redirectToRoute('app.security.login');
         }
 
-        return $this->render('home.html.twig');
+        if(in_array('ROLE_SA', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app.admin.index');
+        } else if (in_array('ROLE_USER', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app.dashboard.index');
+        }
     }
 }

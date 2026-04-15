@@ -2,68 +2,144 @@
 
 {% block title('Produits') %}
 
-{% block topbar %}
-    <h1 class="ui header">Produits</h1>
-{% endblock %}
+{% block topbar('Produits') %}
 
 {% block body %}
+    <div class="flex justify-between">
+        <div>
+            <label for="modal_create_product" type="button" class="btn btn-primary">
+                <i class="ri ri-add-line"></i>
+                Nouveau
+            </label>
 
-    {% for msg in app.flashes('success') %}
-        <div class="ui positive message">
-            {{ msg }}
+            <label for="modal_search_product" type="button" class="btn btn-secondary btn-outline">
+                <i class="ri ri-search-line"></i>
+            </label>
         </div>
-    {% endfor %}
 
-    <a href="{{ path('app.dashboard.product.create') }}" class="ui black button">
-        <i class="plus icon"></i>
-        Nouveau
-    </a>
+        <div class="dropdown dropdown-end">
+            <button popovertarget="export" style="anchor-name:--anchor-export" class="btn btn-success">
+                <i class="ri ri-file-excel-2-line"></i>
+                Exporter
+            </button>
+            <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
+                popover id="export" style="position-anchor:--anchor-export">
+                <li><a data-turbo="false" href="{{ path('app.export.products') }}"><i class="ri ri-box-3-line"></i>Produits</a></li>
+                <li><a data-turbo="false" href="{{ path('app.export.units') }}"><i class="ri ri-hashtag"></i>Stock global</a></li>
+            </ul>
+        </div>
+    </div>
 
-    <button class="ui basic black button searchButton">
-        <i class="search icon"></i>
-        Rechercher
-    </button>
+    <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+        <table class="table">
+            <thead class="bg-base-200/50">
+            <tr>
+                <th class="table-loop">#</th>
+                <th>Réf. Interne</th>
+                <th>Réf. Fournisseur</th>
+                <th>Désignation</th>
+                <th>Catégorie</th>
+                <th>Prix de vente</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr class="clickable-row hover transition-colors" data-href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
+                    <td class="table-loop opacity-50">{{ loop.index }}</td>
+                    <td>
+                        {{ product.refInterne }}
+                    </td>
+                    <td>{{ product.refSupplier }}</td>
+                    <td>{{ product.designation }}</td>
+                    <td>
+                        <span class="badge badge-ghost badge-sm uppercase">{{ product.category.label ?? 'N/A' }}</span>
+                    </td>
+                    <td class="font-mono text-sm">{{ product.sellPrice|format_currency('EUR', locale: 'fr') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <div class="ui segment searchModal">
-        {{ form_start(searchForm) }}
-            <div class="ui form">
+    <div class="navigation">
+        {{ knp_pagination_render(products) }}
+    </div>
 
-                <div class="four wide field">
-                    {{ form_widget(searchForm.search) }}
+    {# Créer un produit #}
+    {% embed 'components/Modal.html.twig' with {'id': 'modal_create_product', modalForm: formCreateProduct} %}
 
-                    {{ form_widget(searchForm.submit, {
-                        label_html: true
-                    }) }}
+        {% block modal_title %}Nouveau produit{% endblock %}
+
+        {% block modal_body %}
+            <div class="grid grid-cols-2 gap-5">
+                <div class="field">
+                    <label for="product_refInterne">Référence Interne</label>
+                    {{ form_widget(formCreateProduct.refInterne) }}
                 </div>
 
+                <div class="field">
+                    <label for="product_refSupplier">Référence Fournisseur</label>
+                    {{ form_widget(formCreateProduct.refSupplier) }}
+                </div>
             </div>
-        {{ form_end(searchForm) }}
-    </div>
 
-    <table class="ui celled table">
-        <thead>
-        <tr>
-            <th class="table-loop">#</th>
-            <th>Réf. Interne</th>
-            <th>Réf. Fournisseur</th>
-            <th>Désignation</th>
-            <th>Prix de vente</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for product in pagination %}
-            <tr data-controller="row-link" data-action="click->row-link#click" data-row-link-url-value="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">
-                <td class="table-loop">{{ loop.index }}</td>
-                <td><a href="{{ path('app.dashboard.product.update', { refInterne: product.refInterne }) }}">{{ product.refInterne }}</a></td>
-                <td>{{ product.refSupplier }}</td>
-                <td>{{ product.designation }}</td>
-                <td>{{ product.sellPrice }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            <div class="field">
+                <label for="product_designation">Désignation</label>
+                {{ form_row(formCreateProduct.designation) }}
+            </div>
 
-    <div class="pagination">
-        {{ knp_pagination_render(pagination, 'pagination/semantic_ui_pagination.html.twig') }}
-    </div>
+            <div class="field">
+                <label for="product_category">Catégorie</label>
+                {{ form_widget(formCreateProduct.category) }}
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="field">
+                    <label for="product_sellPrice">Prix de vente HT</label>
+                    {{ form_row(formCreateProduct.sellPrice) }}
+                </div>
+
+                <div class="field">
+                    <label for="product_tva">TVA</label>
+                    {{ form_widget(formCreateProduct.tva) }}
+                </div>
+            </div>
+
+            <div class="hidden">
+                {{ form_row(formCreateProduct.description) }}
+                {{ form_row(formCreateProduct.brands) }}
+                {{ form_row(formCreateProduct.width) }}
+                {{ form_row(formCreateProduct.height) }}
+                {{ form_row(formCreateProduct.weightKg) }}
+                {{ form_row(formCreateProduct.length) }}
+                {{ form_row(formCreateProduct.color) }}
+            </div>
+        {% endblock %}
+
+        {% block modal_footer %}
+            <div class="field">
+                {{ form_row(formCreateProduct.submit, { label_html: true }) }}
+            </div>
+        {% endblock %}
+
+    {% endembed %}
+
+    {# Rechercher un produit #}
+    {% embed 'components/Modal.html.twig' with {'id': 'modal_search_product', modalForm: form} %}
+
+        {% block modal_title %}Rechercher{% endblock %}
+
+        {% block modal_body %}
+            <div>
+                {{ form_row(form.search) }}
+            </div>
+        {% endblock %}
+
+        {% block modal_footer %}
+            <div>
+                {{ form_widget(form.submit, { label_html: true }) }}
+            </div>
+        {% endblock %}
+
+    {% endembed %}
 {% endblock %}

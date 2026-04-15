@@ -1,0 +1,32 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Paramètres - Couleur - ' ~ color.label) %}
+
+{% block topbar %}
+	<div class="breadcrumbs text-lg">
+		<ul>
+			<li><a href="{{ path('app.dashboard.settings.index') }}">Paramètres</a></li>
+			<li><a href="{{ path('app.dashboard.settings.index', { tab: 'products' }) }}">Couleurs</a></li>
+			<li>{{ color.label }}</li>
+		</ul>
+	</div>
+{% endblock %}
+
+{% block body %}
+	{{ form_start(form) }}
+
+	<div class="field">
+		<label for="category_label">Nom</label>
+		{{ form_row(form.label) }}
+	</div>
+
+
+	<div class="field">
+		{{ form_widget(form.submit, {label_html: true}) }}
+		<a data-turbo="false" href="{{ path('app.dashboard.settings.delete.color', {id: color.id}) }}" class="btn btn-error">
+			<i class="ri ri-delete-bin-line"></i>
+			Supprimer
+		</a>
+	</div>
+	{{ form_end(form) }}
+{% endblock %}

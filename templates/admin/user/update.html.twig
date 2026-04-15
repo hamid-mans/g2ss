@@ -3,30 +3,68 @@
 {% block title('Modifier un utilisateur') %}
 
 {% block body %}
-    <div class="ui segment">
-        <h1><i class="blue save icon"></i>Utilisateur : {{ user.lastname ~ ' ' ~ user.firstname }}</h1>
-        <br>
-
-        <div class="ui form">
-            {{ form_start(userForm) }}
-            <div class="two fields">
-                <div class="field">
+    {{ form_start(userForm) }}
+        <div class="flex flex-col gap-3">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
                     <label for="user_firstname">Prénom</label>
                     {{ form_row(userForm.firstname) }}
                 </div>
 
-                <div class="field">
+                <div>
                     <label for="user_lastname">Nom de famille</label>
                     {{ form_row(userForm.lastname) }}
                 </div>
             </div>
 
-            <div class="field">
-                <label for="user_deposits">Dépôts</label>
-                {{ form_widget(userForm.deposits) }}
+            <div>
+                <label>Agences</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {% for child in userForm.deposits %}
+                        <label class="label cursor-pointer border-2 border-base-300 rounded-box p-2 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                            <div class="flex items-center gap-3">
+                                {{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+                                <span class="label-text font-semibold">{{ child.vars.label }}</span>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
             </div>
 
-            <div class="two fields">
+            <div>
+                <label class="font-bold mb-2 block">Rôle de l'utilisateur</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% for child in userForm.roles %}
+                        <label class="label cursor-pointer border-2 border-base-300 rounded-box p-3 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                            <div class="flex items-center gap-3">
+                                {# On garde le widget caché ou stylisé, et on affiche le label proprement #}
+                                {{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+                                <span class="label-text font-semibold">
+                        {{ child.vars.label }}
+                    </span>
+                            </div>
+                            {# Petit ajout pour expliquer le rôle #}
+                            <div class="text-xs opacity-50">
+                                {{ child.vars.value == 'ROLE_ADMIN' ? 'Accès total' : 'Accès limité' }}
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="field">
+                    <label>Fuseau horaire</label>
+                    {{ form_row(userForm.timezone) }}
+                </div>
+
+                <div class="field">
+                    <label>Photo de profil</label>
+                    {{ form_row(userForm.avatar) }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
                 <div class="field">
                     <label for="user_email">Email</label>
                     {{ form_row(userForm.email) }}
@@ -34,16 +72,35 @@
 
                 <div class="field">
                     <label for="user_password">Mot de passe</label>
-                    {{ form_row(userForm.plainPassword) }}
+                    {{ form_row(userForm.plainPassword, { attr: { placeholder: "Laisser vide pour ne pas modifier le mot de passe" } }) }}
                 </div>
             </div>
 
 
             <div class="field">
-                {{ component('Modal', { title: "Souhaitez-vous supprimer l'uitlisateur ?", text: "En supprimant l'utilisateur, il ne pourra plus accéder à la société.", url: path('app.admin.delete_user', {id: user.id}) }) }}
-                {{ form_widget(userForm.submit, {label_html: true}) }} <button class="ui basic red button" type="button" onclick="$('.ui.mini.modal').modal('show')"><i class="trash icon"></i>Supprimer l'utilisateur</button>
+                {{ form_widget(userForm.submit, {label_html: true}) }}
+                <label for="modal_delete_deposit" class="btn btn-error" type="button">
+                    <i class="ri ri-delete-bin-line"></i>Supprimer
+                </label>
+
+                <input type="checkbox" id="modal_delete_deposit" class="modal-toggle" />
+                <div class="modal" role="dialog">
+                    <div class="modal-box">
+                        <div class="py-4">
+                            <h3 class="text-2xl font-bold">Attention !</h3>
+                            <p class="py-4">Êtes-vous sûr de supprimer cet utilisateur ?</p>
+
+                            <a class="btn btn-error" data-turbo="false" href="{{ path('app.admin.delete_user', { id: user.id }) }}">
+                                <i class="ri ri-delete-bin-line"></i>
+                                Supprimer
+                            </a>
+                        </div>
+
+                    </div>
+                    <label class="modal-backdrop" for="modal_delete_deposit">Close</label>
+                </div>
             </div>
-            {{ form_end(userForm) }}
         </div>
-    </div>
+    {{ form_end(userForm) }}
+
 {% endblock %}

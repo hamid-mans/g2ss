@@ -1,0 +1,9 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block topbar("Une erreur est survenue sur l'application.") %}
+
+{% block body %}
+	<p>
+		<a href="{{ path('app.dashboard.index') }}">Retour à l'accueil</a>
+	</p>
+{% endblock %}

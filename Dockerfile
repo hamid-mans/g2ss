@@ -1,28 +1,52 @@
-FROM php:8.4-cli
+FROM php:8.4-fpm
 
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
-    git unzip libicu-dev libzip-dev default-mysql-client \
- && docker-php-ext-install intl pdo pdo_mysql zip \
- && rm -rf /var/lib/apt/lists/*
+    git \
+    unzip \
+    libicu-dev \
+    libzip-dev \
+    libpq-dev \
+    libonig-dev \
+    libxml2-dev \
+    # Pour l'extension GD (images)
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    mariadb-client \
+    nodejs \
+    npm \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Configuration et installation des extensions PHP
+# On configure GD pour supporter JPEG et Freetype
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+    intl \
+    zip \
+    pdo \
+    pdo_mysql \
+    bcmath \
+    gd
+
+# Installation de Redis via PECL
+RUN pecl install redis && docker-php-ext-enable redis
 
 WORKDIR /app
 
-# entrypoint (à la racine du repo)
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod 755 /entrypoint.sh
+# Installation de Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# ✅ copier le code dans l'image
+# Gestion du script d'entrée
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 COPY . /app
 
-# Compile asset-map pendant le build
-RUN php bin/console asset-map:compile --env=prod
+RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
 
-# (optionnel) warmup cache
-RUN php bin/console cache:warmup --env=prod
+ENTRYPOINT ["entrypoint.sh"]
 
-EXPOSE 8000
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["sh", "-lc", "composer install --no-interaction && php -S 0.0.0.0:8000 -t public"]
+CMD ["php-fpm"]

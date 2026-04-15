@@ -1,0 +1,9 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block topbar("Cette page n'existe pas.") %}
+
+{% block body %}
+	<p>
+		<a href="{{ path('app.dashboard.index') }}">Retour à l'accueil</a>
+	</p>
+{% endblock %}

@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/administration/se-connecter', name: 'app.security.login')]
+    #[Route(path: '/se-connecter', name: 'app.security.login')]
     public function login(UserPasswordHasherInterface $hasher, AuthenticationUtils $authenticationUtils): Response
     {
         // if ($this->getUser()) {
@@ -22,12 +22,12 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('admin/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('dashboard/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
     #[Route(path: '/logout', name: 'app.security.logout')]
-    public function logout(): void
+    public function logout(): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        return $this->redirectToRoute('app.security.login');
     }
 }

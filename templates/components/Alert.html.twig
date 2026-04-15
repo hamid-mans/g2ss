@@ -1,3 +1,62 @@
-<div class="ui {{ type}} message">
-    {{ text }}
+<div class="toast-container hidden">
+	{% for type, messages in app.flashes %}
+		{% for message in messages %}
+			<script>
+                (function() {
+                    const isSuccess = "{{ type }}" === 'success';
+                    const themeColor = isSuccess ? 'oklch(62% 0.15 145)' : 'oklch(62% 0.18 25)';
+                    const icon = isSuccess ? 'ri-checkbox-circle-fill' : 'ri-error-warning-fill';
+                    const label = isSuccess ? 'Succès' : 'Erreur';
+                    const msg = {{ message|json_encode|raw }};
+
+                    // On crée l'élément HTML proprement pour Toastify
+                    const toastNode = document.createElement("div");
+                    toastNode.className = "flex items-center gap-4 font-sans";
+                    toastNode.innerHTML = `
+                        <i class="${icon} text-2xl" style="color: ${themeColor}"></i>
+                        <div style="flex: 1">
+                            <div style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; font-weight: 800; opacity: 0.6; margin-bottom: 2px;">${label}</div>
+                            <div style="font-size: 14px; font-weight: 600; line-height: 1.2;">${msg}</div>
+                        </div>
+                    `;
+
+                    Toastify({
+                        node: toastNode, // ON UTILISE NODE ICI
+                        duration: 5000,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                        className: "g2ss-toast",
+                        style: {
+                            background: "var(--color-base-100)",
+                            color: "var(--color-base-content)",
+                            borderLeft: `5px solid ${themeColor}`,
+                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                            borderRadius: '12px',
+                            padding: '16px 20px',
+                            minWidth: '320px',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }
+                    }).showToast();
+                })();
+			</script>
+		{% endfor %}
+	{% endfor %}
 </div>
+
+<style>
+    /* Personnalisation de l'animation de Toastify */
+    .g2ss-toast {
+        font-family: 'Geist', sans-serif !important;
+        animation: toast-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes toast-in {
+        from { transform: translateX(100%) scale(0.9); opacity: 0; }
+        to { transform: translateX(0) scale(1); opacity: 1; }
+    }
+
+    /* On masque le conteneur toast de DaisyUI car Toastify gère sa propre position */
+    .toast-container { display: none; }
+</style>

@@ -1,0 +1,31 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Paramètres - TVA - ' ~ tva.value) %}
+
+{% block topbar %}
+	<div class="breadcrumbs text-lg">
+		<ul>
+			<li><a href="{{ path('app.dashboard.settings.index') }}">Paramètres</a></li>
+			<li><a href="{{ path('app.dashboard.settings.index', { tab: 'products' }) }}">TVA</a></li>
+			<li>{{ tva.value }}</li>
+		</ul>
+	</div>
+{% endblock %}
+
+{% block body %}
+	{{ form_start(form) }}
+
+	<div class="field">
+		<label for="tva_value">Valeur</label>
+		{{ form_row(form.value) }}
+	</div>
+
+	<div class="field">
+		{{ form_widget(form.submit, {label_html: true}) }}
+		<a data-turbo="false" href="{{ path('app.dashboard.settings.delete.tva', {id: tva.id}) }}" class="btn btn-error">
+			<i class="ri ri-delete-bin-line"></i>
+			Supprimer
+		</a>
+	</div>
+	{{ form_end(form) }}
+{% endblock %}

@@ -42,13 +42,20 @@ class Deposit
     /**
      * @var Collection<int, ProductUnit>
      */
-    #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'deposit')]
+    #[ORM\OneToMany(targetEntity: ProductUnit::class, mappedBy: 'deposit', orphanRemoval: true)]
     private Collection $productUnits;
+
+    /**
+     * @var Collection<int, Movement>
+     */
+    #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'deposit', orphanRemoval: true)]
+    private Collection $movements;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->productUnits = new ArrayCollection();
+        $this->movements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -179,6 +186,36 @@ class Deposit
             // set the owning side to null (unless already changed)
             if ($productUnit->getDeposit() === $this) {
                 $productUnit->setDeposit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Movement>
+     */
+    public function getMovements(): Collection
+    {
+        return $this->movements;
+    }
+
+    public function addMovement(Movement $movement): static
+    {
+        if (!$this->movements->contains($movement)) {
+            $this->movements->add($movement);
+            $movement->setDeposit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovement(Movement $movement): static
+    {
+        if ($this->movements->removeElement($movement)) {
+            // set the owning side to null (unless already changed)
+            if ($movement->getDeposit() === $this) {
+                $movement->setDeposit(null);
             }
         }
 

@@ -2,34 +2,178 @@
 
 {% block title('Accueil') %}
 
-{% block topbar %}
-    <h1 class="ui header">
-            Tableau de bord
-    </h1>
-{% endblock %}
+{% block topbar(app.user.company.name) %}
 
 {% block body %}
-
-
-    <div class="ui st   ats">
-        <a href="{{ path('app.dashboard.product.index') }}">
-            <div class="stat btc-blue">
-                <div class="value">
-                    <i class="box icon"></i> 5
+    <div class="flex gap-6 mb-8">
+        <div class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow flex-1">
+            <a class="card-body p-6" href="{{ path('app.dashboard.product.index') }}">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-primary/10 rounded-xl text-primary">
+                        <i class="ri-box-3-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase tracking-widest font-bold opacity-50 mb-1">En stock</p>
+                        <p class="text-3xl font-black tracking-tight">{{ sumProducts }}</p>
+                    </div>
                 </div>
-                <div class="label">
-                    Produits
+            </a>
+        </div>
+
+        <div class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow flex-1">
+            <a class="card-body p-6" href="{{ path('app.dashboard.product.index') }}">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-secondary/10 rounded-xl text-secondary">
+                        <i class="ri-money-euro-box-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase tracking-widest font-bold opacity-50 mb-1">Valeur totale d'achat</p>
+                        <p class="text-3xl font-black tracking-tight">{{ costProducts|number_format(2, ',', ' ') }} €</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="flex-1"></div>
+    </div>
+
+    <div class="grid grid-cols-5 w-full gap-6 mb-8">
+        <div class="flex flex-col col-span-2">
+            <p class="font-bold mb-3 uppercase text-xs opacity-60 tracking-widest">Stock par catégorie</p>
+            <div class="bg-base-100 border border-base-300 rounded-box p-4 shadow-sm h-full">
+                <div id="chart-stockPerCategory"
+                     data-series="{{ unitsCategories|json_encode }}"
+                     data-labels="{{ categories|json_encode }}">
                 </div>
             </div>
-        </a>
+        </div>
 
-        <div class="stat btc-orange">
-            <div class="value">
-                <i class="warehouse icon"></i> 5
+        <div class="col-span-3 flex flex-col">
+            <p class="font-bold mb-3 uppercase text-xs opacity-60 tracking-widest">Valeur d'achat par catégorie</p>
+            <div class="bg-base-100 border border-base-300 rounded-box p-4 shadow-sm h-full">
+                <div id="chart-sellPricePerCategory"
+                     data-series="{{ buyPriceCategories|json_encode }}"
+                     data-labels="{{ categories|json_encode }}">
+                </div>
             </div>
-            <div class="label">
-                Dépôts
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 w-full gap-6 items-stretch">
+
+        <div class="col-span-2 flex flex-col">
+            <p class="font-bold mb-3 uppercase text-xs opacity-60 tracking-widest">Derniers mouvements</p>
+            <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 flex-grow shadow-sm">
+                <table class="table table-md">
+                    <thead class="bg-base-200/50">
+                    <tr>
+                        <th class="w-12 text-center opacity-50">#</th>
+                        <th>Mouvement</th>
+                        <th>Dépôt</th>
+                        <th>Utilisateur</th>
+                        <th class="text-right">Date</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-200">
+                    {% for movement in movements %}
+                        <tr class="hover cursor-pointer transition-colors" data-modal-trigger="modal_detail_movement_{{ movement.id }}">
+                            <th class="text-center opacity-40 font-normal text-xs">{{ loop.index }}</th>
+                            <td>
+                                    <span class="badge badge-sm py-3 px-3 font-bold {{ movement.type == 0 ? 'bg-red-500/10 text-error border-none' : 'bg-green-500/10 text-success border-none' }}">
+                                        {{ movement.type == 0 ? 'SORTIE' : 'ENTRÉE' }}
+                                    </span>
+                            </td>
+                            <td class="font-medium text-sm">{{ movement.deposit.name }}</td>
+                            <td class="text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="avatar">
+                                        <div class="w-7 rounded-full">
+                                            <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" />
+                                        </div>
+                                    </div>️
+                                    {{ movement.user.firstname ~ ' ' ~ movement.user.lastname|upper }}
+                                </div>
+                            </td>
+                            <td class="text-right text-xs font-mono opacity-60">{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                {% for movement in movements %}
+                    {# Détail d'un mouvement #}
+                    {% embed 'components/Modal.html.twig' with {'id': 'modal_detail_movement_' ~ movement.id} %}
+
+                        {% block modal_title %}Détail du mouvement{% endblock %}
+
+                        {% block modal_body %}
+                            <div class="field">
+                                <label>Type</label>
+                                <input type="text" value="{{ movement.type == 1 ? 'Entrée' : 'Sortie' }}" disabled>
+                            </div>
+
+                            <div class="field">
+                                <label>Dépôt</label>
+                                <input type="text" value="{{ movement.deposit.name }}" disabled>
+                            </div>
+                            <div class="grid">
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div class="field">
+                                        <label>Utilisateur</label>
+                                        <input type="text" value="{{ movement.user.firstname ~ ' ' ~ movement.user.lastname }}" disabled>
+                                    </div>
+
+                                    <div class="field">
+                                        <label>Date du mouvement</label>
+                                        <input type="text" value="{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label>Détail des lignes <span class="bg-base-200 border border-base-300 px-2 py-1 m-1 rounded-box">{{ movement.productUnits|length }}</span></label>
+                                <div class="overflow-x-auto max-h-60 rounded-box border border-base-300 bg-base-100 mt-1">
+                                    <table class="table overflow-scroll">
+                                        <thead class="bg-base-200/50">
+                                        <tr>
+                                            <th>Numéro de série</th>
+                                            <th>Prix achat</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for unit in movement.productUnits %}
+                                            <tr>
+                                                <td>{{ unit.serialNumber }}</td>
+                                                <td>{{ unit.buyPrice }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endblock %}
+
+                    {% endembed %}
+                {% endfor %}
             </div>
+        </div>
+
+        <div class="flex flex-col">
+            <p class="font-bold mb-3 uppercase text-xs opacity-60 tracking-widest">Notes</p>
+
+            {{ form_start(notesForm, {'attr': {
+                'class': 'flex flex-col flex-grow bg-base-100 gap-2 overflow-hidden'
+            }}) }}
+
+            {{ form_widget(notesForm.notes, {
+
+            }) }}
+
+            {{ form_widget(notesForm.submit, {
+                'label_html': true,
+            }) }}
+
+            {{ form_end(notesForm) }}
         </div>
     </div>
 {% endblock %}

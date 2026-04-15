@@ -1,0 +1,62 @@
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: roothamid123
+      MARIADB_USER: g2s
+      MARIADB_PASSWORD: g2s
+      MARIADB_DATABASE: g2s
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: g2s
+      PMA_PASSWORD: g2s
+      PMA_ARBITRARY: 1
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mysql://g2s:g2s@db:3306/g2s?serverVersion=mariadb-11.8.5&charset=utf8mb4
+      - APP_ENV=dev
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: ["php-fpm"]
+    restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+
+  caddy:
+    image: caddy:latest
+    depends_on:
+      - app
+    ports:
+      - "80:80"      # HTTP pour local
+      - "443:443"     # HTTPS auto-signé pour local
+    environment:
+      SITE_HOST: ${SITE_HOST:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./:/app
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:

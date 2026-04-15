@@ -1,0 +1,27 @@
+{# templates/_partials/_pagination.html.twig #}
+{% if pageCount > 1 %}
+	<div class="mt-4 join shadow-sm rounded-box">
+		{# Bouton Précédent #}
+		{% if previous is defined %}
+			<a href="{{ path(route, query|merge({(pageParameterName): previous})) }}" class="join-item btn bg-base-100 italic">«</a>
+		{% else %}
+			<button class="join-item btn btn btn-disabled bg-base-100 opacity-50">«</button>
+		{% endif %}
+
+		{# Pages #}
+		{% for page in pagesInRange %}
+			{% if page != current %}
+				<a href="{{ path(route, query|merge({(pageParameterName): page})) }}" class="join-item btn btn bg-base-100">{{ page }}</a>
+			{% else %}
+				<button class="join-item btn btn btn-secondary no-animation">{{ page }}</button>
+			{% endif %}
+		{% endfor %}
+
+		{# Bouton Suivant #}
+		{% if next is defined %}
+			<a href="{{ path(route, query|merge({(pageParameterName): next})) }}" class="join-item btn btn bg-base-100 italic">»</a>
+		{% else %}
+			<button class="join-item btn btn btn-disabled bg-base-100 opacity-50">»</button>
+		{% endif %}
+	</div>
+{% endif %}

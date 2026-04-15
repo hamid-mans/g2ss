@@ -18,9 +18,9 @@ class SearchType extends AbstractType
                 'required' => false,
             ])
             ->add('submit', SubmitType::class, [
-                'label' => '<i class="search icon"></i>Rechercher',
+                'label' => '<i class="ri ri-search-line"></i>Rechercher',
                 'attr' => [
-                    'class' => 'ui basic black button'
+                    'class' => 'btn btn-primary'
                 ]
             ])
         ;

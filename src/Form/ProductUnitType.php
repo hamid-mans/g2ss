@@ -5,9 +5,11 @@ namespace App\Form;
 use App\Entity\Deposit;
 use App\Entity\Product;
 use App\Entity\ProductUnit;
-use App\Repository\DepositRepository;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,13 +20,14 @@ class ProductUnitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $company = $options['company'];
         $user = $options['user'];
 
         $builder
             ->add('serialNumber', TextType::class, [
                 'label' => false
             ])
-            ->add('buyPrice', TextType::class, [
+            ->add('buyPrice', NumberType::class, [
                 'label' => false,
                 'required' => false
             ])
@@ -33,18 +36,26 @@ class ProductUnitType extends AbstractType
                 'required' => false
             ])
             ->add('deposit', EntityType::class, [
-                'label' => false,
                 'class' => Deposit::class,
-                'choice_label' => 'name',
-                'query_builder' => function (DepositRepository $repository) use ($user) {
-                    return $repository->createQueryBuilder('d')
-                        ->andWhere('d.company = :company')
-                        ->setParameter('company', $user->getCompany())
-                        ->orderBy('d.name', 'ASC');
+                'query_builder' => function (EntityRepository $er) use ($company, $user) {
+                    $qb = $er->createQueryBuilder('d')
+                        ->where('d.company = :company')
+                        ->setParameter('company', $company);
+
+                    if ($user) {
+                        $qb->innerJoin('d.users', 'u')
+                            ->andWhere('u.id = :userId')
+                            ->setParameter('userId', $user->getId());
+                    }
+
+                    return $qb->orderBy('d.name', 'ASC');
                 },
-                'attr' => [
-                    'class' => 'ui search dropdown'
-                ]
+                'choice_label' => 'name',
+                'label' => false,
+            ])
+            ->add('createdAt', DateType::class, [
+                'label' => false,
+                'disabled' => true,
             ])
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],
@@ -61,7 +72,10 @@ class ProductUnitType extends AbstractType
             'data_class' => ProductUnit::class,
             'submit_label' => null,
             'submit_class' => null,
+            'company' => null,
             'user' => null,
         ]);
+
+        $resolver->setRequired('company');
     }
 }

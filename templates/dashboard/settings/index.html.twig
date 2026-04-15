@@ -1,0 +1,504 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Paramètres') %}
+
+{% block topbar('Paramètres') %}
+
+{% block body %}
+    <div class="tabs tabs-border">
+        <br><br>
+
+        {# SOCIETE #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" checked />
+            <i class="ri ri-government-line"></i>
+            Société
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            {{ form_start(formCompany) }}
+
+                    <div class="field">
+                        <label for="formCompany.name">Raison sociale</label>
+                        {{ form_row(formCompany.name) }}
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-6">
+                        <div class="field">
+                            <label for="formCompany.address1">Adresse 1</label>
+                            {{ form_row(formCompany.address1) }}
+                        </div>
+
+                        <div class="field">
+                            <label for="formCompany.address2">Adresse 2</label>
+                            {{ form_row(formCompany.address2) }}
+                        </div>
+
+                        <div class="field">
+                            <label for="formCompany.cop">Code postal</label>
+                            {{ form_row(formCompany.cop) }}
+                        </div>
+
+                        <div class="field">
+                            <label for="formCompany.city">Ville</label>
+                            {{ form_row(formCompany.city) }}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        {{ form_row(formCompany.submit, { label_html: true }) }}
+                    </div>
+
+            {{ form_end(formCompany) }}
+        </div>
+
+
+        {# DÉPOTS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'deposits' ? 'checked' : '' }} />
+            <i class="ri ri-database-line"></i>
+            Dépôts
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            <label for="modal_create_deposit" class="btn btn-primary">
+                <i class="ri ri-add-line"></i>
+                Nouveau
+            </label>
+
+            <span class="badge {{ app.user.company.deposits|length >= 10 ? 'badge-error' : 'badge-secondary' }}">{{ app.user.company.deposits|length }} / 10 dépôts</span>
+
+            <input type="checkbox" id="modal_create_deposit" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-11/12 max-w-3xl">
+                    <h3 class="text-2xl font-bold mb-3">Nouveau dépôt</h3>
+                    <div class="py-4">
+                        {{ form_start(formCreateDeposit) }}
+                            <div class="field">
+                                <label for="deposit_name">Nom</label>
+                                {{ form_row(formCreateDeposit.name) }}
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="field">
+                                    <label for="deposit_address1">Adresse 1</label>
+                                    {{ form_row(formCreateDeposit.address1) }}
+                                </div>
+
+                                <div class="field">
+                                    <label for="deposit_address2">Adresse 2</label>
+                                    {{ form_row(formCreateDeposit.address2) }}
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="field">
+                                    <label for="deposit_cop">Code postal</label>
+                                    {{ form_row(formCreateDeposit.cop) }}
+                                </div>
+
+                                <div class="field">
+                                    <label for="deposit_city">Ville</label>
+                                    {{ form_row(formCreateDeposit.city) }}
+                                </div>
+                            </div>
+
+
+                            <div class="field">
+                                {{ form_row(formCreateDeposit.submit, {label_html: true}) }}
+                            </div>
+                        {{ form_end(formCreateDeposit) }}
+                    </div>
+                </div>
+                <label class="modal-backdrop" for="modal_create_deposit">Close</label>
+            </div>
+
+
+            <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                <table class="table">
+                    <thead class="bg-base-200">
+                    <tr>
+                        <th class="table-loop">#</th>
+                        <th>Nom</th>
+                        <th>Adresse 1</th>
+                        <th>Adresse 2</th>
+                        <th>Ville</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for deposit in app.user.company.deposits %}
+                        <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.deposit', { id: deposit.id }) }}">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ deposit.name }}</td>
+                            <td>{{ deposit.address1 }}</td>
+                            <td>{{ deposit.address2 }}</td>
+                            <td>{{ deposit.cop ~ ' ' ~ deposit.city }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# UTILISATEURS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'users' ? 'checked' : '' }} />
+            <i class="ri ri-user-settings-line"></i>
+            Utilisateurs
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            <label for="modal_create_user" class="btn btn-primary">
+                <i class="ri ri-add-line"></i>
+                Nouveau
+            </label>
+
+            <span class="badge {{ app.user.company.users|length >= 5 ? 'badge-error' : 'badge-secondary' }}">{{ app.user.company.users|length }} / 5 utilisateurs</span>
+
+            <input type="checkbox" id="modal_create_user" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-11/12 max-w-3xl">
+                    <h3 class="text-2xl font-bold mb-3">Nouvel utilisateur</h3>
+                    <div class="py-4">
+                        {{ form_start(formCreateUser) }}
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="field">
+                                    <label for="user_firstname">Prénom</label>
+                                    {{ form_row(formCreateUser.firstname) }}
+                                </div>
+
+                                <div class="field">
+                                    <label for="user_lastname">Nom de famille</label>
+                                    {{ form_row(formCreateUser.lastname) }}
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label>Dépôts</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                    {% for child in formCreateUser.deposits %}
+                                        <label class="label cursor-pointer border-2 border-base-300 rounded-box p-2 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                            <div class="flex items-center gap-3">
+                                                {{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+                                                <span class="label-text font-semibold">{{ child.vars.label }}</span>
+                                            </div>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="font-bold mb-2 block">Rôle de l'utilisateur</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {% for child in formCreateUser.roles %}
+                                        <label class="label cursor-pointer border-2 border-base-300 rounded-box p-3 transition-all hover:bg-base-200 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                            <div class="flex items-center gap-3">
+                                                {# On garde le widget caché ou stylisé, et on affiche le label proprement #}
+                                                {{ form_widget(child, {'attr': {'class': 'checkbox checkbox-primary'}}) }}
+                                                <span class="label-text font-semibold">
+                        {{ child.vars.label }}
+                    </span>
+                                            </div>
+                                            {# Petit ajout pour expliquer le rôle #}
+                                            <div class="text-xs opacity-50">
+                                                {{ child.vars.value == 'ROLE_ADMIN' ? 'Accès total' : 'Accès limité' }}
+                                            </div>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="field">
+                                    <label for="user_email">Email</label>
+                                    {{ form_row(formCreateUser.email) }}
+                                </div>
+
+                                <div class="field">
+                                    <label for="user_password">Mot de passe</label>
+                                    {{ form_row(formCreateUser.plainPassword) }}
+                                </div>
+                            </div>
+
+
+                            <div class="field">
+                                {{ form_row(formCreateUser.submit, {label_html: true}) }}
+                            </div>
+                        {{ form_end(formCreateUser) }}
+                    </div>
+                </div>
+                <label class="modal-backdrop" for="modal_create_user">Close</label>
+            </div>
+
+
+            <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                <table class="table">
+                    <thead class="bg-base-200">
+                    <tr>
+                        <th class="table-loop">#</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Agences</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in app.user.company.users %}
+                            <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.user', { id: user.id }) }}">
+                                <td>{{ loop.index }}</td>
+                                <td>{{ user.lastname }}</td>
+                                <td>{{ user.firstname }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.deposits|map(d => d.name)|join(', ') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# PRODUITS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'products' ? 'checked' : '' }} />
+            <i class="ri ri-box-3-line"></i>
+            Produits
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            <p class="font-bold text-2xl mb-3">Unités</p>
+
+            {{ form_start(formComanyUnits) }}
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="field">
+                    <label for="company_dimensionsUnits">Dimmensions</label>
+                    {{ form_row(formComanyUnits.dimensionsUnit) }}
+                </div>
+
+                <div class="field">
+                    <label for="company_weight">Poids</label>
+                    {{ form_row(formComanyUnits.weightUnit) }}
+                </div>
+            </div>
+
+            <div class="field">
+                {{ form_row(formComanyUnits.submit, {label_html: true}) }}
+            </div>
+
+            {{ form_end(formComanyUnits) }}
+
+            <div class="divider"></div>
+
+            <p class="font-bold text-2xl">Taux de TVA</p>
+            <label for="modal_create_tva" class="btn btn-primary mt-4">
+                <i class="ri ri-add-line"></i>
+                Nouveau
+            </label>
+            <input type="checkbox" id="modal_create_tva" class="modal-toggle" />
+            <div class="modal" role="dialog">
+                <div class="modal-box w-11/12 max-w-3xl">
+                    <h3 class="text-2xl font-bold mb-3">Ajouter un taux</h3>
+                    <div class="py-4">
+                        {{ form_start(formCreateTVA) }}
+                            <div>
+                                <label for="tva_value">Valeur</label>
+                                {{ form_row(formCreateTVA.value) }}
+                            </div>
+
+                            <div class="mt-2">
+                                {{ form_row(formCreateTVA.submit, { label_html: true }) }}
+                            </div>
+                        {{ form_end(formCreateTVA) }}
+                    </div>
+                </div>
+                <label class="modal-backdrop" for="modal_create_tva">Close</label>
+            </div>
+
+            <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                <table class="table">
+                    <thead class="bg-base-200">
+                    <tr>
+                        <th class="table-loop">#</th>
+                        <th>Taux</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for tva in app.user.company.tVAs %}
+                        <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.tva', { id: tva.id }) }}">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ tva.value }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="grid mt-8">
+                <div class="grid grid-cols-2 gap-10">
+                    <div>
+                        <p class="font-bold text-2xl">Catégories</p>
+
+                        <label for="modal_create_category" class="btn btn-primary mt-4">
+                            <i class="ri ri-add-line"></i>
+                            Nouveau
+                        </label>
+                        <input type="checkbox" id="modal_create_category" class="modal-toggle" />
+                        <div class="modal" role="dialog">
+                            <div class="modal-box w-11/12 max-w-3xl">
+                                <h3 class="text-2xl font-bold mb-3">Nouvelle catégorie</h3>
+                                <div class="py-4">
+                                    {{ form_start(formCreateCategory) }}
+
+                                    <div class="field">
+                                        <label for="category_label">Nom</label>
+                                        {{ form_row(formCreateCategory.label) }}
+                                    </div>
+
+
+                                    <div class="field">
+                                        {{ form_row(formCreateCategory.submit, {label_html: true}) }}
+                                    </div>
+                                    {{ form_end(formCreateCategory) }}
+                                </div>
+                            </div>
+                            <label class="modal-backdrop" for="modal_create_category">Close</label>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                            <table class="table">
+                                <thead class="bg-base-200">
+                                <tr>
+                                    <th class="table-loop">#</th>
+                                    <th>Nom</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for category in app.user.company.categories %}
+                                    <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.category', { id: category.id }) }}">
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ category.label }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+                    <div>
+                        <p class="font-bold text-2xl">Marques</p>
+
+                        <label for="modal_create_brand" class="btn btn-primary mt-4">
+                            <i class="ri ri-add-line"></i>
+                            Nouveau
+                        </label>
+                        <input type="checkbox" id="modal_create_brand" class="modal-toggle" />
+                        <div class="modal" role="dialog">
+                            <div class="modal-box w-11/12 max-w-3xl">
+                                <h3 class="text-2xl font-bold mb-3">Nouvelle marque</h3>
+                                <div class="py-4">
+                                    {{ form_start(formCreateBrand) }}
+
+                                    <div class="field">
+                                        <label for="category_label">Nom</label>
+                                        {{ form_row(formCreateBrand.label) }}
+                                    </div>
+
+
+                                    <div class="field">
+                                        {{ form_row(formCreateBrand.submit, {label_html: true}) }}
+                                    </div>
+                                    {{ form_end(formCreateBrand) }}
+                                </div>
+                            </div>
+                            <label class="modal-backdrop" for="modal_create_brand">Close</label>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                            <table class="table">
+                                <thead class="bg-base-200">
+                                <tr>
+                                    <th class="table-loop">#</th>
+                                    <th>Nom</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for brand in app.user.company.brands %}
+                                    <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.brand', { id: brand.id }) }}">
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ brand.label }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="grid grid-cols-2 gap-10 mt-10">
+                    <div>
+                        <p class="font-bold text-2xl">Couleurs</p>
+
+                        <label for="modal_create_color" class="btn btn-primary mt-4">
+                            <i class="ri ri-add-line"></i>
+                            Nouveau
+                        </label>
+                        <input type="checkbox" id="modal_create_color" class="modal-toggle" />
+                        <div class="modal" role="dialog">
+                            <div class="modal-box w-11/12 max-w-3xl">
+                                <h3 class="text-2xl font-bold mb-3">Nouvelle couleur</h3>
+                                <div class="py-4">
+                                    {{ form_start(formCreateColor) }}
+
+                                    <div class="field">
+                                        <label for="category_label">Nom</label>
+                                        {{ form_row(formCreateColor.label) }}
+                                    </div>
+
+
+                                    <div class="field">
+                                        {{ form_row(formCreateColor.submit, {label_html: true}) }}
+                                    </div>
+                                    {{ form_end(formCreateColor) }}
+                                </div>
+                            </div>
+                            <label class="modal-backdrop" for="modal_create_color">Close</label>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+                            <table class="table">
+                                <thead class="bg-base-200">
+                                <tr>
+                                    <th class="table-loop">#</th>
+                                    <th>Nom</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for color in app.user.company.colors|sort((a, b) => a.label <=> b.label) %}
+                                    <tr class="clickable-row" data-href="{{ path('app.dashboard.settings.update.color', { id: color.id }) }}">
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ color.label }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        {# DOCUMENTS #}
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" {{ app.request.query.get('tab') == 'documents' ? 'checked' : '' }} />
+            <i class="ri ri-folder-line"></i>
+            Documents
+        </label>
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            Rien à voir ici pour l'instant ...
+        </div>
+    </div>
+{% endblock %}
