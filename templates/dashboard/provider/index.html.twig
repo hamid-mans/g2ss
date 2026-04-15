@@ -1,0 +1,117 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Fournisseurs') %}
+
+{% block topbar('Fournisseurs') %}
+
+{% block body %}
+    <div class="flex justify-between">
+        <div>
+            <label for="modal_create_provider" type="button" class="btn btn-primary">
+                <i class="ri ri-add-line"></i>
+                Nouveau
+            </label>
+
+            <label for="modal_search_product" type="button" class="btn btn-secondary btn-outline">
+                <i class="ri ri-search-line"></i>
+            </label>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+        <table class="table">
+            <thead class="bg-base-200/50">
+            <tr>
+                <th class="table-loop">#</th>
+                <th>Nom / Raison sociale</th>
+                <th>Adresse</th>
+                <th>Ville</th>
+                <th>Contact : Nom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for provider in providers %}
+                <tr class="clickable-row hover transition-colors" data-href="{{ path('app.dashboard.provider.update', { id: provider.id }) }}">
+                    <td class="table-loop opacity-50">{{ loop.index }}</td>
+                    <td>{{ provider.name }}</td>
+                    <td>{{ provider.address1 }}</td>
+                    <td>{{ provider.cop ~ ' ' ~ provider.city }}</td>
+                    <td>{{ provider.contactFirstname ~ ' ' ~ provider.contactLastname }}</td>
+                    <td>{{ provider.email }}</td>
+                    <td>{{ provider.phone1 }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+    {# Créer un produit #}
+    {% embed 'components/Modal.html.twig' with {'id': 'modal_create_provider', modalForm: createProviderForm} %}
+
+        {% block modal_title %}Nouveau fournisseur{% endblock %}
+
+        {% block modal_body %}
+            <div class="grid grid-cols-2 gap-6">
+                <div class="field">
+                    <label for="provider_name">Nom / Raison sociale</label>
+                    {{ form_widget(createProviderForm.name) }}
+                </div>
+
+                <div class="field">
+                    <label for="provider_email">Email</label>
+                    {{ form_widget(createProviderForm.email) }}
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="provider_address1">Adresse</label>
+                {{ form_widget(createProviderForm.address1) }}
+            </div>
+
+            <div class="field">
+                <label for="provider_address2">Complément d'adresse</label>
+                {{ form_widget(createProviderForm.address2) }}
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="field">
+                    <label for="provider_cop">Code postal</label>
+                    {{ form_row(createProviderForm.cop) }}
+                </div>
+
+                <div class="field">
+                    <label for="provider_city">Ville</label>
+                    {{ form_row(createProviderForm.city) }}
+                </div>
+            </div>
+
+
+            <div class="hidden">
+                {{ form_row(createProviderForm.address1_liv) }}
+                {{ form_row(createProviderForm.address2_liv) }}
+                {{ form_row(createProviderForm.cop_liv) }}
+                {{ form_row(createProviderForm.city_liv) }}
+                {{ form_row(createProviderForm.website) }}
+                {{ form_row(createProviderForm.contact_email) }}
+                {{ form_row(createProviderForm.contact_firstname) }}
+                {{ form_row(createProviderForm.contact_lastname) }}
+                {{ form_row(createProviderForm.contact_phone) }}
+                {{ form_row(createProviderForm.phone1) }}
+                {{ form_row(createProviderForm.description) }}
+                {{ form_row(createProviderForm.phone2) }}
+            </div>
+        {% endblock %}
+
+        {% block modal_footer %}
+            <div>
+                {{ form_row(createProviderForm.submit, { label_html: true }) }}
+            </div>
+        {% endblock %}
+
+    {% endembed %}
+
+{% endblock %}

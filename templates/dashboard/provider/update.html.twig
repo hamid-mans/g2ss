@@ -1,0 +1,39 @@
+{% extends 'layouts/dashboard.base.html.twig' %}
+
+{% block title('Fournisseur : ' ~ provider.name) %}
+
+{% block topbar %}
+    <div class="breadcrumbs text-lg">
+        <ul>
+            <li><a href="{{ path('app.dashboard.provider.index') }}">Fournisseurs</a></li>
+            <li>{{ provider.name }}</li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block body %}
+
+    <div class="tabs tabs-border"><br><br>
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" checked />
+            <i class="ri ri-information-line"></i>
+            Général
+        </label>
+
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            Contenu du général
+        </div>
+
+
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" checked />
+            <i class="ri ri-information-line"></i>
+            Général
+        </label>
+
+        <div class="tab-content border-base-300 bg-base-100 p-6">
+            Contenu du général 2
+        </div>
+    </div>
+
+{% endblock %}

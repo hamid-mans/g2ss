@@ -38,7 +38,7 @@ class Provider
     private ?string $phone2 = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $address1�_liv = null;
+    private ?string $address1_liv = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $address2_liv = null;
@@ -168,14 +168,14 @@ class Provider
         return $this;
     }
 
-    public function getAddress1�Liv(): ?string
+    public function getAddress1Liv(): ?string
     {
-        return $this->address1�_liv;
+        return $this->address1_liv;
     }
 
-    public function setAddress1�Liv(?string $address1�_liv): static
+    public function setAddress1Liv(?string $address1_liv): static
     {
-        $this->address1�_liv = $address1�_liv;
+        $this->address1_liv = $address1_liv;
 
         return $this;
     }

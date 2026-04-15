@@ -82,7 +82,8 @@
 						</a>
 					</li>
 					<li>
-						<a href="">
+						<a href="{{ path('app.dashboard.provider.index') }}"
+						   class="{{ 'app.dashboard.provider' in app.request.attributes.get('_route') ? 'menu-active' : '' }}">
 							<i class="ri-group-line text-[17px]"></i> Fournisseurs
 						</a>
 					</li>
