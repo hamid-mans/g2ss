@@ -254,7 +254,6 @@
 			</div>
 		</div>
 
-
 		{# MOUVEMENTS #}
 
 		<label class="tab flex gap-2">
@@ -268,21 +267,23 @@
 				Nouveau
 			</label>
 
-			{{ form_start(movementSearchForm) }}
-			<input type="hidden" name="tab" value="movements">
+			<div class="border-base-300 bg-base-100">
+				<span class="badge badge-secondary my-3">Qté. Mouv. : {{ countMovementsWithFilter }}</span>
 
-			<div class="grid grid-cols-8 gap-6">
-				<div class="col-span-2 field">
-					<label>Type</label>
-					{{ form_widget(movementSearchForm.type) }}
-				</div>
+				{{ form_start(movementSearchForm, {'attr': {'class': 'flex flex-wrap gap-4 items-end'}}) }}
+				<input type="hidden" name="tab" value="movements">
 
-				<div class="field col-span-2">
-					<label>Utilisateur</label>
-					{{ form_widget(movementSearchForm.user) }}
-				</div>
+				<div class="grid grid-cols-4 gap-6">
+					<div class="field">
+						<label>Type</label>
+						{{ form_widget(movementSearchForm.type) }}
+					</div>
 
-				<div class="grid grid-cols-3 gap-6 col-span-4">
+					<div class="field">
+						<label>Utilisateur</label>
+						{{ form_widget(movementSearchForm.user) }}
+					</div>
+
 					<div class="field">
 						<label>Du</label>
 						{{ form_widget(movementSearchForm.dateFrom) }}
@@ -292,101 +293,101 @@
 						<label>Au</label>
 						{{ form_widget(movementSearchForm.dateTo) }}
 					</div>
-
-					<div class="field">
-						<button type="submit" class="btn btn-secondary"><i class="ri-filter-line"></i> Filtrer</button>
-						<a href="{{ path('app.dashboard.product.update', {refInterne: product.refInterne, tab: 'movements'}) }}" class="btn">Réinitialiser</a>
-					</div>
 				</div>
-			</div>
+
+				<div class="field">
+					<button type="submit" class="btn btn-secondary"><i class="ri-filter-line"></i> Filtrer</button>
+					<a href="{{ path('app.dashboard.product.update', {refInterne: product.refInterne, tab: 'movements'}) }}" class="btn">Réinitialiser</a>
+				</div>
 
 
-			{{ form_end(movementSearchForm) }}
+				{{ form_end(movementSearchForm) }}
 
-			<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
-				<table class="table">
-					<thead class="bg-base-200/50">
-					<tr>
-						<th class="table-loop">#</th>
-						<th><i class="ri ri-arrow-left-right-line"></i></th>
-						<th>Dépôt</th>
-						<th>Utilisateur</th>
-						<th>Date</th>
-					</tr>
-					</thead>
-					<tbody>
-					{% for movement in movements|sort((a, b) => b.createdAt <=> a.createdAt) %}
-						<tr data-modal-trigger="modal_detail_movement_{{ movement.id }}">
-							<td class="table-loop">{{ loop.index }}</td>
-							<td class="{{ movement.type == 0 ? 'bg-red-500/25' : 'bg-green-500/25' }}">{{ movement.type == 0 ? 'Sortie' : 'Entrée' }}</td>
-							<td>{{ movement.deposit.name }}</td>
-							<td>{{ movement.user.firstname ~ ' ' ~ movement.user.lastname|upper }}</td>
-							<td>{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}</td>
+				<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+					<table class="table">
+						<thead class="bg-base-200/50">
+						<tr>
+							<th class="table-loop">#</th>
+							<th><i class="ri ri-arrow-left-right-line"></i></th>
+							<th>Dépôt</th>
+							<th>Utilisateur</th>
+							<th>Date</th>
 						</tr>
-					{% endfor %}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+						{% for movement in movements|sort((a, b) => b.createdAt <=> a.createdAt) %}
+							<tr data-modal-trigger="modal_detail_movement_{{ movement.id }}">
+								<td class="table-loop">{{ loop.index }}</td>
+								<td class="{{ movement.type == 0 ? 'bg-red-500/25' : 'bg-green-500/25' }}">{{ movement.type == 0 ? 'Sortie' : 'Entrée' }}</td>
+								<td>{{ movement.deposit.name }}</td>
+								<td>{{ movement.user.firstname ~ ' ' ~ movement.user.lastname|upper }}</td>
+								<td>{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
 
-				{% for movement in movements %}
-					{# Détail d'un mouvement #}
-					{% embed 'components/Modal.html.twig' with {'id': 'modal_detail_movement_' ~ movement.id} %}
+					{% for movement in movements %}
+						{# Détail d'un mouvement #}
+						{% embed 'components/Modal.html.twig' with {'id': 'modal_detail_movement_' ~ movement.id} %}
 
-						{% block modal_title %}Détail du mouvement{% endblock %}
+							{% block modal_title %}Détail du mouvement{% endblock %}
 
-						{% block modal_body %}
-							<div class="field">
-								<label>Type</label>
-								<input type="text" value="{{ movement.type == 1 ? 'Entrée' : 'Sortie' }}" disabled>
-							</div>
+							{% block modal_body %}
+								<div class="field">
+									<label>Type</label>
+									<input type="text" value="{{ movement.type == 1 ? 'Entrée' : 'Sortie' }}" disabled>
+								</div>
 
-							<div class="field">
-								<label>Dépôt</label>
-								<input type="text" value="{{ movement.deposit.name }}" disabled>
-							</div>
-							<div class="grid">
-								<div class="grid grid-cols-2 gap-6">
-									<div class="field">
-										<label>Utilisateur</label>
-										<input type="text" value="{{ movement.user.firstname ~ ' ' ~ movement.user.lastname }}" disabled>
-									</div>
+								<div class="field">
+									<label>Dépôt</label>
+									<input type="text" value="{{ movement.deposit.name }}" disabled>
+								</div>
+								<div class="grid">
+									<div class="grid grid-cols-2 gap-6">
+										<div class="field">
+											<label>Utilisateur</label>
+											<input type="text" value="{{ movement.user.firstname ~ ' ' ~ movement.user.lastname }}" disabled>
+										</div>
 
-									<div class="field">
-										<label>Date du mouvement</label>
-										<input type="text" value="{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}" disabled>
+										<div class="field">
+											<label>Date du mouvement</label>
+											<input type="text" value="{{ movement.createdAt|date('d/m/Y H:i', app.user.timezone) }}" disabled>
+										</div>
 									</div>
 								</div>
-							</div>
 
-							<div class="field">
-								<label>Détail des lignes <span class="bg-base-200 border border-base-300 px-2 py-1 m-1 rounded-box">{{ movement.productUnits|length }}</span></label>
-								<div class="overflow-x-auto max-h-60 rounded-box border border-base-300 bg-base-100 mt-1">
-									<table class="table overflow-scroll">
-										<thead class="bg-base-200/50">
-										<tr>
-											<th>Numéro de série</th>
-											<th>Prix achat</th>
-										</tr>
-										</thead>
-										<tbody>
-										{% for unit in movement.productUnits %}
+								<div class="field">
+									<label>Détail des lignes <span class="bg-base-200 border border-base-300 px-2 py-1 m-1 rounded-box">{{ movement.productUnits|length }}</span></label>
+									<div class="overflow-x-auto max-h-60 rounded-box border border-base-300 bg-base-100 mt-1">
+										<table class="table overflow-scroll">
+											<thead class="bg-base-200/50">
 											<tr>
-												<td>{{ unit.serialNumber }}</td>
-												<td>{{ unit.buyPrice }}</td>
+												<th>Numéro de série</th>
+												<th>Prix achat</th>
 											</tr>
-										{% endfor %}
-										</tbody>
-									</table>
+											</thead>
+											<tbody>
+											{% for unit in movement.productUnits %}
+												<tr>
+													<td>{{ unit.serialNumber }}</td>
+													<td>{{ unit.buyPrice }}</td>
+												</tr>
+											{% endfor %}
+											</tbody>
+										</table>
+									</div>
 								</div>
-							</div>
-						{% endblock %}
+							{% endblock %}
 
-					{% endembed %}
-				{% endfor %}
-			</div>
-			<div class="navigation">
-				{{ knp_pagination_render(movements, null, {
-					'tab': 'movements'
-				}) }}
+						{% endembed %}
+					{% endfor %}
+				</div>
+				<div class="navigation">
+					{{ knp_pagination_render(movements, null, {
+						'tab': 'movements'
+					}) }}
+				</div>
 			</div>
 		</div>
 	</div>

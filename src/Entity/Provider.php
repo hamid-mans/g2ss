@@ -37,6 +37,36 @@ class Provider
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $phone2 = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address1�_liv = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address2_liv = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cop_liv = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $city_liv = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $website = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $contact_firstname = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $contact_lastname = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $contact_phone = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $contact_email = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,6 +164,126 @@ class Provider
     public function setPhone2(?string $phone2): static
     {
         $this->phone2 = $phone2;
+
+        return $this;
+    }
+
+    public function getAddress1�Liv(): ?string
+    {
+        return $this->address1�_liv;
+    }
+
+    public function setAddress1�Liv(?string $address1�_liv): static
+    {
+        $this->address1�_liv = $address1�_liv;
+
+        return $this;
+    }
+
+    public function getAddress2Liv(): ?string
+    {
+        return $this->address2_liv;
+    }
+
+    public function setAddress2Liv(?string $address2_liv): static
+    {
+        $this->address2_liv = $address2_liv;
+
+        return $this;
+    }
+
+    public function getCopLiv(): ?string
+    {
+        return $this->cop_liv;
+    }
+
+    public function setCopLiv(?string $cop_liv): static
+    {
+        $this->cop_liv = $cop_liv;
+
+        return $this;
+    }
+
+    public function getCityLiv(): ?string
+    {
+        return $this->city_liv;
+    }
+
+    public function setCityLiv(?string $city_liv): static
+    {
+        $this->city_liv = $city_liv;
+
+        return $this;
+    }
+
+    public function getWebsite(): ?string
+    {
+        return $this->website;
+    }
+
+    public function setWebsite(?string $website): static
+    {
+        $this->website = $website;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getContactFirstname(): ?string
+    {
+        return $this->contact_firstname;
+    }
+
+    public function setContactFirstname(?string $contact_firstname): static
+    {
+        $this->contact_firstname = $contact_firstname;
+
+        return $this;
+    }
+
+    public function getContactLastname(): ?string
+    {
+        return $this->contact_lastname;
+    }
+
+    public function setContactLastname(?string $contact_lastname): static
+    {
+        $this->contact_lastname = $contact_lastname;
+
+        return $this;
+    }
+
+    public function getContactPhone(): ?string
+    {
+        return $this->contact_phone;
+    }
+
+    public function setContactPhone(?string $contact_phone): static
+    {
+        $this->contact_phone = $contact_phone;
+
+        return $this;
+    }
+
+    public function getContactEmail(): ?string
+    {
+        return $this->contact_email;
+    }
+
+    public function setContactEmail(?string $contact_email): static
+    {
+        $this->contact_email = $contact_email;
 
         return $this;
     }
