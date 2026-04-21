@@ -64,13 +64,13 @@ class Company
     /**
      * @var Collection<int, Brand>
      */
-    #[ORM\OneToMany(targetEntity: Brand::class, mappedBy: 'company')]
+    #[ORM\OneToMany(targetEntity: Brand::class, mappedBy: 'company', cascade: ['remove'])]
     private Collection $brands;
 
     /**
      * @var Collection<int, Color>
      */
-    #[ORM\OneToMany(targetEntity: Color::class, mappedBy: 'company')]
+    #[ORM\OneToMany(targetEntity: Color::class, mappedBy: 'company', cascade: ['remove'])]
     private Collection $colors;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -82,17 +82,29 @@ class Company
     /**
      * @var Collection<int, TVA>
      */
-    #[ORM\OneToMany(targetEntity: TVA::class, mappedBy: 'company', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: TVA::class, mappedBy: 'company', orphanRemoval: true, cascade: ['remove'])]
     private Collection $tVAs;
 
     /**
      * @var Collection<int, Movement>
      */
-    #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'company', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'company', orphanRemoval: true, cascade: ['remove'])]
     private Collection $movements;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
+
+    /**
+     * @var Collection<int, Provider>
+     */
+    #[ORM\OneToMany(targetEntity: Provider::class, mappedBy: 'company', cascade: ['remove'])]
+    private Collection $providers;
+
+    /**
+     * @var Collection<int, ProductProviderComparative>
+     */
+    #[ORM\OneToMany(targetEntity: ProductProviderComparative::class, mappedBy: 'company', cascade: ['remove'])]
+    private Collection $productProviderComparatives;
 
     public function __construct()
     {
@@ -105,6 +117,8 @@ class Company
         $this->colors = new ArrayCollection();
         $this->tVAs = new ArrayCollection();
         $this->movements = new ArrayCollection();
+        $this->providers = new ArrayCollection();
+        $this->productProviderComparatives = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -468,6 +482,66 @@ class Company
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Provider>
+     */
+    public function getProviders(): Collection
+    {
+        return $this->providers;
+    }
+
+    public function addProvider(Provider $provider): static
+    {
+        if (!$this->providers->contains($provider)) {
+            $this->providers->add($provider);
+            $provider->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProvider(Provider $provider): static
+    {
+        if ($this->providers->removeElement($provider)) {
+            // set the owning side to null (unless already changed)
+            if ($provider->getCompany() === $this) {
+                $provider->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductProviderComparative>
+     */
+    public function getProductProviderComparatives(): Collection
+    {
+        return $this->productProviderComparatives;
+    }
+
+    public function addProductProviderComparative(ProductProviderComparative $productProviderComparative): static
+    {
+        if (!$this->productProviderComparatives->contains($productProviderComparative)) {
+            $this->productProviderComparatives->add($productProviderComparative);
+            $productProviderComparative->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductProviderComparative(ProductProviderComparative $productProviderComparative): static
+    {
+        if ($this->productProviderComparatives->removeElement($productProviderComparative)) {
+            // set the owning side to null (unless already changed)
+            if ($productProviderComparative->getCompany() === $this) {
+                $productProviderComparative->setCompany(null);
+            }
+        }
 
         return $this;
     }

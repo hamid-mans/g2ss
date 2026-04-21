@@ -6,7 +6,7 @@
 
 {% block body %}
     <div class="flex gap-6 mb-8">
-        <div class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow flex-1">
+        <div class="card box flex-1">
             <a class="card-body p-6" href="{{ path('app.dashboard.product.index') }}">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-primary/10 rounded-xl text-primary">
@@ -20,7 +20,7 @@
             </a>
         </div>
 
-        <div class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow flex-1">
+        <div class="card box flex-1">
             <a class="card-body p-6" href="{{ path('app.dashboard.product.index') }}">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-secondary/10 rounded-xl text-secondary">
@@ -40,7 +40,7 @@
     <div class="grid grid-cols-5 w-full gap-6 mb-8">
         <div class="flex flex-col col-span-2">
             <p class="font-bold mb-3 uppercase text-xs opacity-60 tracking-widest">Stock par catégorie</p>
-            <div class="bg-base-100 border border-base-300 rounded-box p-4 shadow-sm h-full">
+            <div class="box p-4 h-full">
                 <div id="chart-stockPerCategory"
                      data-series="{{ unitsCategories|json_encode }}"
                      data-labels="{{ categories|json_encode }}">
@@ -50,7 +50,7 @@
 
         <div class="col-span-3 flex flex-col">
             <p class="font-bold mb-3 uppercase text-xs opacity-60 tracking-widest">Valeur d'achat par catégorie</p>
-            <div class="bg-base-100 border border-base-300 rounded-box p-4 shadow-sm h-full">
+            <div class="box p-4 h-full">
                 <div id="chart-sellPricePerCategory"
                      data-series="{{ buyPriceCategories|json_encode }}"
                      data-labels="{{ categories|json_encode }}">
@@ -63,7 +63,7 @@
 
         <div class="col-span-2 flex flex-col">
             <p class="font-bold mb-3 uppercase text-xs opacity-60 tracking-widest">Derniers mouvements</p>
-            <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 flex-grow shadow-sm">
+            <div class="box">
                 <table class="table table-md">
                     <thead class="bg-base-200/50">
                     <tr>
@@ -142,7 +142,7 @@
                                         </thead>
                                         <tbody>
                                         {% for unit in movement.productUnits %}
-                                            <tr>
+                                            <tr data-href="{{ path('app.dashboard.product_unit.update', { id: unit.id }) }}" class="clickable-row hover">
                                                 <td>{{ unit.serialNumber }}</td>
                                                 <td>{{ unit.buyPrice }}</td>
                                             </tr>

@@ -148,11 +148,13 @@
 		<div class="p-3 border-t border-base-300">
 			<div class="dropdown dropdown-top bg-base-200 rounded-box w-full">
 				<div tabindex="0" role="button" class="btn m-1">
+					{% if app.user and app.user.avatar %}
 					<div class="avatar avatar-online">
 						<div class="w-8 rounded-full">
 							<img src="{{ app.user ? asset('uploads/avatars/' ~ app.user.avatar) : asset('build/images/profil.webp') }}" />
 						</div>
 					</div>️
+					{% endif %}
 					<span class="ml-1">{{ app.user.firstname ?? 'Connectez-vous' ~ ' ' ~ app.user.lastname ?? '' }}</span>
 				</div>
 				<ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm gap-3">

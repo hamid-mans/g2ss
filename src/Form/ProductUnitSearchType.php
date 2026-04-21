@@ -4,6 +4,7 @@
 namespace App\Form;
 
 use App\Entity\Deposit;
+use App\Repository\DepositRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -15,6 +16,8 @@ class ProductUnitSearchType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $company = $options['company'];
+
         $builder
             ->add('q', TextType::class, [
                 'label' => false,
@@ -27,7 +30,7 @@ class ProductUnitSearchType extends AbstractType
                 'label' => false,
                 'required' => false,
                 'placeholder' => 'Tous les dépôts',
-                'choices' => $options['company_deposits'],
+                'choices' => $options['company_deposits']
             ])
             ;
     }
@@ -38,6 +41,7 @@ class ProductUnitSearchType extends AbstractType
             'method' => 'GET',
             'csrf_protection' => false,
             'company_deposits' => [],
+            'company' => [],
         ]);
     }
 }

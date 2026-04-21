@@ -13,6 +13,7 @@
 
 {% block body %}
 
+    {{ form_start(form) }}
     <div class="tabs tabs-border"><br><br>
         <label class="tab flex gap-2">
             <input type="radio" name="tab" checked />
@@ -20,20 +21,155 @@
             Général
         </label>
 
-        <div class="tab-content border-base-300 bg-base-100 p-6">
-            Contenu du général
+        <div class="tab-content box p-6">
+            <div class="grid grid-cols-3 gap-6">
+                <div class="field col-span-2">
+                    <label for="provider_name">Nom / Raison sociale</label>
+                    {{ form_row(form.name) }}
+                </div>
+
+                <div class="field col-span-1">
+                    <label for="provider_website">Site Web</label>
+                    {{ form_row(form.website) }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+                <div class="field">
+                    <label for="provider_email">Email</label>
+                    {{ form_row(form.email) }}
+                </div>
+
+                <div class="field">
+                    <label for="provider_phone1">Téléphone Fixe</label>
+                    {{ form_row(form.phone1) }}
+                </div>
+
+                <div class="field">
+                    <label for="provider_phone2">Téléphone Portable</label>
+                    {{ form_row(form.phone2) }}
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="provider_description">Description / Note interne</label>
+                {{ form_row(form.description) }}
+            </div>
+
+            <div class="field">
+                {{ form_widget(form.submit, {label_html: true}) }}
+                <label for="modal_delete_provider" type="button" class="btn btn-error">
+                    <i class="ri ri-delete-bin-line"></i>
+                    Supprimer
+                </label>
+            </div>
+        </div>
+
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab">
+            <i class="ri ri-map-pin-line"></i>
+            Adresse
+        </label>
+        <div class="tab-content box p-6">
+            <div>
+                <div class="field">
+                    <label for="provider_address1">Adresse</label>
+                    {{ form_row(form.address1) }}
+                </div>
+                <div class="field">
+                    <label for="provider_address2">Complément d'adresse</label>
+                    {{ form_row(form.address2) }}
+                </div>
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="col-span-1">
+                        <label for="provider_cop">Code postal</label>
+                        {{ form_row(form.cop) }}
+                    </div>
+
+                    <div class="col-span-2">
+                        <label for="provider_city">Ville</label>
+                        {{ form_row(form.city) }}
+                    </div>
+                </div>
+            </div>
         </div>
 
 
         <label class="tab flex gap-2">
-            <input type="radio" name="tab" checked />
-            <i class="ri ri-information-line"></i>
-            Général
+            <input type="radio" name="tab" />
+            <i class="ri ri-user-line"></i>
+            Contact
         </label>
 
-        <div class="tab-content border-base-300 bg-base-100 p-6">
-            Contenu du général 2
+        <div class="tab-content box p-6">
+           <div class="grid grid-cols-2 gap-6">
+               <div class="field">
+                   <label for="provider_contact_firstname">Contact : Prénom</label>
+                   {{ form_row(form.contact_firstname) }}
+               </div>
+
+               <div class="field">
+                   <label for="provider_contact_lastname">Contact : Nom</label>
+                   {{ form_row(form.contact_lastname) }}
+               </div>
+           </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="field">
+                    <label for="provider_contact_email">Contact : Email</label>
+                    {{ form_row(form.contact_email) }}
+                </div>
+
+                <div class="field">
+                    <label for="provider_contact_phone">Contact : Téléphone</label>
+                    {{ form_row(form.contact_phone) }}
+                </div>
+            </div>
+        </div>
+
+
+        <label class="tab flex gap-2">
+            <input type="radio" name="tab" />
+            <i class="ri ri-folder-history-line"></i>
+            Historique
+        </label>
+
+        <div class="tab-content box p-6">
+            Rien à trouver par ici ...
         </div>
     </div>
 
+
+
+    <div class="hidden">
+        {{ form_row(form.address1_liv) }}
+        {{ form_row(form.address2_liv) }}
+        {{ form_row(form.cop_liv) }}
+        {{ form_row(form.city_liv) }}
+    </div>
+    {{ form_end(form) }}
+
+
+
+
+    {# Supprimer le produit #}
+    {% embed 'components/Modal.html.twig' with {'id': 'modal_delete_provider'} %}
+
+        {% block modal_title %}Attention !{% endblock %}
+
+        {% block modal_body %}
+            Êtes-vous sûr de vouloir supprimer définitivement le fournisseur <b>{{ provider.name }}</b> ?
+        {% endblock %}
+
+        {% block modal_footer %}
+            <a class="btn btn-error" href="{{ path('app.dashboard.provider.delete', { id: provider.id }) }}">
+                <i class="ri ri-delete-bin-line"></i>
+                Supprimer
+            </a>
+        {% endblock %}
+
+    {% endembed %}
+
 {% endblock %}
+
+

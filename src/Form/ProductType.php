@@ -7,6 +7,10 @@ use App\Entity\Category;
 use App\Entity\Color;
 use App\Entity\Product;
 use App\Entity\TVA;
+use App\Repository\BrandRepository;
+use App\Repository\CategoryRepository;
+use App\Repository\ColorRepository;
+use App\Repository\TVARepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -23,6 +27,8 @@ class ProductType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $company = $options['company'];
+
         $builder
             ->add('designation', TextType::class, [
                 'label' => false,
@@ -65,6 +71,11 @@ class ProductType extends AbstractType
                 'required' => false,
                 'placeholder' => "Aucune marque",
                 'choice_label' => 'label',
+                'query_builder' => function (BrandRepository $er) use ($company) {
+                    return $er->createQueryBuilder('d')
+                        ->where('d.company = :company')
+                        ->setParameter('company', $company);
+                }
             ])
             ->add('category', EntityType::class, [
                 'label' => false,
@@ -72,6 +83,11 @@ class ProductType extends AbstractType
                 'required' => false,
                 'placeholder' => "Aucune catégorie",
                 'choice_label' => 'label',
+                'query_builder' => function (CategoryRepository $er) use ($company) {
+                    return $er->createQueryBuilder('d')
+                        ->where('d.company = :company')
+                        ->setParameter('company', $company);
+                }
             ])
             ->add('color', EntityType::class, [
                 'label' => false,
@@ -79,6 +95,11 @@ class ProductType extends AbstractType
                 'required' => false,
                 'placeholder' => "Aucune couleur",
                 'choice_label' => 'label',
+                'query_builder' => function (ColorRepository $er) use ($company) {
+                    return $er->createQueryBuilder('d')
+                        ->where('d.company = :company')
+                        ->setParameter('company', $company);
+                }
             ])
             ->add('weightKg', NumberType::class, [
                 'label' => false,
@@ -104,6 +125,11 @@ class ProductType extends AbstractType
                 'choice_label' => function (Tva $tva) {
                     return $tva->getValue() . ' %';
                 },
+                'query_builder' => function (TVARepository $er) use ($company) {
+                    return $er->createQueryBuilder('d')
+                        ->where('d.company = :company')
+                        ->setParameter('company', $company);
+                }
             ])
             ->add('submit', SubmitType::class, [
                 'label' => $options['submit_label'],
@@ -119,7 +145,8 @@ class ProductType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Product::class,
             'submit_label' => false,
-            'submit_class' => null
+            'submit_class' => null,
+            'company' => null,
         ]);
     }
 }

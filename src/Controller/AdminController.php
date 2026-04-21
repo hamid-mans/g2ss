@@ -8,6 +8,7 @@ use App\Entity\Color;
 use App\Entity\Company;
 use App\Entity\Deposit;
 use App\Entity\Modules;
+use App\Entity\TVA;
 use App\Entity\User;
 use App\Form\CompanyType;
 use App\Form\DepositType;
@@ -66,10 +67,10 @@ class AdminController extends AbstractController
             $user = new User();
             $user->setCompany($company);
             $user->setFirstname("Administrateur");
-            $user->setLastname("1");
             $user->setRoles(['ROLE_ADMIN']);
-            $user->setEmail('email@email.fr');
-            $user->setPassword("");
+            $user->setEmail(str_replace(" ", "", strtolower(substr($company->getName(), 0, 5))) . '@email.fr');
+            $user->setTimezone("Europe/Paris");
+            $user->setPassword("password");
             $user->addDeposit($deposit);
             $entityManager->persist($user);
 
@@ -77,11 +78,21 @@ class AdminController extends AbstractController
                 "Blanc", "Noir", "Rouge", "Vert", "Bleu"
             ];
 
-            foreach ($colors as $color) {
+            foreach ($colors as $clr) {
                 $color = new Color();
-                $color->setLabel($color);
+                $color->setLabel($clr);
                 $color->setCompany($company);
                 $entityManager->persist($color);
+            }
+
+            $tvas = [
+                "20", "5.5", "10", "0"
+            ];
+
+            foreach ($tvas as $t) {
+                $tva = new Tva();
+                $tva->setCompany($company);
+                $tva->setValue($t);
             }
 
             $entityManager->flush();
