@@ -75,10 +75,17 @@ class Product
     #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'product', orphanRemoval: true)]
     private Collection $movements;
 
+    /**
+     * @var Collection<int, ProductProviderComparative>
+     */
+    #[ORM\OneToMany(targetEntity: ProductProviderComparative::class, mappedBy: 'product')]
+    private Collection $productProviderComparatives;
+
     public function __construct()
     {
         $this->productUnits = new ArrayCollection();
         $this->movements = new ArrayCollection();
+        $this->productProviderComparatives = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -161,7 +168,7 @@ class Product
     public function getPriceTtc(): float
     {
         if (!$this->tva) {
-            return $this->sellPrice;
+            return $this->sellPrice ?? 0;
         }
 
         return ($this->sellPrice ?? 0) * (1 + ($this->tva->getValue() / 100));
@@ -317,6 +324,36 @@ class Product
             // set the owning side to null (unless already changed)
             if ($movement->getProduct() === $this) {
                 $movement->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductProviderComparative>
+     */
+    public function getProductProviderComparatives(): Collection
+    {
+        return $this->productProviderComparatives;
+    }
+
+    public function addProductProviderComparative(ProductProviderComparative $productProviderComparative): static
+    {
+        if (!$this->productProviderComparatives->contains($productProviderComparative)) {
+            $this->productProviderComparatives->add($productProviderComparative);
+            $productProviderComparative->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductProviderComparative(ProductProviderComparative $productProviderComparative): static
+    {
+        if ($this->productProviderComparatives->removeElement($productProviderComparative)) {
+            // set the owning side to null (unless already changed)
+            if ($productProviderComparative->getProduct() === $this) {
+                $productProviderComparative->setProduct(null);
             }
         }
 

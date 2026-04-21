@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProviderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProviderRepository::class)]
@@ -66,6 +68,27 @@ class Provider
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contact_email = null;
+
+    #[ORM\ManyToOne(inversedBy: 'providers')]
+    private ?Company $company = null;
+
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'comparative')]
+    private Collection $products;
+
+    /**
+     * @var Collection<int, ProductProviderComparative>
+     */
+    #[ORM\OneToMany(targetEntity: ProductProviderComparative::class, mappedBy: 'provider')]
+    private Collection $productProviderComparatives;
+
+    public function __construct()
+    {
+        $this->products = new ArrayCollection();
+        $this->productProviderComparatives = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -284,6 +307,78 @@ class Provider
     public function setContactEmail(?string $contact_email): static
     {
         $this->contact_email = $contact_email;
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setComparative($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getComparative() === $this) {
+                $product->setComparative(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductProviderComparative>
+     */
+    public function getProductProviderComparatives(): Collection
+    {
+        return $this->productProviderComparatives;
+    }
+
+    public function addProductProviderComparative(ProductProviderComparative $productProviderComparative): static
+    {
+        if (!$this->productProviderComparatives->contains($productProviderComparative)) {
+            $this->productProviderComparatives->add($productProviderComparative);
+            $productProviderComparative->setProvider($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductProviderComparative(ProductProviderComparative $productProviderComparative): static
+    {
+        if ($this->productProviderComparatives->removeElement($productProviderComparative)) {
+            // set the owning side to null (unless already changed)
+            if ($productProviderComparative->getProvider() === $this) {
+                $productProviderComparative->setProvider(null);
+            }
+        }
 
         return $this;
     }

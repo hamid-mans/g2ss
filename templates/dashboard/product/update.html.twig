@@ -20,7 +20,7 @@
 			<i class="ri ri-store-2-line"></i>
 			Général
 		</label>
-		<div class="tab-content border-base-300 bg-base-100 p-6">
+		<div class="tab-content box p-6">
 
 			<div class="flex gap-3">
 				<p class="badge badge-secondary">
@@ -88,7 +88,7 @@
 			<i class="ri ri-information-line"></i>
 			Infos complémentaires
 		</label>
-		<div class="tab-content border-base-300 bg-base-100 p-6">
+		<div class="tab-content box p-6">
 			<div class="grid grid-cols-5 gap-6">
 				<div class="field">
 					<label for="product_weightKg">Poids ({{ app.user.company.weightUnit }})</label>
@@ -126,29 +126,89 @@
 			<i class="ri ri-money-euro-circle-line text-lg"></i>
 			Tarification
 		</label>
-		<div class="tab-content border-base-300 bg-base-100 p-6">
-			<div class="grid grid-cols-5 gap-6">
-				<div class="field">
-					<label for="product_sellPrice">Prix de vente HT</label>
-					{{ form_widget(form.sellPrice) }}
-				</div>
+		<div class="tab-content box p-6">
+			<div class="grid grid-cols-2 gap-13">
+				<div class="grid grid-cols-2 gap-6">
+					<div>
+						<div class="field">
+							<label for="product_sellPrice">Prix de vente HT</label>
+							{{ form_widget(form.sellPrice) }}
+						</div>
 
-				<div class="field">
-					<label for="product_tva">Taux TVA</label>
-					{{ form_row(form.tva) }}
-				</div>
+						<div class="field">
+							<label for="product_sellPriceTTC">Prix de vente TTC</label>
+							<input disabled type="text" value="{{ product.priceTtc }} €" id="product_sellPriceTTC">
+						</div>
+					</div>
 
-				<div class="field">
-					<label for="product_sellPriceTTC">Prix de vente TTC</label>
-					<input disabled type="text" value="{{ product.priceTtc }} €" id="product_sellPriceTTC">
-				</div>
+					<div>
+						<div class="field">
+							<label for="product_tva">Taux TVA</label>
+							{{ form_row(form.tva) }}
+						</div>
 
-				<div class="field">
-					<label>Marge estimée HT</label>
-					<input type="text" value="{{ product.sellPrice - pmp }} €" disabled>
+						<div class="field">
+							<label>Marge estimée HT</label>
+							<input type="text" value="{{ product.sellPrice - pmp }} €" disabled>
+						</div>
+					</div>
+				</div>
+				<div>
+					<p class="text-xl font-bold">Tarifs / Fournisseur</p>
+					<label for="modal_create_comparative" type="button" class="btn btn-secondary my-3">
+						<i class="ri ri-add-line"></i>
+						Ajouter
+					</label>
+
+					<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 ">
+						<table class="table">
+							<thead>
+							<tr>
+								<th>#</th>
+								<th>Fournisseur</th>
+								<th>Prix d'achat (€)</th>
+								<th><i class="ri ri-eraser-line"></i></th>
+							</tr>
+							</thead>
+							<tbody>
+							{% for comparative in product.productProviderComparatives|filter(c => c.company == app.user.company) %}
+								<tr>
+									<td>{{ loop.index }}</td>
+									<td>{{ comparative.provider.name }}</td>
+									<td>{{ comparative.buyPrice ~ ' €' }}</td>
+									<td onclick="event.stopPropagation()">
+										<label for="modal_delete_comparative_{{ comparative.id }}" type="button" class="font-bold badge badge-error">
+											Effacer
+											<i class="ri ri-eraser-line"></i>
+										</label>
+
+										{# Supprimer un numéro de série #}
+										{% embed 'components/Modal.html.twig' with {'id': 'modal_delete_comparative_' ~ comparative.id} %}
+
+											{% block modal_title %}Attention !{% endblock %}
+
+											{% block modal_body %}
+												Êtes-vous sûr de vouloir sortir définitivement le tarif fournisseur de <b>{{ comparative.provider.name }}</b> ?
+											{% endblock %}
+
+											{% block modal_footer %}
+												<a class="btn btn-error" data-turbo="false" href="{{ path('app.dashboard.comparative.delete', { id: comparative.id }) }}">
+													Supprimer
+													<i class="ri ri-expand-right-line"></i>
+												</a>
+											{% endblock %}
+
+										{% endembed %}
+									</td>
+								</tr>
+							{% endfor %}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
-		</div>
+
+			</div>
 
 		{{ form_end(form) }}
 
@@ -159,7 +219,7 @@
 			<i class="ri ri-box-3-line"></i>
 			Stock
 		</label>
-		<div class="tab-content border-base-300 bg-base-100 p-6">
+		<div class="tab-content box p-6">
 
 			<label for="modal_create_unit" type="button" class="btn btn-success">
 				<i class="ri ri-contract-left-line"></i>
@@ -197,7 +257,7 @@
 					{{ form_end(searchForm) }}
 				</div>
 
-				<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+				<div class="overflow-x-auto box">
 					<table class="table">
 						<thead class="bg-base-200/50">
 						<tr>
@@ -261,7 +321,7 @@
 			<i class="ri ri-arrow-left-right-line"></i>
 			Mouvements
 		</label>
-		<div class="tab-content border-base-300 bg-base-100 p-6">
+		<div class="tab-content box p-6">
 			<label for="modal_create_movement" class="btn btn-primary">
 				<i class="ri ri-add-line"></i>
 				Nouveau
@@ -303,7 +363,7 @@
 
 				{{ form_end(movementSearchForm) }}
 
-				<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 mt-5">
+				<div class="overflow-x-auto box mt-5">
 					<table class="table">
 						<thead class="bg-base-200/50">
 						<tr>
@@ -369,9 +429,9 @@
 											</thead>
 											<tbody>
 											{% for unit in movement.productUnits %}
-												<tr>
+												<tr class="clickable-row" data-href="{{ path('app.dashboard.product_unit.update', { id: unit.id }) }}">
 													<td>{{ unit.serialNumber }}</td>
-													<td>{{ unit.buyPrice }}</td>
+													<td>{{ unit.buyPrice ~ ' €' }}</td>
 												</tr>
 											{% endfor %}
 											</tbody>
@@ -482,6 +542,39 @@
 					<i class="ri ri-contract-left-line"></i>
 					Entrée
 				</button>
+			</div>
+
+		{% endblock %}
+
+	{% endembed %}
+
+
+
+	{# Créer un tarif fournisseur #}
+	{% embed 'components/Modal.html.twig' with {'id': 'modal_create_comparative', modalForm: formComparative} %}
+
+		{% block modal_title %}Nouveau tarif fournisseur{% endblock %}
+
+		{% block modal_body %}
+
+			<div class="grid grid-cols-2 gap-6">
+				<div>
+					<label>Fournisseur</label>
+					{{ form_widget(formComparative.provider) }}
+				</div>
+
+				<div>
+					<label>Prix d'achat</label>
+					{{ form_widget(formComparative.buyPrice) }}
+				</div>
+			</div>
+
+		{% endblock %}
+
+		{% block modal_footer %}
+
+			<div class="">
+				{{ form_row(formComparative.submit, {label_html: true}) }}
 			</div>
 
 		{% endblock %}

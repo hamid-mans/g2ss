@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Movement;
 use App\Entity\Product;
+use App\Entity\ProductProviderComparative;
 use App\Entity\ProductUnit;
 use App\Entity\User;
+use App\Form\ComparativeType;
 use App\Form\MovementSearchType;
 use App\Form\ProductType;
 use App\Form\ProductUnitSearchType;
@@ -13,6 +15,7 @@ use App\Form\ProductUnitType;
 use App\Form\Search\SearchDepositType;
 use App\Form\SearchType;
 use App\Repository\MovementRepository;
+use App\Repository\ProductProviderComparativeRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ProductUnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -57,6 +60,7 @@ final class ProductController extends AbstractController
         $formCreateProduct = $this->createForm(ProductType::class, $product, [
             'submit_label' => '<i class="ri ri-add-large-line"></i> Ajouter',
             'submit_class' => 'btn btn-primary',
+            'company' => $this->getUser()->getCompany(),
         ]);
         $formCreateProduct->handleRequest($request);
 
@@ -84,7 +88,8 @@ final class ProductController extends AbstractController
         MovementRepository $movementRepository,
         ProductUnitRepository $productUnitRepository,
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ProductProviderComparativeRepository $productProviderComparativeRepository,
     ): Response {
         if ($product->getCompany() !== $this->getUser()->getCompany()) {
             throw $this->createNotFoundException("Ce produit n'existe pas !");
@@ -93,6 +98,7 @@ final class ProductController extends AbstractController
         $form = $this->createForm(ProductType::class, $product, [
             'submit_label' => '<i class="ri ri-save-line"></i> Enregistrer',
             'submit_class' => 'btn btn-primary',
+            'company' => $this->getUser()->getCompany(),
         ]);
         $form->handleRequest($request);
 
@@ -221,11 +227,38 @@ final class ProductController extends AbstractController
 
         }
 
+        // Tarification - Comparatif prix achat/Fournisseur
+        $comparative = new ProductProviderComparative();
+        $createComparativeForm = $this->createForm(ComparativeType::class, $comparative, [
+            'submit_label' => "<i class='ri ri-add-line'></i> Ajouter",
+            'submit_class' => "btn btn-primary",
+            'company' => $product->getCompany(),
+        ]);
+        $createComparativeForm->handleRequest($request);
+
+        if ($createComparativeForm->isSubmitted() && $createComparativeForm->isValid()) {
+
+            if(count($productProviderComparativeRepository->findBy(['product' => $product])) >= 1){
+                $this->addFlash('error', "Un tarif pour ce fournisseur existe déjà !");
+
+                return $this->redirectToRoute('app.dashboard.product.update', ['refInterne' => $product->getRefInterne(), 'tab' => 'prices']);
+            }
+            $comparative->setProduct($product);
+            $comparative->setCompany($this->getUser()->getCompany());
+            $entityManager->persist($comparative);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Tarif fournisseur créé !');
+
+            return $this->redirectToRoute('app.dashboard.product.update', ['refInterne' => $product->getRefInterne(), 'tab' => 'prices']);
+        }
+
         return $this->render('dashboard/product/update.html.twig', [
             'product' => $product,
             'form' => $form->createView(),
             'formCreateUnit' => $formCreateUnit->createView(),
             'formSearchDeposit' => $formSearchDeposit->createView(),
+            'formComparative' => $createComparativeForm->createView(),
             'productUnits' => $paginationUnits,
             'pmp' => number_format($pmp, 2),
             'movements' => $paginationMovements,
